@@ -1,0 +1,6 @@
+.git/
+.ansible/
+.venv/
+
+.vscode/**/*
+!.vscode/extensions.json

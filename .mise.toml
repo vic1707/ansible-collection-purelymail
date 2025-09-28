@@ -1,0 +1,17 @@
+## Will still need
+# pip install -r .config/requirements.txt
+[env]
+_.python.venv = { path = "{{ config_root }}/.venv", create = true }
+ANSIBLE_HOME = "{{ config_root }}/.ansible"
+
+[tools]
+actionlint = "1.7.7"
+python = "3.13.7"
+typos = "1.36.3"
+zizmor = "1.14.1"
+
+[alias]
+zizmor = "asdf:vic1707/asdf-zizmor"
+
+[settings.python]
+compile = false ## Forces download of precompiled bin
