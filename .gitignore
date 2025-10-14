@@ -2,6 +2,7 @@
 .ansible/
 .venv/
 __pycache__/
+.ruff_cache/
 
 .vscode/**/*
 !.vscode/extensions.json
