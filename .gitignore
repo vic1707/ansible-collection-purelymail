@@ -1,6 +1,7 @@
 .git/
 .ansible/
 .venv/
+.ruff_cache/
 
 .vscode/**/*
 !.vscode/extensions.json

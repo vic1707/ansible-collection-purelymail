@@ -28,10 +28,6 @@ jobs:
         with:
           persist-credentials: false
       - uses: jdx/mise-action@e3d7b8d67a7958d1207f6ed871e83b1ea780e7b0 # v3.3.1
-      - name: Install python deps
-        run: |
-          pip install -r .config/requirements.txt
-          echo PATH="${GITHUB_WORKSPACE}/.venv/bin:$PATH" >> "$GITHUB_ENV"
 
       - name: Zizmor
         run: zizmor .
@@ -46,3 +42,9 @@ jobs:
 
       - name: Ansible-lint
         run: ansible-lint -c .config/.ansible-lint.yml 
+
+      - name: ty
+        run: ty check 
+
+      - name: ruff
+        run: ruff check 
