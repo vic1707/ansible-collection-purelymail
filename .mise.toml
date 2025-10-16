@@ -4,12 +4,12 @@ _.python.venv = { path = "{{ config_root }}/.venv", create = true }
 ANSIBLE_HOME = "{{ config_root }}/.ansible"
 
 [tools]
-actionlint = "1.7.7"
+actionlint = "1.7.8"
 jq = "1.8.1"
-python = "3.13.7"
-typos = "1.36.3"
-uv = "0.9.2"
-zizmor = "1.14.1"
+python = "3.13.9"
+typos = "1.38.1"
+uv = "0.9.3"
+zizmor = "1.15.2"
 
 [alias]
 zizmor = "asdf:vic1707/asdf-zizmor"
