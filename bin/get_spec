@@ -3,7 +3,7 @@ set -euo pipefail
 
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 URI="https://news.purelymail.com/api/swagger-spec.js"
-OUT="$SCRIPT_DIR/../spec.json"
+OUT="$SCRIPT_DIR/../spec.jsonc"
 
 get() {
     local url="$1"
@@ -20,5 +20,5 @@ get() {
 get "$URI" \
     | sed -E 's/^window\.swaggerSpec\s*=\s*//' \
     | sed -E 's/;[[:space:]]*$//' \
-    | jq . \
+    | jq --indent 4 . \
         > "$OUT"
