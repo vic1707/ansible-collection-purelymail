@@ -4,6 +4,8 @@ version = "0.0.1"
 dependencies = [
     "ansible>=12.1.0",
     "ansible-lint>=25.9.2",
+    "pydantic>=2.12.3",
+    "requests>=2.32.5",
     "ruff>=0.14.0",
     "ty>=0.0.1a22",
 ]
