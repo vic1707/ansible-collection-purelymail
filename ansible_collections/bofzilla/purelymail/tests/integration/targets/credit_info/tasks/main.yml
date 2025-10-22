@@ -1,0 +1,22 @@
+---
+- name: Import integration_config.yml
+  ansible.builtin.include_vars:
+    # playbook_dir == "<collection_dir>/tests/integration"
+    file: "{{ playbook_dir }}/integration_config.yml"
+
+- name: Get account credit
+  bofzilla.purelymail.credit_info:
+    api_token: "{{ PURELYMAIL_API_TOKEN }}"
+  register: result
+
+- name: dbg
+  ansible.builtin.debug:
+    var: result
+
+- name: Assert module returns credit info
+  ansible.builtin.assert:
+    that:
+      - result is not failed
+      - result.credit is defined
+      - result.credit is number and result.credit is float
+      - result.changed == false
