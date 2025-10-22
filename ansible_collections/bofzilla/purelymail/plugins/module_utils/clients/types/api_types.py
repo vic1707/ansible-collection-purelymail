@@ -3,7 +3,7 @@ from pydantic.dataclasses import dataclass
 from pydantic import ConfigDict, Field
 
 
-@dataclass(config=ConfigDict(extra="forbid"))
+@dataclass(config=ConfigDict(extra="forbid", populate_by_name=True))
 class RoutingRule:
 	prefix: bool
 	catchall: bool

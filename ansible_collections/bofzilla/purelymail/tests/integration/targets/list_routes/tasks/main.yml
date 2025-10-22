@@ -1,0 +1,22 @@
+---
+- name: Import integration_config.yml
+  ansible.builtin.include_vars:
+    # playbook_dir == "<collection_dir>/tests/integration"
+    file: "{{ playbook_dir }}/integration_config.yml"
+
+- name: Get account routing rules
+  bofzilla.purelymail.list_routes:
+    api_token: "{{ PURELYMAIL_API_TOKEN }}"
+  register: result
+
+- name: dbg
+  ansible.builtin.debug:
+    var: result
+
+- name: Assert module returns routing rules
+  ansible.builtin.assert:
+    that:
+      - result is not failed
+      - result.changed == false
+      - result.routes is defined
+      - result.routes | length >= 0
