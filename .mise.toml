@@ -3,6 +3,24 @@ _.path = "{{ env.PATH }}:{{ config_root }}/bin"
 _.python.venv = { path = "{{ config_root }}/.venv", create = true }
 ANSIBLE_HOME = "{{ config_root }}/.ansible"
 
+[tasks.generate-integration-config]
+env = { _.file = ".env" }
+dir = "{{ config_root }}/ansible_collections/bofzilla/purelymail/tests/integration"
+run = '''
+rm -f integration_config.yml
+while read -r line; do
+    eval 'echo "'"$line"'"' >> integration_config.yml
+done < integration_config.yml.tpl
+'''
+
+[tasks.integration-test]
+depends = ["generate-integration-config"]
+dir = "{{ config_root }}/ansible_collections/bofzilla/purelymail"
+run = "ansible-test integration"
+
+[tasks.tests]
+depends = ["integration-test"]
+
 [tools]
 actionlint = "1.7.8"
 jq = "1.8.1"
