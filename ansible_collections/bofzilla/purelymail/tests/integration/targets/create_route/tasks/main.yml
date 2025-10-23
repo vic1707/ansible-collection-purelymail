@@ -1,0 +1,28 @@
+---
+- name: Import integration_config.yml
+  ansible.builtin.include_vars:
+    # playbook_dir == "<collection_dir>/tests/integration"
+    file: "{{ playbook_dir }}/integration_config.yml"
+
+- name: Create a new route
+  bofzilla.purelymail.create_route:
+    api_token: "{{ PURELYMAIL_API_TOKEN }}"
+
+    # Creates a `Any address except valid user address (catchall)`
+    match_user: ""
+    prefix: true
+    catchall: true
+    domain_name: example.com
+    target_addresses:
+      - "admin@example.com"
+  register: result
+
+- name: dbg
+  ansible.builtin.debug:
+    var: result
+
+- name: Assert module returns routing rules
+  ansible.builtin.assert:
+    that:
+      - result is not failed
+      - result.changed == true
