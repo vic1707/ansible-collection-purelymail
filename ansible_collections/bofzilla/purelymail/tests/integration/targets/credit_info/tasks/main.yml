@@ -9,7 +9,7 @@
     api_token: "{{ PURELYMAIL_API_TOKEN }}"
   register: result
 
-- name: dbg
+- name: Debug result
   ansible.builtin.debug:
     var: result
 

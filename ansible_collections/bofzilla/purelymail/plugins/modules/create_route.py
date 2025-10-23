@@ -18,10 +18,10 @@ description:
   - This module connects to Purelymail API and creates a new routing rule
   - This module is idempotent and supports check mode.
   - WebUI match cases:
-      - [Any address] → C(match_user="", prefix=True, catchall=False)
-      - [Any address except valid user address (catchall)] → C(match_user="", prefix=True, catchall=True)
-      - [Any address starting with] → C(match_user="<anything you want>", prefix=True, catchall=False)
-      - [The exact address] → C(match_user="<anything you want>", prefix=False, catchall=False)
+    - (Any address) → C(match_user="", prefix=True, catchall=False)
+    - (Any address except valid user address (catchall)) → C(match_user="", prefix=True, catchall=True)
+    - (Any address starting with) → C(match_user="<anything you want>", prefix=True, catchall=False)
+    - (The exact address) → C(match_user="<anything you want>", prefix=False, catchall=False)
 options:
   api_token:
     description: Purelymail API token
@@ -48,7 +48,7 @@ options:
   catchall:
     description: Whether this is a catchall rule
     type: bool
-	default: false
+    default: false
     required: false
 
 author:
@@ -60,11 +60,11 @@ EXAMPLES = r"""
   bofzilla.purelymail.create_route:
     api_token: "{{ lookup('env','PURELYMAIL_API_TOKEN') }}"
 
-	domain_name: example.com
-	match_user: admin
-	target_addresses: ["example@example.com"]
-	prefix: false
-	catchall: false
+    domain_name: example.com
+    match_user: admin
+    target_addresses: ["example@example.com"]
+    prefix: false
+    catchall: false
 """
 
 RETURN = r""""""
