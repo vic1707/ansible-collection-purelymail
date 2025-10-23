@@ -1,0 +1,21 @@
+---
+- name: Import integration_config.yml
+  ansible.builtin.include_vars:
+    # playbook_dir == "<collection_dir>/tests/integration"
+    file: "{{ playbook_dir }}/integration_config.yml"
+
+- name: Delete a routing rule
+  bofzilla.purelymail.delete_route:
+    api_token: "{{ PURELYMAIL_API_TOKEN }}"
+    routing_rule_id: 45127 # TODO
+  register: result
+
+- name: dbg
+  ansible.builtin.debug:
+    var: result
+
+- name: Assert module return
+  ansible.builtin.assert:
+    that:
+      - result is not failed
+      - result.changed == true
