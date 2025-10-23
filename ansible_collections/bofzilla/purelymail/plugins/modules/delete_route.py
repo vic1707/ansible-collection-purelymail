@@ -16,6 +16,7 @@ module: delete_route
 short_description: Delete a Purelymail account's routing rule
 description:
   - This module connects to Purelymail API and deletes a specified routing rule.
+  - This module is idempotent and supports check mode.
 options:
   api_token:
     description: Purelymail API token
@@ -46,17 +47,31 @@ def main():
 			api_token=dict(type="str", required=True, no_log=True),
 			routing_rule_id=dict(type="int", required=True),
 		),
+		supports_check_mode=True,
 	)
 
 	api = PurelymailAPI(module, module.params["api_token"])
 	client = RoutingClient(api)
 
 	try:
-		# TODO idempotence
-		_ = client.delete_route(DeleteRoutingRequest(module.params["routing_rule_id"]))
+		id = module.params["routing_rule_id"]
+
+		existing_routes = client.list_routes()
+
+		if not any(r.id == id for r in existing_routes.rules):
+			module.exit_json(changed=False)
+
+		if module.check_mode:
+			module.exit_json(changed=True)
+
+		_ = client.delete_route(DeleteRoutingRequest(id))
 		module.exit_json(changed=True)
 	except Exception as e:
-		module.fail_json(msg=str(e))
+		import traceback
+
+		module.fail_json(
+			msg=f"{type(e).__name__}: {e}", exception=traceback.format_exc()
+		)
 
 
 if __name__ == "__main__":

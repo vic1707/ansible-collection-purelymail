@@ -1,4 +1,5 @@
 ---
+## TODO: handle idempotence
 - name: Import integration_config.yml
   ansible.builtin.include_vars:
     # playbook_dir == "<collection_dir>/tests/integration"
