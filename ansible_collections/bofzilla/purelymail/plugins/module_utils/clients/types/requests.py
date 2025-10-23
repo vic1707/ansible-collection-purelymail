@@ -18,6 +18,15 @@ class CreateRoutingRequest(RoutingRule):
 	id: None = Field(default=None, init=False)  # doesn't exist yet
 	catchall: bool = False
 
+	def matches(self, rule: RoutingRule) -> bool:
+		return (
+			self.prefix == rule.prefix
+			and self.catchall == rule.catchall
+			and self.domainName == rule.domainName
+			and self.matchUser == rule.matchUser
+			and self.targetAddresses == rule.targetAddresses
+		)
+
 
 @dataclass(config=ConfigDict(extra="forbid"))
 class DeleteRoutingRequest:

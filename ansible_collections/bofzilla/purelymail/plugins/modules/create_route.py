@@ -16,6 +16,7 @@ module: create_route
 short_description: Create a new routing rule
 description:
   - This module connects to Purelymail API and creates a new routing rule
+  - This module is idempotent and supports check mode.
   - WebUI match cases:
       - [Any address] → C(match_user="", prefix=True, catchall=False)
       - [Any address except valid user address (catchall)] → C(match_user="", prefix=True, catchall=True)
@@ -79,6 +80,7 @@ def main():
 			prefix=dict(type="bool", required=True),
 			catchall=dict(type="bool", required=False, default=False),
 		),
+		supports_check_mode=True,
 	)
 
 	api = PurelymailAPI(module, module.params["api_token"])
@@ -89,7 +91,14 @@ def main():
 		del route_spec["api_token"]
 		route = CreateRoutingRequest(**route_spec)
 
-		# TODO: check mode, idempotence
+		existing_routes = client.list_routes()
+
+		if any(route.matches(r) for r in existing_routes.rules):
+			module.exit_json(changed=False)
+
+		if module.check_mode:
+			module.exit_json(changed=True)
+
 		_ = client.create_route(route)
 		module.exit_json(changed=True)
 	except Exception as e:
