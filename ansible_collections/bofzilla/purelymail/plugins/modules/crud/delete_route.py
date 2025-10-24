@@ -16,7 +16,6 @@ module: delete_route
 short_description: Delete a Purelymail account's routing rule
 description:
   - This module connects to Purelymail API and deletes a specified routing rule.
-  - This module is idempotent and supports check mode.
 options:
   api_token:
     description: Purelymail API token
@@ -27,6 +26,15 @@ options:
     description: Routing rule's id
     required: true
     type: int
+
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
+  idempotent:
+    support: full
+
 author:
   - vic1707
 """

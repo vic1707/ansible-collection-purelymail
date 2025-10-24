@@ -18,6 +18,15 @@ options:
     description: Purelymail API token
     required: true
     type: str
+
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
+  idempotent:
+    support: none
+
 author:
   - vic1707
 """

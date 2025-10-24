@@ -16,7 +16,6 @@ module: create_route
 short_description: Create a new routing rule
 description:
   - This module connects to Purelymail API and creates a new routing rule
-  - This module is idempotent and supports check mode.
   - WebUI match cases:
     - (Any address) → C(match_user="", prefix=True, catchall=False)
     - (Any address except valid user address (catchall)) → C(match_user="", prefix=True, catchall=True)
@@ -50,6 +49,14 @@ options:
     type: bool
     default: false
     required: false
+
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
+  idempotent:
+    support: full
 
 author:
   - vic1707
