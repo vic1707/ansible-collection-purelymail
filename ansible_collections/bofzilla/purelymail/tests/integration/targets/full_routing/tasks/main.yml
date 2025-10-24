@@ -1,0 +1,92 @@
+# NOTE: ansible-test will warn "Unable to determine context" for this multi-module test.
+#       This is expected and safe to ignore.
+---
+- name: Import integration_config.yml
+  ansible.builtin.include_vars:
+    file: "{{ playbook_dir }}/integration_config.yml"
+
+# --- CREATE ---
+
+- name: Create a new test route
+  bofzilla.purelymail.crud.create_route:
+    api_token: "{{ PURELYMAIL_API_TOKEN }}"
+
+    domain_name: "{{ PURELYMAIL_DOMAIN }}"
+    match_user: testintegration
+    target_addresses:
+      - test@{{ PURELYMAIL_DOMAIN }}
+    prefix: false
+    catchall: false
+  register: create_result
+
+- name: Assert create changed state
+  ansible.builtin.assert:
+    that:
+      - create_result is not failed
+      - create_result.changed == true
+
+# --- IDEMPOTENCY ---
+
+- name: Run create again (should not change)
+  bofzilla.purelymail.crud.create_route:
+    api_token: "{{ PURELYMAIL_API_TOKEN }}"
+    domain_name: "{{ PURELYMAIL_DOMAIN }}"
+    match_user: testintegration
+    target_addresses:
+      - test@{{ PURELYMAIL_DOMAIN }}
+    prefix: false
+    catchall: false
+  register: create_again
+
+- name: Assert create is idempotent
+  ansible.builtin.assert:
+    that:
+      - create_again.changed == false
+
+# --- LIST & CAPTURE ID ---
+
+- name: Get all routes
+  bofzilla.purelymail.crud.list_routes:
+    api_token: "{{ PURELYMAIL_API_TOKEN }}"
+  register: list_result
+
+- name: Find our test route ID
+  ansible.builtin.set_fact:
+    test_route_id: >-
+      {{ (list_result.routes
+           | selectattr('domainName', 'equalto', PURELYMAIL_DOMAIN)
+           | selectattr('matchUser', 'equalto', 'testintegration')
+           | map(attribute='id')
+           | list
+         )[0] | default(None) }}
+
+- name: Ensure we found our test route
+  ansible.builtin.assert:
+    that:
+      - test_route_id is not none
+
+# --- DELETE ---
+
+- name: Delete the route
+  bofzilla.purelymail.crud.delete_route:
+    api_token: "{{ PURELYMAIL_API_TOKEN }}"
+    routing_rule_id: "{{ test_route_id }}"
+  register: delete_result
+
+- name: Assert delete changed state
+  ansible.builtin.assert:
+    that:
+      - delete_result.changed == true
+
+# --- DELETE IDEMPOTENCY ---
+
+- name: Delete again (should be idempotent)
+  bofzilla.purelymail.crud.delete_route:
+    api_token: "{{ PURELYMAIL_API_TOKEN }}"
+    routing_rule_id: "{{ test_route_id }}"
+  register: delete_again
+
+- name: Assert delete is idempotent
+  ansible.builtin.assert:
+    that:
+      - delete_again.changed == false
