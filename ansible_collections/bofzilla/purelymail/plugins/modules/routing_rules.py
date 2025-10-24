@@ -6,7 +6,7 @@ from pydantic.dataclasses import dataclass
 
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.base_client import PurelymailAPI
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.routing_client import RoutingClient
-from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.requests import CreateRoutingRequest
+from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.requests import CreateRoutingRequest, DeleteRoutingRequest
 
 DOCUMENTATION = r"""
 module: routing_rules
@@ -21,19 +21,12 @@ description:
     - (Any address starting with) → C(match_user="<anything you want>", prefix=True, catchall=False)
     - (The exact address) → C(match_user="<anything you want>", prefix=False, catchall=False)
   - When using presets, you can provide the preset name in the rule instead of manually setting prefix/catchall/match_user.
-  - Optionally, `only_specified_rules` can be set to true to remove any rules not explicitly defined in the input list.
 
 options:
   api_token:
     description: Purelymail API token
     required: true
     type: str
-
-  only_specified_rules:
-    description: If true, remove any existing rules not specified in `rules`
-    type: bool
-    required: false
-    default: false
 
   rules:
     description: List of routing rules to apply
@@ -103,7 +96,6 @@ RETURN = r""""""
 module_spec = dict(
 	argument_spec=dict(
 		api_token=dict(type="str", required=True, no_log=True),
-		only_specified_rules=dict(type="bool", required=False, default=False),
 		rules=dict(
 			type="list",
 			required=True,
@@ -150,6 +142,15 @@ def main():
 	try:
 		existing_rules = client.list_routes().rules
 		rules = [RuleSpec(**r).into_create_routing_request() for r in module.params["rules"]]
+
+		extra_rules = [er.id for er in existing_rules if not any(r.matches(er) for r in rules)]
+		missing_rules = [r for r in rules if not any(r.matches(er) for er in existing_rules)]
+
+		for id in extra_rules:
+			client.delete_route(DeleteRoutingRequest(id))
+
+		for rule in missing_rules:
+			client.create_route(rule)
 
 		module.exit_json(changed=True)
 	except Exception as e:
