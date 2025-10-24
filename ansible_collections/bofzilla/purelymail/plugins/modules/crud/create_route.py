@@ -108,7 +108,9 @@ def main():
 		_ = client.create_route(route)
 		module.exit_json(changed=True)
 	except Exception as e:
-		module.fail_json(msg=str(e))
+		import traceback
+
+		module.fail_json(f"{type(e).__name__}: {e}", exception=traceback.format_exc())
 
 
 if __name__ == "__main__":

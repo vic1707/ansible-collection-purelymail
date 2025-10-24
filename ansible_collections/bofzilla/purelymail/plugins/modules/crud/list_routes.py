@@ -80,7 +80,9 @@ def main():
 			routes=[r.__dict__ for r in data.rules],
 		)
 	except Exception as e:
-		module.fail_json(msg=str(e))
+		import traceback
+
+		module.fail_json(f"{type(e).__name__}: {e}", exception=traceback.format_exc())
 
 
 if __name__ == "__main__":
