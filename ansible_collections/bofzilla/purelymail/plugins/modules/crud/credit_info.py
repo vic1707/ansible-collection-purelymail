@@ -24,7 +24,7 @@ author:
 
 EXAMPLES = r"""
 - name: Get account credit
-  bofzilla.purelymail.credit_info:
+  bofzilla.purelymail.crud.credit_info:
     api_token: "{{ lookup('env','PURELYMAIL_API_TOKEN') }}"
 """
 

@@ -24,7 +24,7 @@ author:
 
 EXAMPLES = r"""
 - name: Get account routing rules
-  bofzilla.purelymail.list_routes:
+  bofzilla.purelymail.crud.list_routes:
     api_token: "{{ lookup('env','PURELYMAIL_API_TOKEN') }}"
 """
 

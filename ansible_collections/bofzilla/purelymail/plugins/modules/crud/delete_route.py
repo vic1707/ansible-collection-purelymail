@@ -33,7 +33,7 @@ author:
 
 EXAMPLES = r"""
 - name: Get account routing rules
-  bofzilla.purelymail.delete_route:
+  bofzilla.purelymail.crud.delete_route:
     api_token: "{{ lookup('env','PURELYMAIL_API_TOKEN') }}"
     routing_rule_id: 177013
 """

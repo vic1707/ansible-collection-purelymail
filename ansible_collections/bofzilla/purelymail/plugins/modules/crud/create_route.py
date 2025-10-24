@@ -57,7 +57,7 @@ author:
 
 EXAMPLES = r"""
 - name: Create routing rule
-  bofzilla.purelymail.create_route:
+  bofzilla.purelymail.crud.create_route:
     api_token: "{{ lookup('env','PURELYMAIL_API_TOKEN') }}"
 
     domain_name: example.com

@@ -14,6 +14,9 @@ enable_list:
   - no-same-owner # opt-in
   # - only-builtins # opt-in <https://github.com/ansible/ansible-lint/issues/2904>
 
+skip_list:
+  - fqcn[deep] # warns for crud.* modules
+
 exclude_paths:
   - .ansible
   - .config

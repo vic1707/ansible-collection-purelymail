@@ -1,12 +1,21 @@
 ---
+# TODO: idempotency
 - name: Import integration_config.yml
   ansible.builtin.include_vars:
     # playbook_dir == "<collection_dir>/tests/integration"
     file: "{{ playbook_dir }}/integration_config.yml"
 
-- name: Get account routing rules
-  bofzilla.purelymail.list_routes:
+- name: Create a new route
+  bofzilla.purelymail.crud.create_route:
     api_token: "{{ PURELYMAIL_API_TOKEN }}"
+
+    # Creates a `Any address except valid user address (catchall)`
+    match_user: ""
+    prefix: true
+    catchall: true
+    domain_name: example.com
+    target_addresses:
+      - "admin@example.com"
   register: result
 
 - name: Debug result
@@ -17,6 +26,4 @@
   ansible.builtin.assert:
     that:
       - result is not failed
-      - result.changed == false
-      - result.routes is defined
-      - result.routes | length >= 0
+      - result.changed == true
