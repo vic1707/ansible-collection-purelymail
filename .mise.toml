@@ -18,8 +18,12 @@ depends = ["generate-integration-config"]
 dir = "{{ config_root }}/ansible_collections/bofzilla/purelymail"
 run = "ansible-test integration"
 
+[tasks.unit-test]
+dir = "{{ config_root }}/ansible_collections/bofzilla/purelymail"
+run = "ansible-test units"
+
 [tasks.tests]
-depends = ["integration-test"]
+depends = ["unit-test", "integration-test"]
 
 [tools]
 actionlint = "1.7.8"

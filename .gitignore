@@ -5,6 +5,7 @@
 __pycache__/
 .ruff_cache/
 
+ansible_collections/bofzilla/purelymail/collections/
 ansible_collections/bofzilla/purelymail/tests/output/
 ansible_collections/bofzilla/purelymail/tests/integration/inventory
 ansible_collections/bofzilla/purelymail/tests/integration/integration_config.yml
