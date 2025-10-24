@@ -83,7 +83,7 @@ attributes:
   diff_mode:
     support: none
   idempotent:
-    support: none
+    support: full
 
 author:
   - vic1707
@@ -145,6 +145,9 @@ def main():
 
 		extra_rules = [er.id for er in existing_rules if not any(r.matches(er) for r in rules)]
 		missing_rules = [r for r in rules if not any(r.matches(er) for er in existing_rules)]
+
+		if len(extra_rules) == 0 and len(missing_rules) == 0:
+			module.exit_json(changed=False)
 
 		for id in extra_rules:
 			client.delete_route(DeleteRoutingRequest(id))
