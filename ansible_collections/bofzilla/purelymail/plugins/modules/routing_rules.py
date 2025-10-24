@@ -79,7 +79,7 @@ options:
 
 attributes:
   check_mode:
-    support: none
+    support: full
   diff_mode:
     support: none
   idempotent:
@@ -129,7 +129,7 @@ module_spec = dict(
 
 
 def main():
-	module = AnsibleModule(**module_spec)
+	module = AnsibleModule(**module_spec, supports_check_mode=True)
 
 	# Waiting for <https://github.com/ansible/ansible/pull/86074> to remove
 	for idx, rule in enumerate(module.params["rules"]):
@@ -148,6 +148,9 @@ def main():
 
 		if len(extra_rules) == 0 and len(missing_rules) == 0:
 			module.exit_json(changed=False)
+
+		if module.check_mode:
+			module.exit_json(changed=True)
 
 		for id in extra_rules:
 			client.delete_route(DeleteRoutingRequest(id))
