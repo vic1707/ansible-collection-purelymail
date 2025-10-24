@@ -16,7 +16,6 @@ class EmptyRequest:
 @dataclass(config=ConfigDict(extra="forbid"))
 class CreateRoutingRequest(RoutingRule):
 	id: None = Field(default=None, init=False)  # doesn't exist yet
-	catchall: bool = False
 
 	def matches(self, rule: RoutingRule) -> bool:
 		return (

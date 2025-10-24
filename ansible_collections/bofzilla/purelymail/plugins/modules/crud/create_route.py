@@ -47,8 +47,7 @@ options:
   catchall:
     description: Whether this is a catchall rule
     type: bool
-    default: false
-    required: false
+    required: true
 
 attributes:
   check_mode:
@@ -85,7 +84,7 @@ def main():
 			match_user=dict(type="str", required=True),
 			target_addresses=dict(type="list", elements="str", required=True),
 			prefix=dict(type="bool", required=True),
-			catchall=dict(type="bool", required=False, default=False),
+			catchall=dict(type="bool", required=True),
 		),
 		supports_check_mode=True,
 	)
