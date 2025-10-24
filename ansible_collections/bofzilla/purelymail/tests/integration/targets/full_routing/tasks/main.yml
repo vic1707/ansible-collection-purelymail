@@ -18,6 +18,8 @@
     prefix: false
     catchall: false
   register: create_result
+  environment:
+    PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
 
 - name: Assert create changed state
   ansible.builtin.assert:
@@ -37,6 +39,8 @@
     prefix: false
     catchall: false
   register: create_again
+  environment:
+    PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
 
 - name: Assert create is idempotent
   ansible.builtin.assert:
@@ -49,6 +53,8 @@
   bofzilla.purelymail.crud.list_routes:
     api_token: "{{ PURELYMAIL_API_TOKEN }}"
   register: list_result
+  environment:
+    PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
 
 - name: Find our test route ID
   ansible.builtin.set_fact:
@@ -72,6 +78,8 @@
     api_token: "{{ PURELYMAIL_API_TOKEN }}"
     routing_rule_id: "{{ test_route_id }}"
   register: delete_result
+  environment:
+    PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
 
 - name: Assert delete changed state
   ansible.builtin.assert:
@@ -85,6 +93,8 @@
     api_token: "{{ PURELYMAIL_API_TOKEN }}"
     routing_rule_id: "{{ test_route_id }}"
   register: delete_again
+  environment:
+    PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
 
 - name: Assert delete is idempotent
   ansible.builtin.assert:

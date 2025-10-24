@@ -1,5 +1,6 @@
 from ansible.module_utils.basic import AnsibleModule
 from dataclasses import dataclass
+import os
 from typing import Type, TypeVar
 import requests
 
@@ -20,6 +21,9 @@ class PurelymailAPI:
 	api_token: str
 	base_url: str = "https://purelymail.com/api"
 	api_version: str = "v0"
+	TLS_VERIFY = (
+		True if os.environ.get("PURELYMAIL_API_TLS_VERIFY", "true") == "true" else False
+	)
 
 	@property
 	def url(self):
@@ -30,6 +34,7 @@ class PurelymailAPI:
 			f"{self.url}/{endpoint.lstrip('/')}",
 			headers={"Purelymail-Api-Token": self.api_token},
 			json=payload.__dict__,
+			verify=self.TLS_VERIFY,
 		)
 		resp.raise_for_status()
 

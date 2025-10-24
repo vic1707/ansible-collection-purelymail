@@ -8,6 +8,8 @@
   bofzilla.purelymail.crud.credit_info:
     api_token: "{{ PURELYMAIL_API_TOKEN }}"
   register: result
+  environment:
+    PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
 
 - name: Debug result
   ansible.builtin.debug:
