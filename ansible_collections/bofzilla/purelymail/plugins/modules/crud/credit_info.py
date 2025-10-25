@@ -55,9 +55,8 @@ def main():
 
 	try:
 		data = client.account_credit()
-		credit_f = float(data.credit)
 
-		module.exit_json(changed=False, credit=credit_f)
+		module.exit_json(changed=False, credit=data.credit)
 	except Exception as e:
 		import traceback
 

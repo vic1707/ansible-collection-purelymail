@@ -1,4 +1,4 @@
-from pydantic import ConfigDict
+from pydantic import ConfigDict, Json, PositiveFloat
 from pydantic.dataclasses import dataclass
 from typing import List
 
@@ -13,7 +13,7 @@ class EmptyResponse:
 ## Billing
 @dataclass(config=ConfigDict(extra="forbid"))
 class CheckCreditResponse:
-	credit: str
+	credit: Json[PositiveFloat]
 
 
 ## Routing
