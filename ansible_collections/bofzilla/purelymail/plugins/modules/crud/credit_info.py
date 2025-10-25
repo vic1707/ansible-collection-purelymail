@@ -21,11 +21,11 @@ options:
 
 attributes:
   check_mode:
-    support: none
+    support: full
   diff_mode:
     support: none
   idempotent:
-    support: none
+    support: full
 
 author:
   - vic1707
@@ -56,11 +56,8 @@ def main():
 	try:
 		data = client.account_credit()
 		credit_f = float(data.credit)
-		module.exit_json(
-			changed=False,
-			credit=credit_f,
-			msg=f"Current credit is {data.credit}",
-		)
+
+		module.exit_json(changed=False, credit=credit_f)
 	except Exception as e:
 		import traceback
 

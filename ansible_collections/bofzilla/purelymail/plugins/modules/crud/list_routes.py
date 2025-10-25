@@ -21,11 +21,11 @@ options:
 
 attributes:
   check_mode:
-    support: none
+    support: full
   diff_mode:
     support: none
   idempotent:
-    support: none
+    support: full
 
 author:
   - vic1707
@@ -75,10 +75,8 @@ def main():
 
 	try:
 		data = client.list_routes()
-		module.exit_json(
-			changed=False,
-			routes=[r.__dict__ for r in data.rules],
-		)
+
+		module.exit_json(changed=False, routes=[r.__dict__ for r in data.rules])
 	except Exception as e:
 		import traceback
 
