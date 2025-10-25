@@ -21,10 +21,10 @@ class ApiError(Exception):
 		return f"[{self.code}] {self.message}"
 
 
-ApiResponse = Annotated[
+type ApiResponse[T] = Annotated[
 	Union[ApiSuccess[T], ApiError], Field(..., discriminator="type")
 ]
 
 
 def parse_api_response(data: dict) -> Union[ApiSuccess[T], ApiError]:
-	return TypeAdapter(ApiResponse).validate_python(data, extra='forbid')
+	return TypeAdapter(ApiResponse[T]).validate_python(data, extra='forbid')
