@@ -1,12 +1,12 @@
 from pydantic import ConfigDict, Field, TypeAdapter
 from pydantic.dataclasses import dataclass
-from typing import Annotated, Literal, TypeVar, Generic, Union
+from typing import Annotated, Literal, TypeVar, Union
 
 T = TypeVar("T")
 
 
 @dataclass(config=ConfigDict(extra="forbid"))
-class ApiSuccess(Generic[T]):
+class ApiSuccess[T]:
 	type: Literal["success"]
 	result: T
 
