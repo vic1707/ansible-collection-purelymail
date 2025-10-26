@@ -27,4 +27,4 @@ type ApiResponse[T] = Annotated[
 
 
 def parse_api_response(data: dict) -> Union[ApiSuccess[T], ApiError]:
-	return TypeAdapter(ApiResponse[T]).validate_python(data, extra='forbid')
+	return TypeAdapter(ApiResponse[T]).validate_python(data, extra="forbid")

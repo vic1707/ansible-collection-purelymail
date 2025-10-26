@@ -6,9 +6,11 @@ from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.
 	RoutingRule,
 )
 
+
 @dataclass(config=ConfigDict(extra="forbid"))
 class EmptyResponse:
 	pass
+
 
 ## Billing
 @dataclass(config=ConfigDict(extra="forbid"))
