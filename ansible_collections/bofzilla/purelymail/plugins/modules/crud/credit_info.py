@@ -23,7 +23,7 @@ attributes:
   check_mode:
     support: full
   diff_mode:
-    support: none
+    support: full
   idempotent:
     support: full
 
@@ -55,6 +55,14 @@ def main():
 
 	try:
 		data = client.account_credit()
+
+		diff = None
+		if module._diff:
+			res = dict(credit=data.credit)
+			diff = {"before": res, "after": res}
+
+		if module.check_mode or module._diff:
+			module.exit_json(changed=False, diff=diff)
 
 		module.exit_json(changed=False, credit=data.credit)
 	except Exception as e:
