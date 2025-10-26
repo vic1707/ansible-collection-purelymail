@@ -23,7 +23,7 @@ attributes:
   check_mode:
     support: full
   diff_mode:
-    support: none
+    support: full
   idempotent:
     support: full
 
@@ -74,9 +74,16 @@ def main():
 	client = RoutingClient(api)
 
 	try:
-		data = client.list_routes()
+		rules = client.list_routes().as_dict()
 
-		module.exit_json(changed=False, routes=[r.__dict__ for r in data.rules])
+		diff = None
+		if module._diff:
+			diff = {"before": rules, "after": rules}
+
+		if module.check_mode or module._diff:
+			module.exit_json(changed=False, diff=diff)
+
+		module.exit_json(changed=False, routes=rules)
 	except Exception as e:
 		import traceback
 

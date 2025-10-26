@@ -1,3 +1,5 @@
+from typing import Any
+
 from pydantic import ConfigDict, Json, PositiveFloat
 from pydantic.dataclasses import dataclass
 
@@ -21,3 +23,6 @@ class CheckCreditResponse:
 @dataclass(config=ConfigDict(extra="forbid"))
 class ListRoutingResponse:
 	rules: list[RoutingRule]
+
+	def as_dict(self) -> list[dict[str, Any]]:
+		return [r.__dict__ for r in self.rules]
