@@ -104,9 +104,7 @@ def main():
 		if module._diff:
 			result["diff"] = {
 				"before": existing_routes.as_dict_no_ids(),
-				"after": existing_routes.with_added(route).as_dict_no_ids()
-				if result["changed"]
-				else existing_routes.as_dict_no_ids(),
+				"after": existing_routes.with_added(route).as_dict_no_ids() if result["changed"] else existing_routes.as_dict_no_ids(),
 			}
 
 		if result["changed"] and not module.check_mode:

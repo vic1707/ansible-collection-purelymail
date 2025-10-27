@@ -16,24 +16,9 @@ from ansible_collections.bofzilla.purelymail.tests.unit.plugins.mock_utils impor
 )
 
 EXISTING_RULES = [
-	RoutingRule(
-		id=1,
-		matchUser="toto",
-		prefix=True,
-		catchall=False,
-		domainName="example.com",
-		targetAddresses=["admin@example.com"],
-	),
-	RoutingRule(
-		id=2,
-		matchUser="admin",
-		prefix=True,
-		catchall=False,
-		domainName="example.com",
-		targetAddresses=["support@example.com"],
-	),
+	RoutingRule(id=1, matchUser="toto", prefix=True, catchall=False, domainName="example.com", targetAddresses=["admin@example.com"]),
+	RoutingRule(id=2, matchUser="admin", prefix=True, catchall=False, domainName="example.com", targetAddresses=["support@example.com"]),
 ]
-MOCKED_RESPONSE = ListRoutingResponse(EXISTING_RULES)
 
 
 def run(
@@ -51,7 +36,7 @@ def run(
 	module.check_mode = check_mode
 	module.params = {"api_token": "dQw4w9WgXcQ", "routing_rule_id": id}
 
-	routing_client.list_routes.return_value = MOCKED_RESPONSE
+	routing_client.list_routes.return_value = ListRoutingResponse(EXISTING_RULES)
 
 	with pytest.raises(AnsibleExitJson) as excinfo:
 		delete_route.main()
@@ -71,8 +56,8 @@ def test_diff_mode_successful_delete(monkeypatch: pytest.MonkeyPatch):
 			],
 			"after": [
 				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"], "id": 2}
-			]
-		}
+			],
+		},
 	}
 
 

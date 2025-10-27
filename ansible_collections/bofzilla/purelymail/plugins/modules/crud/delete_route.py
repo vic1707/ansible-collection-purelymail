@@ -70,9 +70,7 @@ def main():
 		if module._diff:
 			result["diff"] = {
 				"before": existing_routes.as_dict(),
-				"after": existing_routes.filter(lambda r: r.id != id).as_dict()
-				if result["changed"]
-				else existing_routes.as_dict(),
+				"after": existing_routes.filter(lambda r: r.id != id).as_dict() if result["changed"] else existing_routes.as_dict(),
 			}
 
 		if result["changed"] and not module.check_mode:

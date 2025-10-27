@@ -15,26 +15,10 @@ from ansible_collections.bofzilla.purelymail.tests.unit.plugins.mock_utils impor
 	bootstrap_module,
 )
 
-EXISTING_RULES = ListRoutingResponse(
-	[
-		RoutingRule(
-			id=1,
-			matchUser="toto",
-			prefix=True,
-			catchall=False,
-			domainName="example.com",
-			targetAddresses=["admin@example.com"],
-		),
-		RoutingRule(
-			id=2,
-			matchUser="admin",
-			prefix=True,
-			catchall=False,
-			domainName="example.com",
-			targetAddresses=["support@example.com"],
-		),
-	]
-)
+EXISTING_RULES = [
+	RoutingRule(id=1, matchUser="toto", prefix=True, catchall=False, domainName="example.com", targetAddresses=["admin@example.com"]),
+	RoutingRule(id=2, matchUser="admin", prefix=True, catchall=False, domainName="example.com", targetAddresses=["support@example.com"]),
+]
 
 
 def run(
@@ -51,7 +35,7 @@ def run(
 	module.check_mode = check_mode
 	module.params = {"api_token": "dQw4w9WgXcQ"}
 
-	routing_client.list_routes.return_value = EXISTING_RULES
+	routing_client.list_routes.return_value = ListRoutingResponse(EXISTING_RULES)
 
 	with pytest.raises(AnsibleExitJson) as excinfo:
 		list_routes.main()
@@ -75,9 +59,9 @@ def test_diff(monkeypatch: pytest.MonkeyPatch):
 			"after": [
 				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"], "id": 1},
 				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"], "id": 2},
-			]
-		}
-	} 
+			],
+		},
+	}
 
 
 def test_check(monkeypatch: pytest.MonkeyPatch):
@@ -93,15 +77,21 @@ def test_check_and_diff(monkeypatch: pytest.MonkeyPatch):
 			"before": [
 				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"], "id": 1},
 				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"], "id": 2},
-			], 
+			],
 			"after": [
 				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"], "id": 1},
 				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"], "id": 2},
-			]
+			],
 		},
 	}
 
 
 def test_normal(monkeypatch: pytest.MonkeyPatch):
 	data, _ = run(monkeypatch)
-	assert data == {"changed": False, "routes": EXISTING_RULES.as_dict()}
+	assert data == {
+		"changed": False,
+		"routes": [
+			{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"], "id": 1},
+			{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"], "id": 2},
+		],
+	}

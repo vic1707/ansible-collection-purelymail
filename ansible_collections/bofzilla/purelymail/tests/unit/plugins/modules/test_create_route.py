@@ -16,22 +16,8 @@ from ansible_collections.bofzilla.purelymail.tests.unit.plugins.mock_utils impor
 )
 
 EXISTING_RULES = [
-	RoutingRule(
-		id=1,
-		matchUser="toto",
-		prefix=True,
-		catchall=False,
-		domainName="example.com",
-		targetAddresses=["admin@example.com"],
-	),
-	RoutingRule(
-		id=2,
-		matchUser="admin",
-		prefix=True,
-		catchall=False,
-		domainName="example.com",
-		targetAddresses=["support@example.com"],
-	),
+	RoutingRule(id=1, matchUser="toto", prefix=True, catchall=False, domainName="example.com", targetAddresses=["admin@example.com"]),
+	RoutingRule(id=2, matchUser="admin", prefix=True, catchall=False, domainName="example.com", targetAddresses=["support@example.com"]),
 ]
 NEW_RULE = RoutingRule(
 	id=69,  # never used
@@ -41,7 +27,6 @@ NEW_RULE = RoutingRule(
 	domainName="example.com",
 	targetAddresses=["support@example.com"],
 )
-MOCKED_RESPONSE = ListRoutingResponse(EXISTING_RULES)
 
 
 def run(
@@ -66,7 +51,7 @@ def run(
 		"catchall": rule_to_create.catchall,
 	}
 
-	routing_client.list_routes.return_value = MOCKED_RESPONSE
+	routing_client.list_routes.return_value = ListRoutingResponse(EXISTING_RULES)
 
 	with pytest.raises(AnsibleExitJson) as excinfo:
 		create_route.main()
@@ -81,13 +66,13 @@ def test_diff_mode_successful_create(monkeypatch: pytest.MonkeyPatch):
 		"changed": True,
 		"diff": {
 			"before": [
-				{ "prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"] },
-				{ "prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"] },
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
 			],
 			"after": [
-				{ "prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"] },
-				{ "prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"] },
-				{ "prefix": True, "catchall": True, "domainName": "example.com", "matchUser": "", "targetAddresses": ["support@example.com"] },
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+				{"prefix": True, "catchall": True, "domainName": "example.com", "matchUser": "", "targetAddresses": ["support@example.com"]},
 			],
 		},
 	}
@@ -100,12 +85,12 @@ def test_diff_mode_nothing_to_create(monkeypatch: pytest.MonkeyPatch):
 		"changed": False,
 		"diff": {
 			"before": [
-				{ "prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"] },
-				{ "prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"] },
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
 			],
 			"after": [
-				{ "prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"] },
-				{ "prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"] },
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
 			],
 		},
 	}
@@ -135,13 +120,13 @@ def test_diff_and_check_modes(monkeypatch: pytest.MonkeyPatch):
 		"changed": True,
 		"diff": {
 			"before": [
-				{ "prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"] },
-				{ "prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"] },
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
 			],
 			"after": [
-				{ "prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"] },
-				{ "prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"] },
-				{ "prefix": True, "catchall": True, "domainName": "example.com", "matchUser": "", "targetAddresses": ["support@example.com"] },
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+				{"prefix": True, "catchall": True, "domainName": "example.com", "matchUser": "", "targetAddresses": ["support@example.com"]},
 			],
 		},
 	}
@@ -154,12 +139,12 @@ def test_diff_and_check_modes_nothing_to_create(monkeypatch: pytest.MonkeyPatch)
 		"changed": False,
 		"diff": {
 			"before": [
-				{ "prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"] },
-				{ "prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"] },
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
 			],
 			"after": [
-				{ "prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"] },
-				{ "prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"] },
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
 			],
 		},
 	}

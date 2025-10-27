@@ -22,9 +22,7 @@ class ApiError(Exception):
 		return f"[{self.code}] {self.message}"
 
 
-type ApiResponse[T] = Annotated[
-	ApiSuccess[T] | ApiError, Field(..., discriminator="type")
-]
+type ApiResponse[T] = Annotated[ApiSuccess[T] | ApiError, Field(..., discriminator="type")]
 
 
 def parse_api_response(data: dict) -> ApiSuccess[T] | ApiError:
