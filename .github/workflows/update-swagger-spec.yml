@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write # Needs to commit
-      pull-requests: write # Opens a PR on change
+      pull-requests: write # Opens a PR on change & comment
 
     steps:
       - name: Harden the runner (Audit all outbound calls)
@@ -41,14 +41,25 @@ jobs:
         run: get_spec
 
       - name: Create Pull Request
+        if: github.event_name != 'pull_request'
         uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
         with:
           commit-message: "chore: update swagger spec"
           title: "chore: update Swagger spec"
           body: |
-            The Swagger spec has changed.
+            ### 🚨 The Swagger spec has changed. 🚨
 
-            Please review the updates to `spec.json`.
+            Please review the updates to `spec.json` and update collection accordingly.
           branch: update-swagger-spec
           base: main
           delete-branch: true
+
+      - name: Post a reminder comment
+        if: github.event_name == 'pull_request'
+        uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b # v3.0.1
+        with:
+          message: |
+            ### 🚨 **Reminder:** Your purelymail API spec isn't up-to-date. 🚨
+
+            Please run the `bin/get_spec` script and commit the updated spec.
+            Don't forget to update your code to reflect this API update!
