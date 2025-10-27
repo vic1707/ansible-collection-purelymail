@@ -43,10 +43,13 @@ jobs:
         run: typos -c .config/.typos.toml
 
       - name: Ansible-lint
-        run: ansible-lint -c .config/.ansible-lint.yml 
+        run: ansible-lint -c .config/.ansible-lint.yml
 
       - name: ty
-        run: ty check 
+        run: ty check
 
-      - name: ruff
-        run: ruff check 
+      - name: ruff (lint)
+        run: ruff check
+
+      - name: ruff (format)
+        run: ruff format --check
