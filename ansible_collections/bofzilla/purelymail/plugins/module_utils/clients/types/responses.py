@@ -26,3 +26,6 @@ class ListRoutingResponse:
 
 	def as_dict(self) -> list[dict[str, Any]]:
 		return [r.__dict__ for r in self.rules]
+
+	def filter(self, predicate):
+		return ListRoutingResponse([r for r in self.rules if predicate(r)])
