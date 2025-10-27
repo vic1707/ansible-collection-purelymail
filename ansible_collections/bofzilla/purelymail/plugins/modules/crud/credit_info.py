@@ -56,15 +56,18 @@ def main():
 	try:
 		data = client.account_credit()
 
-		diff = None
+		res = {"changed": False}
+
 		if module._diff:
-			res = dict(credit=data.credit)
-			diff = {"before": res, "after": res}
+			res["diff"] = {
+				"before": {"credit": data.credit},
+				"after": {"credit": data.credit},
+			}
 
-		if module.check_mode or module._diff:
-			module.exit_json(changed=False, diff=diff)
+		if not module.check_mode:
+			res['credit'] = data.credit
 
-		module.exit_json(changed=False, credit=data.credit)
+		module.exit_json(**res)
 	except Exception as e:
 		import traceback
 

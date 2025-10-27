@@ -39,13 +39,14 @@ def test_diff(monkeypatch: pytest.MonkeyPatch):
 	data, _ = run(monkeypatch, diff=True)
 	assert data == {
 		"changed": False,
+		"credit": 12.34,
 		"diff": {"before": {"credit": 12.34}, "after": {"credit": 12.34}},
 	}
 
 
 def test_check(monkeypatch: pytest.MonkeyPatch):
 	data, _ = run(monkeypatch, check_mode=True)
-	assert data == {"changed": False, "diff": None}
+	assert data == {"changed": False}
 
 
 def test_check_and_diff(monkeypatch: pytest.MonkeyPatch):

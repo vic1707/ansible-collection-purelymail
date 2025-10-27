@@ -76,14 +76,15 @@ def main():
 	try:
 		rules = client.list_routes().as_dict()
 
-		diff = None
+		res = {"changed": False}
+
 		if module._diff:
-			diff = {"before": rules, "after": rules}
+			res["diff"] = {"before": rules, "after": rules}
 
-		if module.check_mode or module._diff:
-			module.exit_json(changed=False, diff=diff)
+		if not module.check_mode:
+			res["routes"] = rules
 
-		module.exit_json(changed=False, routes=rules)
+		module.exit_json(**res)
 	except Exception as e:
 		import traceback
 

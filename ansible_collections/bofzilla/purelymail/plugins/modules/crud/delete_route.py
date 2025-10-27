@@ -63,23 +63,22 @@ def main():
 
 	try:
 		id = module.params["routing_rule_id"]
-
 		existing_routes = client.list_routes()
-		rule_exists = any(r.id == id for r in existing_routes.rules)
 
-		diff = None
+		result = {"changed": any(r.id == id for r in existing_routes.rules)}
+
 		if module._diff:
-			diff = {
+			result["diff"] = {
 				"before": existing_routes.as_dict(),
 				"after": existing_routes.filter(lambda r: r.id != id).as_dict()
-				if rule_exists
+				if result["changed"]
 				else existing_routes.as_dict(),
 			}
 
-		if rule_exists and not module.check_mode:
+		if result["changed"] and not module.check_mode:
 			_ = client.delete_route(DeleteRoutingRequest(id))
 
-		module.exit_json(changed=rule_exists, diff=diff)
+		module.exit_json(**result)
 	except Exception as e:
 		import traceback
 

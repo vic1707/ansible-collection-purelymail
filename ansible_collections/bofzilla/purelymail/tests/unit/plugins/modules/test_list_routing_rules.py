@@ -15,7 +15,7 @@ from ansible_collections.bofzilla.purelymail.tests.unit.plugins.mock_utils impor
 	bootstrap_module,
 )
 
-MOCKED_RULES: ListRoutingResponse = ListRoutingResponse(
+EXISTING_RULES = ListRoutingResponse(
 	[
 		RoutingRule(
 			id=1,
@@ -51,7 +51,7 @@ def run(
 	module.check_mode = check_mode
 	module.params = {"api_token": "dQw4w9WgXcQ"}
 
-	routing_client.list_routes.return_value = MOCKED_RULES
+	routing_client.list_routes.return_value = EXISTING_RULES
 
 	with pytest.raises(AnsibleExitJson) as excinfo:
 		list_routes.main()
@@ -63,23 +63,24 @@ def test_diff(monkeypatch: pytest.MonkeyPatch):
 	data, _ = run(monkeypatch, diff=True)
 	assert data == {
 		"changed": False,
-		"diff": {"before": MOCKED_RULES.as_dict(), "after": MOCKED_RULES.as_dict()},
+		"routes": EXISTING_RULES.as_dict(),
+		"diff": {"before": EXISTING_RULES.as_dict(), "after": EXISTING_RULES.as_dict()},
 	}
 
 
 def test_check(monkeypatch: pytest.MonkeyPatch):
 	data, _ = run(monkeypatch, check_mode=True)
-	assert data == {"changed": False, "diff": None}
+	assert data == {"changed": False}
 
 
 def test_check_and_diff(monkeypatch: pytest.MonkeyPatch):
 	data, _ = run(monkeypatch, check_mode=True, diff=True)
 	assert data == {
 		"changed": False,
-		"diff": {"before": MOCKED_RULES.as_dict(), "after": MOCKED_RULES.as_dict()},
+		"diff": {"before": EXISTING_RULES.as_dict(), "after": EXISTING_RULES.as_dict()},
 	}
 
 
 def test_normal(monkeypatch: pytest.MonkeyPatch):
 	data, _ = run(monkeypatch)
-	assert data == {"changed": False, "routes": MOCKED_RULES.as_dict()}
+	assert data == {"changed": False, "routes": EXISTING_RULES.as_dict()}
