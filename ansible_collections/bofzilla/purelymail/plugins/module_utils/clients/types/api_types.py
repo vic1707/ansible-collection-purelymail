@@ -1,3 +1,5 @@
+from typing import Any
+
 from pydantic import ConfigDict, Field
 from pydantic.dataclasses import dataclass
 
@@ -10,3 +12,8 @@ class RoutingRule:
 	matchUser: str = Field(..., alias="match_user")
 	targetAddresses: list[str] = Field(..., alias="target_addresses")
 	id: int = Field(..., gt=0)
+
+	def as_dict_no_id(self) -> dict[str, Any]:
+		dict = self.__dict__
+		dict.pop("id", None)
+		return dict

@@ -99,14 +99,20 @@ def main():
 
 		existing_routes = client.list_routes()
 
-		if any(route.matches(r) for r in existing_routes.rules):
-			module.exit_json(changed=False)
+		result = {"changed": not any(route.matches(r) for r in existing_routes.rules)}
 
-		if module.check_mode:
-			module.exit_json(changed=True)
+		if module._diff:
+			result["diff"] = {
+				"before": existing_routes.as_dict_no_ids(),
+				"after": existing_routes.with_added(route).as_dict_no_ids()
+				if result["changed"]
+				else existing_routes.as_dict_no_ids(),
+			}
 
-		_ = client.create_route(route)
-		module.exit_json(changed=True)
+		if result["changed"] and not module.check_mode:
+			_ = client.create_route(route)
+
+		module.exit_json(**result)
 	except Exception as e:
 		import traceback
 
