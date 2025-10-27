@@ -63,9 +63,21 @@ def test_diff(monkeypatch: pytest.MonkeyPatch):
 	data, _ = run(monkeypatch, diff=True)
 	assert data == {
 		"changed": False,
-		"routes": EXISTING_RULES.as_dict(),
-		"diff": {"before": EXISTING_RULES.as_dict(), "after": EXISTING_RULES.as_dict()},
-	}
+		"routes": [
+			{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"], "id": 1},
+			{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"], "id": 2},
+		],
+		"diff": {
+			"before": [
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"], "id": 1},
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"], "id": 2},
+			],
+			"after": [
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"], "id": 1},
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"], "id": 2},
+			]
+		}
+	} 
 
 
 def test_check(monkeypatch: pytest.MonkeyPatch):
@@ -77,7 +89,16 @@ def test_check_and_diff(monkeypatch: pytest.MonkeyPatch):
 	data, _ = run(monkeypatch, check_mode=True, diff=True)
 	assert data == {
 		"changed": False,
-		"diff": {"before": EXISTING_RULES.as_dict(), "after": EXISTING_RULES.as_dict()},
+		"diff": {
+			"before": [
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"], "id": 1},
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"], "id": 2},
+			], 
+			"after": [
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"], "id": 1},
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"], "id": 2},
+			]
+		},
 	}
 
 

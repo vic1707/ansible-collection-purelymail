@@ -65,9 +65,14 @@ def test_diff_mode_successful_delete(monkeypatch: pytest.MonkeyPatch):
 	assert data == {
 		"changed": True,
 		"diff": {
-			"before": MOCKED_RESPONSE.as_dict(),
-			"after": ListRoutingResponse([EXISTING_RULES[1]]).as_dict(),
-		},
+			"before": [
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"], "id": 1},
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"], "id": 2},
+			],
+			"after": [
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"], "id": 2}
+			]
+		}
 	}
 
 
@@ -77,8 +82,14 @@ def test_diff_mode_nothing_to_delete(monkeypatch: pytest.MonkeyPatch):
 	assert data == {
 		"changed": False,
 		"diff": {
-			"before": MOCKED_RESPONSE.as_dict(),
-			"after": MOCKED_RESPONSE.as_dict(),
+			"before": [
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"], "id": 1},
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"], "id": 2},
+			],
+			"after": [
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"], "id": 1},
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"], "id": 2},
+			],
 		},
 	}
 
@@ -101,8 +112,13 @@ def test_diff_and_check_modes(monkeypatch: pytest.MonkeyPatch):
 	assert data == {
 		"changed": True,
 		"diff": {
-			"before": MOCKED_RESPONSE.as_dict(),
-			"after": ListRoutingResponse([EXISTING_RULES[1]]).as_dict(),
+			"before": [
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"], "id": 1},
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"], "id": 2},
+			],
+			"after": [
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"], "id": 2},
+			],
 		},
 	}
 
@@ -113,8 +129,14 @@ def test_diff_and_check_modes_nothing_to_delete(monkeypatch: pytest.MonkeyPatch)
 	assert data == {
 		"changed": False,
 		"diff": {
-			"before": MOCKED_RESPONSE.as_dict(),
-			"after": MOCKED_RESPONSE.as_dict(),
+			"before": [
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"], "id": 1},
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"], "id": 2},
+			],
+			"after": [
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"], "id": 1},
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"], "id": 2},
+			],
 		},
 	}
 

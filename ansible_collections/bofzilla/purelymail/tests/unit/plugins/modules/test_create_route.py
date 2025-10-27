@@ -80,8 +80,15 @@ def test_diff_mode_successful_create(monkeypatch: pytest.MonkeyPatch):
 	assert data == {
 		"changed": True,
 		"diff": {
-			"before": MOCKED_RESPONSE.as_dict_no_ids(),
-			"after": MOCKED_RESPONSE.with_added(NEW_RULE).as_dict_no_ids(),
+			"before": [
+				{ "prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"] },
+				{ "prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"] },
+			],
+			"after": [
+				{ "prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"] },
+				{ "prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"] },
+				{ "prefix": True, "catchall": True, "domainName": "example.com", "matchUser": "", "targetAddresses": ["support@example.com"] },
+			],
 		},
 	}
 
@@ -92,8 +99,14 @@ def test_diff_mode_nothing_to_create(monkeypatch: pytest.MonkeyPatch):
 	assert data == {
 		"changed": False,
 		"diff": {
-			"before": MOCKED_RESPONSE.as_dict_no_ids(),
-			"after": MOCKED_RESPONSE.as_dict_no_ids(),
+			"before": [
+				{ "prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"] },
+				{ "prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"] },
+			],
+			"after": [
+				{ "prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"] },
+				{ "prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"] },
+			],
 		},
 	}
 
@@ -121,8 +134,15 @@ def test_diff_and_check_modes(monkeypatch: pytest.MonkeyPatch):
 	assert data == {
 		"changed": True,
 		"diff": {
-			"before": MOCKED_RESPONSE.as_dict_no_ids(),
-			"after": MOCKED_RESPONSE.with_added(NEW_RULE).as_dict_no_ids(),
+			"before": [
+				{ "prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"] },
+				{ "prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"] },
+			],
+			"after": [
+				{ "prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"] },
+				{ "prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"] },
+				{ "prefix": True, "catchall": True, "domainName": "example.com", "matchUser": "", "targetAddresses": ["support@example.com"] },
+			],
 		},
 	}
 
@@ -133,8 +153,14 @@ def test_diff_and_check_modes_nothing_to_create(monkeypatch: pytest.MonkeyPatch)
 	assert data == {
 		"changed": False,
 		"diff": {
-			"before": MOCKED_RESPONSE.as_dict_no_ids(),
-			"after": MOCKED_RESPONSE.as_dict_no_ids(),
+			"before": [
+				{ "prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"] },
+				{ "prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"] },
+			],
+			"after": [
+				{ "prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"] },
+				{ "prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"] },
+			],
 		},
 	}
 

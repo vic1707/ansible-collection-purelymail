@@ -65,7 +65,7 @@ def main():
 			}
 
 		if not module.check_mode:
-			res['credit'] = data.credit
+			res["credit"] = data.credit
 
 		module.exit_json(**res)
 	except Exception as e:
