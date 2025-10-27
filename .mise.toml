@@ -13,17 +13,17 @@ while read -r line; do
 done < integration_config.yml.tpl
 '''
 
-[tasks.integration-test]
+[tasks.integration-tests]
 depends = ["generate-integration-config"]
 dir = "{{ config_root }}/ansible_collections/bofzilla/purelymail"
 run = "ansible-test integration"
 
-[tasks.unit-test]
+[tasks.unit-tests]
 dir = "{{ config_root }}/ansible_collections/bofzilla/purelymail"
 run = "ansible-test units"
 
 [tasks.tests]
-depends = ["unit-test", "integration-test"]
+depends = ["unit-tests", "integration-tests"]
 
 [tools]
 actionlint = "1.7.8"
