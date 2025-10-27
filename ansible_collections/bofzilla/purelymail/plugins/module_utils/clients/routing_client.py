@@ -4,9 +4,9 @@ from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.base_c
 	PurelymailAPI,
 )
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.requests import (
-	EmptyRequest,
-	DeleteRoutingRequest,
 	CreateRoutingRequest,
+	DeleteRoutingRequest,
+	EmptyRequest,
 )
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.responses import (
 	EmptyResponse,
@@ -18,7 +18,7 @@ from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.
 class RoutingClient:
 	api: PurelymailAPI
 
-	def list_routes(self, req: EmptyRequest = EmptyRequest()) -> ListRoutingResponse:
+	def list_routes(self, req: EmptyRequest = EmptyRequest()) -> ListRoutingResponse:  # noqa: B008
 		return self.api.post("/listRoutingRules", req, ListRoutingResponse)
 
 	def delete_route(self, req: DeleteRoutingRequest) -> EmptyResponse:

@@ -1,6 +1,7 @@
+from typing import Annotated, Literal, TypeVar
+
 from pydantic import ConfigDict, Field, TypeAdapter
 from pydantic.dataclasses import dataclass
-from typing import Annotated, Literal, TypeVar, Union
 
 T = TypeVar("T")
 
@@ -22,9 +23,9 @@ class ApiError(Exception):
 
 
 type ApiResponse[T] = Annotated[
-	Union[ApiSuccess[T], ApiError], Field(..., discriminator="type")
+	ApiSuccess[T] | ApiError, Field(..., discriminator="type")
 ]
 
 
-def parse_api_response(data: dict) -> Union[ApiSuccess[T], ApiError]:
+def parse_api_response(data: dict) -> ApiSuccess[T] | ApiError:
 	return TypeAdapter(ApiResponse[T]).validate_python(data, extra="forbid")
