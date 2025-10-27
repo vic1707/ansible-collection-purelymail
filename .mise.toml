@@ -38,3 +38,6 @@ zizmor = "asdf:vic1707/asdf-zizmor"
 
 [settings.python]
 compile = false     ## Forces download of precompiled bin
+
+[settings]
+experimental = true # needed for uv venv
