@@ -31,7 +31,7 @@ attributes:
   check_mode:
     support: full
   diff_mode:
-    support: none
+    support: full
   idempotent:
     support: full
 
@@ -63,17 +63,20 @@ def main():
 
 	try:
 		id = module.params["routing_rule_id"]
-
 		existing_routes = client.list_routes()
 
-		if not any(r.id == id for r in existing_routes.rules):
-			module.exit_json(changed=False)
+		result = {"changed": any(r.id == id for r in existing_routes.rules)}
 
-		if module.check_mode:
-			module.exit_json(changed=True)
+		if module._diff:
+			result["diff"] = {
+				"before": existing_routes.as_dict(),
+				"after": existing_routes.filter(lambda r: r.id != id).as_dict() if result["changed"] else existing_routes.as_dict(),
+			}
 
-		_ = client.delete_route(DeleteRoutingRequest(id))
-		module.exit_json(changed=True)
+		if result["changed"] and not module.check_mode:
+			_ = client.delete_route(DeleteRoutingRequest(id))
+
+		module.exit_json(**result)
 	except Exception as e:
 		import traceback
 
