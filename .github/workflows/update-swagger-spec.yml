@@ -61,15 +61,24 @@ jobs:
           base: main
           delete-branch: true
 
-      - name: Post a reminder comment
+      - name: Post or update reminder comment
         if: github.event_name == 'pull_request' && steps.git-diff.outputs.changed == 'true'
         uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b # v3.0.1
         with:
+          comment-tag: purelymail-spec-check
+          mode: upsert
           message: |
-            ### 🚨 **Reminder:** Your purelymail API spec isn't up-to-date. 🚨
+            ### 🚨 **Reminder:** Your Purelymail API spec isn't up-to-date. 🚨
 
             Please run the `bin/get_spec` script and commit the updated spec.
             Don't forget to update your code to reflect this API update!
+
+      - name: Delete reminder comment when fixed
+        if: github.event_name == 'pull_request' && steps.git-diff.outputs.changed == 'false'
+        uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b
+        with:
+          comment-tag: purelymail-spec-check
+          mode: delete
 
       - name: Fail if reminder was posted
         if: github.event_name == 'pull_request' && steps.git-diff.outputs.changed == 'true'
