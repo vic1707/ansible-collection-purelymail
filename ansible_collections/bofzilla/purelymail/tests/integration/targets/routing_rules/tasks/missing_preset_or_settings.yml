@@ -1,10 +1,10 @@
 # Waiting for <https://github.com/ansible/ansible/pull/86074>
 ---
-- name: Import integration_config.yml
+- name: missing_preset_or_settings |  Import integration_config.yml
   ansible.builtin.include_vars:
     file: "{{ playbook_dir }}/integration_config.yml"
 
-- name: Routing rules management (should fail)
+- name: missing_preset_or_settings | Routing rules management (should fail)
   bofzilla.purelymail.routing_rules:
     api_token: "{{ PURELYMAIL_API_TOKEN }}"
 
@@ -17,11 +17,11 @@
   register: result
   ignore_errors: true
 
-- name: Debug result
+- name: missing_preset_or_settings | Debug result
   ansible.builtin.debug:
     var: result
 
-- name: Assert that the module failed and that the state is correct
+- name: missing_preset_or_settings | Assert that the module failed and that the state is correct
   ansible.builtin.assert:
     that:
       - result.failed is true
