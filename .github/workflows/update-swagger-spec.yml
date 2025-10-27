@@ -21,8 +21,8 @@ jobs:
     name: update swagger spec
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Needs to commit
-      pull-requests: write # Opens a PR on change & comment
+      contents: write # Needed for commit/PR
+      pull-requests: write # Needed for commenting
 
     steps:
       - name: Harden the runner (Audit all outbound calls)
@@ -37,6 +37,15 @@ jobs:
 
       - name: Run spec fetch script
         run: get_spec
+
+      - name: Check for changes
+        id: git-diff
+        run: |
+          if [[ -n "$(git status --porcelain)" ]]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Create Pull Request
         if: github.event_name != 'pull_request'
@@ -53,7 +62,7 @@ jobs:
           delete-branch: true
 
       - name: Post a reminder comment
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && steps.git-diff.outputs.changed == 'true'
         uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b # v3.0.1
         with:
           message: |
@@ -61,3 +70,9 @@ jobs:
 
             Please run the `bin/get_spec` script and commit the updated spec.
             Don't forget to update your code to reflect this API update!
+
+      - name: Fail if reminder was posted
+        if: github.event_name == 'pull_request' && steps.git-diff.outputs.changed == 'true'
+        run: |
+          echo "::error::❌ Spec is out of date. Please update it using bin/get_spec."
+          exit 1
