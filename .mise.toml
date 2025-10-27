@@ -30,7 +30,6 @@ actionlint = "1.7.8"
 jq = "1.8.1"
 python = "3.13.9"
 typos = "1.38.1"
-uv = "0.9.3"
 zizmor = "1.15.2"
 
 [alias]
@@ -38,7 +37,3 @@ zizmor = "asdf:vic1707/asdf-zizmor"
 
 [settings.python]
 compile = false     ## Forces download of precompiled bin
-uv_venv_auto = true
-
-[settings]
-experimental = true # needed for uv venv
