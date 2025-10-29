@@ -148,28 +148,33 @@ def main():
 	client = RoutingClient(api)
 
 	try:
-		existing_rules = client.list_routes().rules
+		existing_rules = client.list_routing_rules()
 		rules = [RuleSpec(**r).into_create_routing_request() for r in module.params["rules"]]
 
-		extra_rules = [er.id for er in existing_rules if not any(r.matches(er) for r in rules)]
-		missing_rules = [r for r in rules if not any(r.matches(er) for er in existing_rules)]
+		extra_rules = [er.id for er in existing_rules.rules if not any(r.matches(er) for r in rules)]
+		missing_rules = [r for r in rules if not any(r.matches(er) for er in existing_rules.rules)]
 
-		would_change = (module.params["canonical"] and extra_rules) or missing_rules
+		result = {"changed": (module.params["canonical"] and extra_rules) or missing_rules}
 
-		if not would_change:
-			module.exit_json(changed=False)
+		if module._diff:
+			result["diff"]["before"] = existing_rules.as_dict_no_ids()
+			after = existing_rules
+			if module.params["canonical"]:
+				after = after.filter(lambda r: r.id in extra_rules)
+			for rule in missing_rules:
+				after = after.with_added(rule)
 
-		if module.check_mode:
-			module.exit_json(changed=True)
+			result["diff"]["after"] = after.as_dict_no_ids()
 
-		if module.params["canonical"]:
-			for id in extra_rules:
-				client.delete_route(DeleteRoutingRequest(id))
+		if result["changed"] and not module.check_mode:
+			if module.params["canonical"]:
+				for id in extra_rules:
+					client.delete_routing_rule(DeleteRoutingRequest(id))
 
-		for rule in missing_rules:
-			client.create_route(rule)
+			for rule in missing_rules:
+				client.create_routing_rule(rule)
 
-		module.exit_json(changed=True)
+		module.exit_json(**result)
 	except Exception as e:
 		module.fail_json(msg=str(e))
 
