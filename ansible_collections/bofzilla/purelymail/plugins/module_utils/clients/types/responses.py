@@ -23,11 +23,11 @@ class CheckCreditResponse:
 class ListRoutingResponse:
 	rules: list[RoutingRule]
 
-	def as_dict(self) -> list[dict[str, Any]]:
-		return [r.__dict__ for r in self.rules]
+	def dump(self, *, by_alias: bool = False, exclude: set[str] | None = None) -> list[dict[str, Any]]:
+		return [r.dump(by_alias=by_alias, exclude=exclude) for r in self.rules]
 
-	def as_dict_no_ids(self) -> list[dict[str, Any]]:
-		return [r.as_dict_no_id() for r in self.rules]
+	def dump_no_id(self, *, by_alias: bool = False) -> list[dict[str, Any]]:
+		return [r.dump(by_alias=by_alias, exclude=["id"]) for r in self.rules]
 
 	def filter(self, predicate: Callable[[RoutingRule], bool]) -> "ListRoutingResponse":
 		return ListRoutingResponse([r for r in self.rules if predicate(r)])

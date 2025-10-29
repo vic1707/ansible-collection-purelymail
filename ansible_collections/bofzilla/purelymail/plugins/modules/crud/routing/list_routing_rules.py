@@ -70,7 +70,7 @@ def main():
 	client = RoutingClient(api)
 
 	try:
-		rules = client.list_routing_rules().as_dict()
+		rules = client.list_routing_rules().dump()
 
 		res = {"changed": False}
 

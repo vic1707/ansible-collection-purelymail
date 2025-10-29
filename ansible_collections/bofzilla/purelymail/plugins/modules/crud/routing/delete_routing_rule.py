@@ -63,8 +63,8 @@ def main():
 
 		if module._diff:
 			result["diff"] = {
-				"before": existing_rules.as_dict(),
-				"after": existing_rules.filter(lambda r: r.id != id).as_dict() if result["changed"] else existing_rules.as_dict(),
+				"before": existing_rules.dump(),
+				"after": existing_rules.filter(lambda r: r.id != id).dump() if result["changed"] else existing_rules.dump(),
 			}
 
 		if result["changed"] and not module.check_mode:
