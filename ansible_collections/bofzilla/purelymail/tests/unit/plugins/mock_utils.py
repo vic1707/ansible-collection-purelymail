@@ -1,7 +1,6 @@
 import functools
 from collections.abc import Callable
-from types import ModuleType
-from typing import Any
+from typing import Any, Protocol
 from unittest.mock import MagicMock
 
 import pytest
@@ -14,7 +13,7 @@ def make_runner():
 	"""
 
 	def _make_runner(
-		py_module: ModuleType,
+		py_module: HasMain,
 		mock_setup: tuple[tuple[str, Callable[[MagicMock], None]] | str, ...],
 	) -> Callable[..., tuple[dict, dict[str, MagicMock]]]:
 		monkeypatch = pytest.MonkeyPatch()
@@ -29,10 +28,14 @@ def make_runner():
 	return _make_runner
 
 
+class HasMain(Protocol):
+	def main(self) -> None: ...
+
+
 # Mapped type like in TS would be cleaner
 def bootstrap_module(
 	monkeypatch: pytest.MonkeyPatch,
-	py_module: ModuleType,
+	py_module: HasMain,
 	mocks: tuple[tuple[str, Callable[[MagicMock], None]] | str, ...] = (),
 ) -> dict[str, MagicMock]:
 	module = MagicMock()
@@ -73,13 +76,13 @@ def fail_json(*_, **kwargs):
 
 
 def run_module_test(
-	py_module: ModuleType,
+	py_module: HasMain,
 	mocks: dict[str, MagicMock],
 	*,
-	params: dict[str, Any] = None,
+	params: dict[str, Any] | None = None,
 	diff: bool = False,
 	check_mode: bool = False,
-	expect: type[Exception] = AnsibleExitJson,
+	expect: type[BaseException | Exception] = AnsibleExitJson,
 ) -> tuple[Any, dict[str, MagicMock]]:
 	module = mocks["AnsibleModule"]
 	module._diff = diff
