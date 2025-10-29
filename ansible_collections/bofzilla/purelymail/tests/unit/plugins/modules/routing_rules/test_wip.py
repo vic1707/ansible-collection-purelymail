@@ -12,6 +12,15 @@ EXISTING_RULES = [
 	RoutingRule(id=2, matchUser="admin", prefix=True, catchall=False, domainName="example.com", targetAddresses=["support@example.com"]),
 ]
 
+EXISTING_RULES_AS_INPUT = [r.dump(by_alias=True, exclude=["id"]) for r in EXISTING_RULES]
+NEW_RULE = dict(
+	domain_name="example.com",
+	match_user="newuser",
+	prefix=False,
+	catchall=False,
+	target_addresses=["helpdesk@example.com"],
+)
+
 
 @pytest.fixture(scope="module")
 def run(make_runner):  # noqa: F811
@@ -31,3 +40,155 @@ def run(make_runner):  # noqa: F811
 		return runner_run(params=params, **kwargs)
 
 	return inner_run
+
+
+def test_noncanonical_changes_normal(run):
+	data, mocks = run([NEW_RULE], canonical=False)
+
+	mocks["RoutingClient"].create_routing_rule.assert_called_once()
+	mocks["RoutingClient"].delete_routing_rule.assert_not_called()
+	assert data == {"changed": True}
+
+
+def test_noncanonical_no_changes_normal(run):
+	data, mocks = run([EXISTING_RULES_AS_INPUT[0]], canonical=False)
+
+	mocks["RoutingClient"].create_routing_rule.assert_not_called()
+	mocks["RoutingClient"].delete_routing_rule.assert_not_called()
+	assert data == {"changed": False}
+
+
+def test_noncanonical_changes_diff(run):
+	data, mocks = run([NEW_RULE], canonical=False, diff=True)
+
+	mocks["RoutingClient"].create_routing_rule.assert_called_once()
+	mocks["RoutingClient"].delete_routing_rule.assert_not_called()
+
+	assert data["changed"] is True
+	assert "before" in data["diff"]
+	assert "after" in data["diff"]
+
+
+def test_noncanonical_no_changes_diff(run):
+	data, mocks = run([EXISTING_RULES_AS_INPUT[0]], canonical=False, diff=True)
+
+	mocks["RoutingClient"].create_routing_rule.assert_not_called()
+	mocks["RoutingClient"].delete_routing_rule.assert_not_called()
+
+	assert data["changed"] is False
+	assert "before" in data["diff"]
+	assert "after" in data["diff"]
+
+
+def test_noncanonical_changes_check(run):
+	data, mocks = run([NEW_RULE], canonical=False, check_mode=True)
+
+	mocks["RoutingClient"].create_routing_rule.assert_not_called()
+	mocks["RoutingClient"].delete_routing_rule.assert_not_called()
+	assert data == {"changed": True}
+
+
+def test_noncanonical_no_changes_check(run):
+	data, mocks = run([EXISTING_RULES_AS_INPUT[0]], canonical=False, check_mode=True)
+
+	mocks["RoutingClient"].create_routing_rule.assert_not_called()
+	mocks["RoutingClient"].delete_routing_rule.assert_not_called()
+	assert data == {"changed": False}
+
+
+def test_noncanonical_changes_diff_check(run):
+	data, mocks = run([NEW_RULE], canonical=False, check_mode=True, diff=True)
+
+	mocks["RoutingClient"].create_routing_rule.assert_not_called()
+	mocks["RoutingClient"].delete_routing_rule.assert_not_called()
+
+	assert data["changed"] is True
+	assert "before" in data["diff"]
+	assert "after" in data["diff"]
+
+
+def test_noncanonical_no_changes_diff_check(run):
+	data, mocks = run([EXISTING_RULES_AS_INPUT[0]], canonical=False, check_mode=True, diff=True)
+
+	mocks["RoutingClient"].create_routing_rule.assert_not_called()
+	mocks["RoutingClient"].delete_routing_rule.assert_not_called()
+
+	assert data["changed"] is False
+	assert "before" in data["diff"]
+	assert "after" in data["diff"]
+
+
+def test_canonical_changes_normal(run):
+	data, mocks = run([NEW_RULE], canonical=True)
+
+	mocks["RoutingClient"].create_routing_rule.assert_called_once()
+	assert mocks["RoutingClient"].delete_routing_rule.call_count == 2
+	assert data == {"changed": True}
+
+
+def test_canonical_no_changes_normal(run):
+	data, mocks = run(EXISTING_RULES_AS_INPUT, canonical=True)
+
+	mocks["RoutingClient"].create_routing_rule.assert_not_called()
+	mocks["RoutingClient"].delete_routing_rule.assert_not_called()
+	assert data == {"changed": False}
+
+
+def test_canonical_changes_diff(run):
+	data, mocks = run([NEW_RULE], canonical=True, diff=True)
+
+	mocks["RoutingClient"].create_routing_rule.assert_called_once()
+	assert mocks["RoutingClient"].delete_routing_rule.call_count == 2
+
+	assert data["changed"] is True
+	assert "before" in data["diff"]
+	assert "after" in data["diff"]
+
+
+def test_canonical_no_changes_diff(run):
+	data, mocks = run(EXISTING_RULES_AS_INPUT, canonical=True, diff=True)
+
+	mocks["RoutingClient"].create_routing_rule.assert_not_called()
+	mocks["RoutingClient"].delete_routing_rule.assert_not_called()
+
+	assert data["changed"] is False
+	assert "before" in data["diff"]
+	assert "after" in data["diff"]
+
+
+def test_canonical_changes_check(run):
+	data, mocks = run([NEW_RULE], canonical=True, check_mode=True)
+
+	mocks["RoutingClient"].create_routing_rule.assert_not_called()
+	mocks["RoutingClient"].delete_routing_rule.assert_not_called()
+	assert data == {"changed": True}
+
+
+def test_canonical_no_changes_check(run):
+	data, mocks = run(EXISTING_RULES_AS_INPUT, canonical=True, check_mode=True)
+
+	mocks["RoutingClient"].create_routing_rule.assert_not_called()
+	mocks["RoutingClient"].delete_routing_rule.assert_not_called()
+	assert data == {"changed": False}
+
+
+def test_canonical_changes_diff_check(run):
+	data, mocks = run([NEW_RULE], canonical=True, check_mode=True, diff=True)
+
+	mocks["RoutingClient"].create_routing_rule.assert_not_called()
+	mocks["RoutingClient"].delete_routing_rule.assert_not_called()
+
+	assert data["changed"] is True
+	assert "before" in data["diff"]
+	assert "after" in data["diff"]
+
+
+def test_canonical_no_changes_diff_check(run):
+	data, mocks = run(EXISTING_RULES_AS_INPUT, canonical=True, check_mode=True, diff=True)
+
+	mocks["RoutingClient"].create_routing_rule.assert_not_called()
+	mocks["RoutingClient"].delete_routing_rule.assert_not_called()
+
+	assert data["changed"] is False
+	assert "before" in data["diff"]
+	assert "after" in data["diff"]

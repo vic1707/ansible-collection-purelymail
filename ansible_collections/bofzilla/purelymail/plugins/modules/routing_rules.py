@@ -141,7 +141,12 @@ def main():
 
 	# Waiting for <https://github.com/ansible/ansible/pull/86074> to remove
 	for idx, rule in enumerate(module.params["rules"]):
-		if rule["preset"] is None and rule["match_user"] is None and rule["prefix"] is None and rule["catchall"] is None:
+		if (
+			rule.get("preset", None) is None
+			and rule.get("match_user", None) is None
+			and rule.get("prefix", None) is None
+			and rule.get("catchall", None) is None
+		):
 			module.fail_json(msg=f"rule[{idx}]: preset is None but any of the following are missing: match_user, prefix, catchall found in rules")
 
 	api = PurelymailAPI(module, module.params["api_token"])
@@ -154,17 +159,18 @@ def main():
 		extra_rules = [er.id for er in existing_rules.rules if not any(r.matches(er) for r in rules)]
 		missing_rules = [r for r in rules if not any(r.matches(er) for er in existing_rules.rules)]
 
-		result = {"changed": (module.params["canonical"] and extra_rules) or missing_rules}
+		result = {"changed": (module.params["canonical"] and len(extra_rules) != 0) or len(missing_rules) != 0}
 
 		if module._diff:
-			result["diff"]["before"] = existing_rules.as_dict_no_ids()
+			result["diff"] = {}
+			result["diff"]["before"] = existing_rules.dump_no_id()
 			after = existing_rules
 			if module.params["canonical"]:
 				after = after.filter(lambda r: r.id in extra_rules)
 			for rule in missing_rules:
 				after = after.with_added(rule)
 
-			result["diff"]["after"] = after.as_dict_no_ids()
+			result["diff"]["after"] = after.dump_no_id()
 
 		if result["changed"] and not module.check_mode:
 			if module.params["canonical"]:
