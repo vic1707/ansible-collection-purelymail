@@ -1,12 +1,11 @@
-from typing import Any
-from unittest.mock import MagicMock
+import functools
 
 import pytest
 
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.api_types import RoutingRule
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.responses import ListRoutingResponse
 from ansible_collections.bofzilla.purelymail.plugins.modules.crud.routing import delete_routing_rule
-from ansible_collections.bofzilla.purelymail.tests.unit.plugins.mock_utils import AnsibleExitJson, bootstrap_module
+from ansible_collections.bofzilla.purelymail.tests.unit.plugins.mock_utils import make_runner  # noqa: F401
 
 EXISTING_RULES = [
 	RoutingRule(id=1, matchUser="toto", prefix=True, catchall=False, domainName="example.com", targetAddresses=["admin@example.com"]),
@@ -14,31 +13,31 @@ EXISTING_RULES = [
 ]
 
 
-def run(
-	monkeypatch: pytest.MonkeyPatch,
-	id: int,
-	*,
-	diff: bool = False,
-	check_mode: bool = False,
-) -> tuple[Any, dict[str, MagicMock]]:
-	mocks = bootstrap_module(monkeypatch, delete_routing_rule, ("RoutingClient",))
-	module = mocks["AnsibleModule"]
-	routing_client = mocks["RoutingClient"]
+@pytest.fixture(scope="module")
+def run(make_runner):  # noqa: F811
+	runner_run = make_runner(
+		delete_routing_rule,
+		(
+			(
+				"RoutingClient",
+				lambda mock: setattr(mock.list_routing_rules, "return_value", ListRoutingResponse(EXISTING_RULES)),
+			),
+		),
+	)
 
-	module._diff = diff
-	module.check_mode = check_mode
-	module.params = {"api_token": "dQw4w9WgXcQ", "routing_rule_id": id}
+	@functools.wraps(runner_run)
+	def inner_run(rule_id: int, **kwargs):
+		return runner_run(
+			params={"routing_rule_id": rule_id},
+			**kwargs,
+		)
 
-	routing_client.list_routing_rules.return_value = ListRoutingResponse(EXISTING_RULES)
-
-	with pytest.raises(AnsibleExitJson) as excinfo:
-		delete_routing_rule.main()
-
-	return excinfo.value.args[0], mocks
+	return inner_run
 
 
-def test_diff_mode_successful_delete(monkeypatch: pytest.MonkeyPatch):
-	data, mocks = run(monkeypatch, EXISTING_RULES[0].id, diff=True)
+def test_diff_mode_successful_delete(run):
+	data, mocks = run(EXISTING_RULES[0].id, diff=True)
+
 	mocks["RoutingClient"].delete_routing_rule.assert_called_once()
 	assert data == {
 		"changed": True,
@@ -54,8 +53,9 @@ def test_diff_mode_successful_delete(monkeypatch: pytest.MonkeyPatch):
 	}
 
 
-def test_diff_mode_nothing_to_delete(monkeypatch: pytest.MonkeyPatch):
-	data, mocks = run(monkeypatch, 69, diff=True)
+def test_diff_mode_nothing_to_delete(run):
+	data, mocks = run(69, diff=True)
+
 	mocks["RoutingClient"].delete_routing_rule.assert_not_called()
 	assert data == {
 		"changed": False,
@@ -72,20 +72,23 @@ def test_diff_mode_nothing_to_delete(monkeypatch: pytest.MonkeyPatch):
 	}
 
 
-def test_check_mode(monkeypatch: pytest.MonkeyPatch):
-	data, mocks = run(monkeypatch, EXISTING_RULES[0].id, check_mode=True)
+def test_check_mode(run):
+	data, mocks = run(EXISTING_RULES[0].id, check_mode=True)
+
 	mocks["RoutingClient"].delete_routing_rule.assert_not_called()
 	assert data == {"changed": True}
 
 
-def test_check_mode_nothing_to_delete(monkeypatch: pytest.MonkeyPatch):
-	data, mocks = run(monkeypatch, 69, check_mode=True)
+def test_check_mode_nothing_to_delete(run):
+	data, mocks = run(69, check_mode=True)
+
 	mocks["RoutingClient"].delete_routing_rule.assert_not_called()
 	assert data == {"changed": False}
 
 
-def test_diff_and_check_modes(monkeypatch: pytest.MonkeyPatch):
-	data, mocks = run(monkeypatch, EXISTING_RULES[0].id, check_mode=True, diff=True)
+def test_diff_and_check_modes(run):
+	data, mocks = run(EXISTING_RULES[0].id, check_mode=True, diff=True)
+
 	mocks["RoutingClient"].delete_routing_rule.assert_not_called()
 	assert data == {
 		"changed": True,
@@ -101,8 +104,9 @@ def test_diff_and_check_modes(monkeypatch: pytest.MonkeyPatch):
 	}
 
 
-def test_diff_and_check_modes_nothing_to_delete(monkeypatch: pytest.MonkeyPatch):
-	data, mocks = run(monkeypatch, 69, check_mode=True, diff=True)
+def test_diff_and_check_modes_nothing_to_delete(run):
+	data, mocks = run(69, check_mode=True, diff=True)
+
 	mocks["RoutingClient"].delete_routing_rule.assert_not_called()
 	assert data == {
 		"changed": False,
@@ -119,13 +123,15 @@ def test_diff_and_check_modes_nothing_to_delete(monkeypatch: pytest.MonkeyPatch)
 	}
 
 
-def test_normal_delete(monkeypatch: pytest.MonkeyPatch):
-	data, mocks = run(monkeypatch, EXISTING_RULES[0].id)
+def test_normal_delete(run):
+	data, mocks = run(EXISTING_RULES[0].id)
+
 	mocks["RoutingClient"].delete_routing_rule.assert_called_once()
 	assert data == {"changed": True}
 
 
-def test_normal_nothing_to_delete(monkeypatch: pytest.MonkeyPatch):
-	data, mocks = run(monkeypatch, 69)
+def test_normal_nothing_to_delete(run):
+	data, mocks = run(69)
+
 	mocks["RoutingClient"].delete_routing_rule.assert_not_called()
 	assert data == {"changed": False}

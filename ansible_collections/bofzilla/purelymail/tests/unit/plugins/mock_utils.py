@@ -1,14 +1,39 @@
+import functools
+from collections.abc import Callable
 from types import ModuleType
+from typing import Any
 from unittest.mock import MagicMock
 
-from pytest import MonkeyPatch
+import pytest
+
+
+@pytest.fixture(scope="module")
+def make_runner():
+	"""
+	Returns a factory that can produce a `run()` callable for any Ansible module.
+	"""
+
+	def _make_runner(
+		py_module: ModuleType,
+		mock_setup: tuple[tuple[str, Callable[[MagicMock], None]] | str, ...],
+	) -> Callable[..., tuple[dict, dict[str, MagicMock]]]:
+		monkeypatch = pytest.MonkeyPatch()
+		mocks = bootstrap_module(monkeypatch, py_module, mocks=mock_setup)
+
+		@functools.wraps(run_module_test)
+		def run_with_params(**kwargs):
+			return run_module_test(py_module, mocks, **kwargs)
+
+		return run_with_params
+
+	return _make_runner
 
 
 # Mapped type like in TS would be cleaner
 def bootstrap_module(
-	monkeypatch: MonkeyPatch,
+	monkeypatch: pytest.MonkeyPatch,
 	py_module: ModuleType,
-	mocks: tuple[str, ...] = (),
+	mocks: tuple[tuple[str, Callable[[MagicMock], None]] | str, ...] = (),
 ) -> dict[str, MagicMock]:
 	module = MagicMock()
 	module.exit_json.side_effect = exit_json
@@ -17,8 +42,14 @@ def bootstrap_module(
 
 	ret = {"AnsibleModule": module}
 
-	for mock_name in mocks:
+	for mock_cfg in mocks:
 		mock = MagicMock()
+		if isinstance(mock_cfg, tuple):
+			mock_name = mock_cfg[0]
+			mock_cfg[1](mock)
+		else:
+			mock_name = mock_cfg
+
 		monkeypatch.setattr(py_module, mock_name, lambda *_, __mock=mock, **__: __mock)
 		ret[mock_name] = mock
 
@@ -39,3 +70,23 @@ def exit_json(*_, **kwargs):
 
 def fail_json(*_, **kwargs):
 	raise AnsibleFailJson(kwargs)
+
+
+def run_module_test(
+	py_module: ModuleType,
+	mocks: dict[str, MagicMock],
+	*,
+	params: dict[str, Any] = None,
+	diff: bool = False,
+	check_mode: bool = False,
+	expect: type[Exception] = AnsibleExitJson,
+) -> tuple[Any, dict[str, MagicMock]]:
+	module = mocks["AnsibleModule"]
+	module._diff = diff
+	module.check_mode = check_mode
+	module.params = {"api_token": "dQw4w9WgXcQ", **(params or {})}
+
+	with pytest.raises(expect) as excinfo:
+		py_module.main()
+
+	return excinfo.value.args[0], mocks
