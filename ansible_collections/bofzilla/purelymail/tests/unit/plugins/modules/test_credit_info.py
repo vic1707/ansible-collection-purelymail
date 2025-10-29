@@ -3,14 +3,9 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.responses import (
-	CheckCreditResponse,
-)
+from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.responses import CheckCreditResponse
 from ansible_collections.bofzilla.purelymail.plugins.modules.crud import credit_info
-from ansible_collections.bofzilla.purelymail.tests.unit.plugins.mock_utils import (
-	AnsibleExitJson,
-	bootstrap_module,
-)
+from ansible_collections.bofzilla.purelymail.tests.unit.plugins.mock_utils import AnsibleExitJson, bootstrap_module
 
 
 def run(

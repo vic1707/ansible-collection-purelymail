@@ -1,14 +1,8 @@
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.base_client import (
-	PurelymailAPI,
-)
-from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.routing_client import (
-	RoutingClient,
-)
-from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.requests import (
-	DeleteRoutingRequest,
-)
+from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.base_client import PurelymailAPI
+from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.routing_client import RoutingClient
+from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.requests import DeleteRoutingRequest
 
 DOCUMENTATION = r"""
 ---

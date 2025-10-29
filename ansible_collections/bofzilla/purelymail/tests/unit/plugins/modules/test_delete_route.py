@@ -3,17 +3,10 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.api_types import (
-	RoutingRule,
-)
-from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.responses import (
-	ListRoutingResponse,
-)
+from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.api_types import RoutingRule
+from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.responses import ListRoutingResponse
 from ansible_collections.bofzilla.purelymail.plugins.modules.crud import delete_route
-from ansible_collections.bofzilla.purelymail.tests.unit.plugins.mock_utils import (
-	AnsibleExitJson,
-	bootstrap_module,
-)
+from ansible_collections.bofzilla.purelymail.tests.unit.plugins.mock_utils import AnsibleExitJson, bootstrap_module
 
 EXISTING_RULES = [
 	RoutingRule(id=1, matchUser="toto", prefix=True, catchall=False, domainName="example.com", targetAddresses=["admin@example.com"]),

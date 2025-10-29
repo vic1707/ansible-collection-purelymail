@@ -1,9 +1,7 @@
 from pydantic import ConfigDict, Field
 from pydantic.dataclasses import dataclass
 
-from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.api_types import (
-	RoutingRule,
-)
+from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.api_types import RoutingRule
 
 
 @dataclass(config=ConfigDict(extra="forbid"))

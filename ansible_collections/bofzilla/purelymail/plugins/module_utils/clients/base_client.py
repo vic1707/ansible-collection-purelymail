@@ -5,11 +5,7 @@ from typing import TypeVar
 import requests
 from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.response_wrapper import (
-	ApiError,
-	ApiSuccess,
-	parse_api_response,
-)
+from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.response_wrapper import ApiError, ApiSuccess, parse_api_response
 
 Rep = TypeVar("Rep")
 Req = TypeVar("Req")
