@@ -5,7 +5,7 @@
     file: "{{ playbook_dir }}/integration_config.yml"
 
 - name: Get account credit
-  bofzilla.purelymail.crud.credit_info:
+  bofzilla.purelymail.crud.billing.check_credit_info:
     api_token: "{{ PURELYMAIL_API_TOKEN }}"
   register: result
   environment:

@@ -9,5 +9,5 @@ from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.
 class BillingClient:
 	api: PurelymailAPI
 
-	def account_credit(self, req: EmptyRequest = EmptyRequest()) -> CheckCreditResponse:  # noqa: B008
+	def check_account_credit(self, req: EmptyRequest = EmptyRequest()) -> CheckCreditResponse:  # noqa: B008
 		return self.api.post("/checkAccountCredit", req, CheckCreditResponse)

@@ -5,7 +5,7 @@
     file: "{{ playbook_dir }}/integration_config.yml"
 
 - name: Get account routing rules
-  bofzilla.purelymail.crud.list_routes:
+  bofzilla.purelymail.crud.routing.list_routing_rules:
     api_token: "{{ PURELYMAIL_API_TOKEN }}"
   register: result
   environment:
@@ -20,5 +20,5 @@
     that:
       - result is not failed
       - result.changed == false
-      - result.routes is defined
-      - result.routes | length >= 0
+      - result.rules is defined
+      - result.rules | length >= 0

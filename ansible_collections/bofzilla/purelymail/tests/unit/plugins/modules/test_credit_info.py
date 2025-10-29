@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.responses import CheckCreditResponse
-from ansible_collections.bofzilla.purelymail.plugins.modules.crud import credit_info
+from ansible_collections.bofzilla.purelymail.plugins.modules.crud.billing import check_credit_info
 from ansible_collections.bofzilla.purelymail.tests.unit.plugins.mock_utils import AnsibleExitJson, bootstrap_module
 
 
@@ -14,7 +14,7 @@ def run(
 	diff: bool = False,
 	check_mode: bool = False,
 ) -> tuple[Any, dict[str, MagicMock]]:
-	mocks = bootstrap_module(monkeypatch, credit_info, ("BillingClient",))
+	mocks = bootstrap_module(monkeypatch, check_credit_info, ("BillingClient",))
 	module = mocks["AnsibleModule"]
 	billing_client = mocks["BillingClient"]
 
@@ -22,10 +22,10 @@ def run(
 	module.check_mode = check_mode
 	module.params = {"api_token": "dQw4w9WgXcQ"}
 
-	billing_client.account_credit.return_value = CheckCreditResponse(credit="12.34")
+	billing_client.check_account_credit.return_value = CheckCreditResponse(credit="12.34")
 
 	with pytest.raises(AnsibleExitJson) as excinfo:
-		credit_info.main()
+		check_credit_info.main()
 
 	return excinfo.value.args[0], mocks
 

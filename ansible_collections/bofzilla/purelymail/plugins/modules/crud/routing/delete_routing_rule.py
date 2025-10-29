@@ -6,7 +6,7 @@ from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.
 
 DOCUMENTATION = r"""
 ---
-module: delete_route
+module: delete_routing_rule
 short_description: Delete a Purelymail account's routing rule
 description:
   - This module connects to Purelymail API and deletes a specified routing rule.
@@ -35,7 +35,7 @@ author:
 
 EXAMPLES = r"""
 - name: Get account routing rules
-  bofzilla.purelymail.crud.delete_route:
+  bofzilla.purelymail.crud.routing.delete_routing_rule:
     api_token: "{{ lookup('env','PURELYMAIL_API_TOKEN') }}"
     routing_rule_id: 177013
 """
@@ -57,18 +57,18 @@ def main():
 
 	try:
 		id = module.params["routing_rule_id"]
-		existing_routes = client.list_routes()
+		existing_rules = client.list_routing_rules()
 
-		result = {"changed": any(r.id == id for r in existing_routes.rules)}
+		result = {"changed": any(r.id == id for r in existing_rules.rules)}
 
 		if module._diff:
 			result["diff"] = {
-				"before": existing_routes.as_dict(),
-				"after": existing_routes.filter(lambda r: r.id != id).as_dict() if result["changed"] else existing_routes.as_dict(),
+				"before": existing_rules.as_dict(),
+				"after": existing_rules.filter(lambda r: r.id != id).as_dict() if result["changed"] else existing_rules.as_dict(),
 			}
 
 		if result["changed"] and not module.check_mode:
-			_ = client.delete_route(DeleteRoutingRequest(id))
+			_ = client.delete_routing_rule(DeleteRoutingRequest(id))
 
 		module.exit_json(**result)
 	except Exception as e:

@@ -5,7 +5,7 @@ from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.routin
 
 DOCUMENTATION = r"""
 ---
-module: list_routes
+module: list_routing_rules
 short_description: Retrieve Purelymail account's defined routing rules
 description:
   - This module connects to Purelymail API and returns current routing rules.
@@ -29,12 +29,12 @@ author:
 
 EXAMPLES = r"""
 - name: Get account routing rules
-  bofzilla.purelymail.crud.list_routes:
+  bofzilla.purelymail.crud.routing.list_routing_rules:
     api_token: "{{ lookup('env','PURELYMAIL_API_TOKEN') }}"
 """
 
 RETURN = r"""
-routes:
+rules:
   description: List of routing rules
   type: list
   elements: dict
@@ -70,7 +70,7 @@ def main():
 	client = RoutingClient(api)
 
 	try:
-		rules = client.list_routes().as_dict()
+		rules = client.list_routing_rules().as_dict()
 
 		res = {"changed": False}
 
@@ -78,7 +78,7 @@ def main():
 			res["diff"] = {"before": rules, "after": rules}
 
 		if not module.check_mode:
-			res["routes"] = rules
+			res["rules"] = rules
 
 		module.exit_json(**res)
 	except Exception as e:

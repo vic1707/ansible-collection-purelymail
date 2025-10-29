@@ -5,7 +5,7 @@ from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.billin
 
 DOCUMENTATION = r"""
 ---
-module: credit_info
+module: check_credit_info
 short_description: Retrieve Purelymail account credit
 description:
   - This module connects to Purelymail API and returns current account credit.
@@ -29,7 +29,7 @@ author:
 
 EXAMPLES = r"""
 - name: Get account credit
-  bofzilla.purelymail.crud.credit_info:
+  bofzilla.purelymail.crud.billing.check_credit_info:
     api_token: "{{ lookup('env','PURELYMAIL_API_TOKEN') }}"
 """
 
@@ -50,7 +50,7 @@ def main():
 	client = BillingClient(api)
 
 	try:
-		data = client.account_credit()
+		data = client.check_account_credit()
 
 		res = {"changed": False}
 

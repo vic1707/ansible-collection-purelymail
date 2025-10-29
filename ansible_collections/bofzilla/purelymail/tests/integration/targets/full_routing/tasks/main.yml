@@ -7,8 +7,8 @@
 
 # --- CREATE ---
 
-- name: Create a new test route
-  bofzilla.purelymail.crud.create_route:
+- name: Create a new test rule
+  bofzilla.purelymail.crud.routing.create_routing_rule:
     api_token: "{{ PURELYMAIL_API_TOKEN }}"
 
     domain_name: "{{ PURELYMAIL_DOMAIN }}"
@@ -30,7 +30,7 @@
 # --- IDEMPOTENCY ---
 
 - name: Run create again (should not change)
-  bofzilla.purelymail.crud.create_route:
+  bofzilla.purelymail.crud.routing.create_routing_rule:
     api_token: "{{ PURELYMAIL_API_TOKEN }}"
     domain_name: "{{ PURELYMAIL_DOMAIN }}"
     match_user: testintegration
@@ -49,34 +49,34 @@
 
 # --- LIST & CAPTURE ID ---
 
-- name: Get all routes
-  bofzilla.purelymail.crud.list_routes:
+- name: Get all rules
+  bofzilla.purelymail.crud.routing.list_routing_rules:
     api_token: "{{ PURELYMAIL_API_TOKEN }}"
   register: list_result
   environment:
     PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
 
-- name: Find our test route ID
+- name: Find our test rule ID
   ansible.builtin.set_fact:
-    test_route_id: >-
-      {{ (list_result.routes
+    test_rule_id: >-
+      {{ (list_result.rules
            | selectattr('domainName', 'equalto', PURELYMAIL_DOMAIN)
            | selectattr('matchUser', 'equalto', 'testintegration')
            | map(attribute='id')
            | list
          )[0] | default(None) }}
 
-- name: Ensure we found our test route
+- name: Ensure we found our test rule
   ansible.builtin.assert:
     that:
-      - test_route_id is not none
+      - test_rule_id is not none
 
 # --- DELETE ---
 
-- name: Delete the route
-  bofzilla.purelymail.crud.delete_route:
+- name: Delete the rule
+  bofzilla.purelymail.crud.routing.delete_routing_rule:
     api_token: "{{ PURELYMAIL_API_TOKEN }}"
-    routing_rule_id: "{{ test_route_id }}"
+    routing_rule_id: "{{ test_rule_id }}"
   register: delete_result
   environment:
     PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
@@ -89,9 +89,9 @@
 # --- DELETE IDEMPOTENCY ---
 
 - name: Delete again (should be idempotent)
-  bofzilla.purelymail.crud.delete_route:
+  bofzilla.purelymail.crud.routing.delete_routing_rule:
     api_token: "{{ PURELYMAIL_API_TOKEN }}"
-    routing_rule_id: "{{ test_route_id }}"
+    routing_rule_id: "{{ test_rule_id }}"
   register: delete_again
   environment:
     PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"

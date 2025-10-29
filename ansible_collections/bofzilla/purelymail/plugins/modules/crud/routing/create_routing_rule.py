@@ -6,7 +6,7 @@ from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.
 
 DOCUMENTATION = r"""
 ---
-module: create_route
+module: create_routing_rule
 short_description: Create a new routing rule
 description:
   - This module connects to Purelymail API and creates a new routing rule
@@ -57,7 +57,7 @@ author:
 
 EXAMPLES = r"""
 - name: Create routing rule
-  bofzilla.purelymail.crud.create_route:
+  bofzilla.purelymail.crud.routing.create_routing_rule:
     api_token: "{{ lookup('env','PURELYMAIL_API_TOKEN') }}"
 
     domain_name: example.com
@@ -87,22 +87,22 @@ def main():
 	client = RoutingClient(api)
 
 	try:
-		route_spec = module.params
-		del route_spec["api_token"]
-		route = CreateRoutingRequest(**route_spec)
+		rule_spec = module.params
+		del rule_spec["api_token"]
+		rule = CreateRoutingRequest(**rule_spec)
 
-		existing_routes = client.list_routes()
+		existing_rules = client.list_routing_rules()
 
-		result = {"changed": not any(route.matches(r) for r in existing_routes.rules)}
+		result = {"changed": not any(rule.matches(r) for r in existing_rules.rules)}
 
 		if module._diff:
 			result["diff"] = {
-				"before": existing_routes.as_dict_no_ids(),
-				"after": existing_routes.with_added(route).as_dict_no_ids() if result["changed"] else existing_routes.as_dict_no_ids(),
+				"before": existing_rules.as_dict_no_ids(),
+				"after": existing_rules.with_added(rule).as_dict_no_ids() if result["changed"] else existing_rules.as_dict_no_ids(),
 			}
 
 		if result["changed"] and not module.check_mode:
-			_ = client.create_route(route)
+			_ = client.create_routing_rule(rule)
 
 		module.exit_json(**result)
 	except Exception as e:
