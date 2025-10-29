@@ -1,12 +1,9 @@
-from typing import Any
-from unittest.mock import MagicMock
-
 import pytest
 
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.api_types import RoutingRule
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.responses import ListRoutingResponse
 from ansible_collections.bofzilla.purelymail.plugins.modules.crud.routing import list_routing_rules
-from ansible_collections.bofzilla.purelymail.tests.unit.plugins.mock_utils import AnsibleExitJson, bootstrap_module
+from ansible_collections.bofzilla.purelymail.tests.unit.plugins.mock_utils import make_runner  # noqa: F401
 
 EXISTING_RULES = [
 	RoutingRule(id=1, matchUser="toto", prefix=True, catchall=False, domainName="example.com", targetAddresses=["admin@example.com"]),
@@ -14,30 +11,21 @@ EXISTING_RULES = [
 ]
 
 
-def run(
-	monkeypatch: pytest.MonkeyPatch,
-	*,
-	diff: bool = False,
-	check_mode: bool = False,
-) -> tuple[Any, dict[str, MagicMock]]:
-	mocks = bootstrap_module(monkeypatch, list_routing_rules, ("RoutingClient",))
-	module = mocks["AnsibleModule"]
-	routing_client = mocks["RoutingClient"]
-
-	module._diff = diff
-	module.check_mode = check_mode
-	module.params = {"api_token": "dQw4w9WgXcQ"}
-
-	routing_client.list_routing_rules.return_value = ListRoutingResponse(EXISTING_RULES)
-
-	with pytest.raises(AnsibleExitJson) as excinfo:
-		list_routing_rules.main()
-
-	return excinfo.value.args[0], mocks
+@pytest.fixture(scope="module")
+def run(make_runner):  # noqa: F811
+	return make_runner(
+		list_routing_rules,
+		(
+			(
+				"RoutingClient",
+				lambda mock: setattr(mock.list_routing_rules, "return_value", ListRoutingResponse(EXISTING_RULES)),
+			),
+		),
+	)
 
 
-def test_diff(monkeypatch: pytest.MonkeyPatch):
-	data, _ = run(monkeypatch, diff=True)
+def test_diff(run):
+	data, _ = run(diff=True)
 	assert data == {
 		"changed": False,
 		"rules": [
@@ -57,13 +45,13 @@ def test_diff(monkeypatch: pytest.MonkeyPatch):
 	}
 
 
-def test_check(monkeypatch: pytest.MonkeyPatch):
-	data, _ = run(monkeypatch, check_mode=True)
+def test_check(run):
+	data, _ = run(check_mode=True)
 	assert data == {"changed": False}
 
 
-def test_check_and_diff(monkeypatch: pytest.MonkeyPatch):
-	data, _ = run(monkeypatch, check_mode=True, diff=True)
+def test_check_and_diff(run):
+	data, _ = run(check_mode=True, diff=True)
 	assert data == {
 		"changed": False,
 		"diff": {
@@ -79,8 +67,8 @@ def test_check_and_diff(monkeypatch: pytest.MonkeyPatch):
 	}
 
 
-def test_normal(monkeypatch: pytest.MonkeyPatch):
-	data, _ = run(monkeypatch)
+def test_normal(run):
+	data, _ = run()
 	assert data == {
 		"changed": False,
 		"rules": [

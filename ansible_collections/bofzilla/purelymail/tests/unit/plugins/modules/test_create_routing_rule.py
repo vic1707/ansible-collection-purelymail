@@ -1,19 +1,18 @@
-from typing import Any
-from unittest.mock import MagicMock
+import functools
 
 import pytest
 
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.api_types import RoutingRule
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.responses import ListRoutingResponse
 from ansible_collections.bofzilla.purelymail.plugins.modules.crud.routing import create_routing_rule
-from ansible_collections.bofzilla.purelymail.tests.unit.plugins.mock_utils import AnsibleExitJson, bootstrap_module
+from ansible_collections.bofzilla.purelymail.tests.unit.plugins.mock_utils import make_runner  # noqa: F401
 
 EXISTING_RULES = [
 	RoutingRule(id=1, matchUser="toto", prefix=True, catchall=False, domainName="example.com", targetAddresses=["admin@example.com"]),
 	RoutingRule(id=2, matchUser="admin", prefix=True, catchall=False, domainName="example.com", targetAddresses=["support@example.com"]),
 ]
 NEW_RULE = RoutingRule(
-	id=69,  # never used
+	id=99999,  # never used
 	matchUser="",
 	prefix=True,
 	catchall=True,
@@ -22,38 +21,35 @@ NEW_RULE = RoutingRule(
 )
 
 
-def run(
-	monkeypatch: pytest.MonkeyPatch,
-	rule_to_create: RoutingRule,
-	*,
-	diff: bool = False,
-	check_mode: bool = False,
-) -> tuple[Any, dict[str, MagicMock]]:
-	mocks = bootstrap_module(monkeypatch, create_routing_rule, ("RoutingClient",))
-	module = mocks["AnsibleModule"]
-	routing_client = mocks["RoutingClient"]
+@pytest.fixture(scope="module")
+def run(make_runner):  # noqa: F811
+	runner_run = make_runner(
+		create_routing_rule,
+		(
+			(
+				"RoutingClient",
+				lambda mock: setattr(mock.list_routing_rules, "return_value", ListRoutingResponse(EXISTING_RULES)),
+			),
+		),
+	)
 
-	module._diff = diff
-	module.check_mode = check_mode
-	module.params = {
-		"api_token": "dQw4w9WgXcQ",
-		"domain_name": rule_to_create.domainName,
-		"match_user": rule_to_create.matchUser,
-		"target_addresses": rule_to_create.targetAddresses,
-		"prefix": rule_to_create.prefix,
-		"catchall": rule_to_create.catchall,
-	}
+	@functools.wraps(runner_run)
+	def inner_run(rule: RoutingRule, **kwargs):
+		params = {
+			"domain_name": rule.domainName,
+			"match_user": rule.matchUser,
+			"target_addresses": rule.targetAddresses,
+			"prefix": rule.prefix,
+			"catchall": rule.catchall,
+		}
+		return runner_run(params=params, **kwargs)
 
-	routing_client.list_routing_rules.return_value = ListRoutingResponse(EXISTING_RULES)
-
-	with pytest.raises(AnsibleExitJson) as excinfo:
-		create_routing_rule.main()
-
-	return excinfo.value.args[0], mocks
+	return inner_run
 
 
-def test_diff_mode_successful_create(monkeypatch: pytest.MonkeyPatch):
-	data, mocks = run(monkeypatch, NEW_RULE, diff=True)
+def test_diff_mode_successful_create(run):
+	data, mocks = run(NEW_RULE, diff=True)
+
 	mocks["RoutingClient"].create_routing_rule.assert_called_once()
 	assert data == {
 		"changed": True,
@@ -71,8 +67,9 @@ def test_diff_mode_successful_create(monkeypatch: pytest.MonkeyPatch):
 	}
 
 
-def test_diff_mode_nothing_to_create(monkeypatch: pytest.MonkeyPatch):
-	data, mocks = run(monkeypatch, EXISTING_RULES[0], diff=True)
+def test_diff_mode_nothing_to_create(run):
+	data, mocks = run(EXISTING_RULES[0], diff=True)
+
 	mocks["RoutingClient"].create_routing_rule.assert_not_called()
 	assert data == {
 		"changed": False,
@@ -89,25 +86,23 @@ def test_diff_mode_nothing_to_create(monkeypatch: pytest.MonkeyPatch):
 	}
 
 
-def test_check_mode(monkeypatch: pytest.MonkeyPatch):
-	data, mocks = run(monkeypatch, NEW_RULE, check_mode=True)
+def test_check_mode(run):
+	data, mocks = run(NEW_RULE, check_mode=True)
+
 	mocks["RoutingClient"].create_routing_rule.assert_not_called()
 	assert data == {"changed": True}
 
 
-def test_check_mode_nothing_to_create(monkeypatch: pytest.MonkeyPatch):
-	data, mocks = run(monkeypatch, EXISTING_RULES[0], check_mode=True)
+def test_check_mode_nothing_to_create(run):
+	data, mocks = run(EXISTING_RULES[0], check_mode=True)
+
 	mocks["RoutingClient"].create_routing_rule.assert_not_called()
 	assert data == {"changed": False}
 
 
-def test_diff_and_check_modes(monkeypatch: pytest.MonkeyPatch):
-	data, mocks = run(
-		monkeypatch,
-		NEW_RULE,
-		check_mode=True,
-		diff=True,
-	)
+def test_diff_and_check_modes(run):
+	data, mocks = run(NEW_RULE, diff=True, check_mode=True)
+
 	mocks["RoutingClient"].create_routing_rule.assert_not_called()
 	assert data == {
 		"changed": True,
@@ -125,8 +120,9 @@ def test_diff_and_check_modes(monkeypatch: pytest.MonkeyPatch):
 	}
 
 
-def test_diff_and_check_modes_nothing_to_create(monkeypatch: pytest.MonkeyPatch):
-	data, mocks = run(monkeypatch, EXISTING_RULES[0], check_mode=True, diff=True)
+def test_diff_and_check_modes_nothing_to_create(run):
+	data, mocks = run(EXISTING_RULES[0], check_mode=True, diff=True)
+
 	mocks["RoutingClient"].create_routing_rule.assert_not_called()
 	assert data == {
 		"changed": False,
@@ -143,13 +139,15 @@ def test_diff_and_check_modes_nothing_to_create(monkeypatch: pytest.MonkeyPatch)
 	}
 
 
-def test_normal_create(monkeypatch: pytest.MonkeyPatch):
-	data, mocks = run(monkeypatch, NEW_RULE)
+def test_normal_create(run):
+	data, mocks = run(NEW_RULE)
+
 	mocks["RoutingClient"].create_routing_rule.assert_called_once()
 	assert data == {"changed": True}
 
 
-def test_normal_nothing_to_create(monkeypatch: pytest.MonkeyPatch):
-	data, mocks = run(monkeypatch, EXISTING_RULES[0])
+def test_normal_nothing_to_create(run):
+	data, mocks = run(EXISTING_RULES[0])
+
 	mocks["RoutingClient"].create_routing_rule.assert_not_called()
 	assert data == {"changed": False}

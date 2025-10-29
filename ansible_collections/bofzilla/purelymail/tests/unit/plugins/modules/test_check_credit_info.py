@@ -1,37 +1,25 @@
-from typing import Any
-from unittest.mock import MagicMock
-
 import pytest
 
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.responses import CheckCreditResponse
 from ansible_collections.bofzilla.purelymail.plugins.modules.crud.billing import check_credit_info
-from ansible_collections.bofzilla.purelymail.tests.unit.plugins.mock_utils import AnsibleExitJson, bootstrap_module
+from ansible_collections.bofzilla.purelymail.tests.unit.plugins.mock_utils import make_runner  # noqa: F401
 
 
-def run(
-	monkeypatch: pytest.MonkeyPatch,
-	*,
-	diff: bool = False,
-	check_mode: bool = False,
-) -> tuple[Any, dict[str, MagicMock]]:
-	mocks = bootstrap_module(monkeypatch, check_credit_info, ("BillingClient",))
-	module = mocks["AnsibleModule"]
-	billing_client = mocks["BillingClient"]
-
-	module._diff = diff
-	module.check_mode = check_mode
-	module.params = {"api_token": "dQw4w9WgXcQ"}
-
-	billing_client.check_account_credit.return_value = CheckCreditResponse(credit="12.34")
-
-	with pytest.raises(AnsibleExitJson) as excinfo:
-		check_credit_info.main()
-
-	return excinfo.value.args[0], mocks
+@pytest.fixture(scope="module")
+def run(make_runner):  # noqa: F811
+	return make_runner(
+		check_credit_info,
+		(
+			(
+				"BillingClient",
+				lambda mock: setattr(mock.check_account_credit, "return_value", CheckCreditResponse(credit="12.34")),
+			),
+		),
+	)
 
 
-def test_diff(monkeypatch: pytest.MonkeyPatch):
-	data, _ = run(monkeypatch, diff=True)
+def test_diff(run):
+	data, _ = run(diff=True)
 	assert data == {
 		"changed": False,
 		"credit": 12.34,
@@ -39,19 +27,19 @@ def test_diff(monkeypatch: pytest.MonkeyPatch):
 	}
 
 
-def test_check(monkeypatch: pytest.MonkeyPatch):
-	data, _ = run(monkeypatch, check_mode=True)
+def test_check(run):
+	data, _ = run(check_mode=True)
 	assert data == {"changed": False}
 
 
-def test_check_and_diff(monkeypatch: pytest.MonkeyPatch):
-	data, _ = run(monkeypatch, diff=True, check_mode=True)
+def test_check_and_diff(run):
+	data, _ = run(diff=True, check_mode=True)
 	assert data == {
 		"changed": False,
 		"diff": {"before": {"credit": 12.34}, "after": {"credit": 12.34}},
 	}
 
 
-def test_normal(monkeypatch: pytest.MonkeyPatch):
-	data, _ = run(monkeypatch)
+def test_normal(run):
+	data, _ = run()
 	assert data == {"changed": False, "credit": 12.34}
