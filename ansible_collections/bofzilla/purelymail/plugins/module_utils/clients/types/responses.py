@@ -3,6 +3,7 @@ from typing import Any
 
 from pydantic import ConfigDict, Json, PositiveFloat
 from pydantic.dataclasses import dataclass
+from pydantic.main import IncEx
 
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.api_types import RoutingRule
 
@@ -23,7 +24,7 @@ class CheckCreditResponse:
 class ListRoutingResponse:
 	rules: list[RoutingRule]
 
-	def dump(self, *, by_alias: bool = False, exclude: set[str] | None = None) -> list[dict[str, Any]]:
+	def dump(self, *, by_alias: bool = False, exclude: IncEx | None = None) -> list[dict[str, Any]]:
 		return [r.dump(by_alias=by_alias, exclude=exclude) for r in self.rules]
 
 	def dump_no_id(self, *, by_alias: bool = False) -> list[dict[str, Any]]:
