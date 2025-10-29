@@ -16,11 +16,11 @@ done < integration_config.yml.tpl
 [tasks.integration-tests]
 depends = ["generate-integration-config"]
 dir = "{{ config_root }}/ansible_collections/bofzilla/purelymail"
-run = "ansible-test integration"
+run = "ansible-test integration --coverage"
 
 [tasks.unit-tests]
 dir = "{{ config_root }}/ansible_collections/bofzilla/purelymail"
-run = "ansible-test units"
+run = "ansible-test units --coverage"
 
 [tasks.tests]
 depends = ["unit-tests", "integration-tests"]
