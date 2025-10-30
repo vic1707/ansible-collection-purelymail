@@ -7,6 +7,12 @@ from pydantic.main import IncEx
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.pydantic import DEFAULT_CFG
 
 PresetType = Literal["any_address", "catchall_except_valid", "prefix_match", "exact_match"]
+PRESET_MAP: dict[PresetType, dict] = {
+	"any_address": {"matchUser": "", "prefix": True, "catchall": False},
+	"catchall_except_valid": {"matchUser": "", "prefix": True, "catchall": True},
+	"prefix_match": {"prefix": True, "catchall": False},
+	"exact_match": {"prefix": False, "catchall": False},
+}
 
 
 @dataclass(config=ConfigDict(**DEFAULT_CFG, validate_by_name=True, validate_by_alias=True))
@@ -25,14 +31,9 @@ class RoutingRule:
 
 	@property
 	def preset(self) -> PresetType | None:
-		if self.matchUser == "" and self.prefix and not self.catchall:
-			return "any_address"
-		elif self.matchUser == "" and self.prefix and self.catchall:
-			return "catchall_except_valid"
-		elif self.prefix and not self.catchall:
-			return "prefix_match"
-		elif not self.prefix and not self.catchall:
-			return "exact_match"
+		for preset, values in PRESET_MAP.items():
+			if all(getattr(self, field) == expected for field, expected in values.items()):
+				return preset
 		return None
 
 

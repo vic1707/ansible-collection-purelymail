@@ -2,7 +2,7 @@ from pydantic import ConfigDict, Field, model_validator
 from pydantic.dataclasses import dataclass
 from pydantic_core import ArgsKwargs
 
-from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.api_types import RoutingRule
+from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.api_types import PRESET_MAP, PresetType, RoutingRule
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.pydantic import DEFAULT_CFG
 
 
@@ -14,7 +14,8 @@ class EmptyRequest:
 ## Routing
 @dataclass(config=ConfigDict(**DEFAULT_CFG))
 class CreateRoutingRequest(RoutingRule):
-	id: None = Field(default=None, init=False)  # doesn't exist yet
+	id: None = Field(default=None, init=False, exclude=True)  # doesn't exist yet
+	_preset: PresetType | None = Field(default=None, exclude=True, alias="preset")
 
 	def matches(self, rule: RoutingRule) -> bool:
 		return (
@@ -28,22 +29,15 @@ class CreateRoutingRequest(RoutingRule):
 	@model_validator(mode="before")
 	@classmethod
 	def apply_preset(cls, data: ArgsKwargs) -> ArgsKwargs:
-		"""Intercept a 'preset' argument without storing it as a field."""
-		match data.kwargs.pop('preset', None):
-			case "any_address":
-				data.kwargs["match_user"] = ""
-				data.kwargs["prefix"] = True
-				data.kwargs["catchall"] = False
-			case "catchall_except_valid":
-				data.kwargs["match_user"] = ""
-				data.kwargs["prefix"] = True
-				data.kwargs["catchall"] = True
-			case "prefix_match":
-				data.kwargs["prefix"] = True
-				data.kwargs["catchall"] = False
-			case "exact_match":
-				data.kwargs["prefix"] = False
-				data.kwargs["catchall"] = False
+		preset = data.kwargs.get("_preset", None) or data.kwargs.get("preset", None)
+		if not preset:
+			return data
+
+		normalized_field_names = {f.name: getattr(f.default, "alias", None) or f.name for f in cls.__dataclass_fields__.values()}
+
+		for k, v in PRESET_MAP[preset].items():
+			name = normalized_field_names.get(k, k)
+			data.kwargs[name] = v
 		return data
 
 
