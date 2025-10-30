@@ -1,8 +1,8 @@
-from ansible_collections.bofzilla.purelymail.plugins.modules.routing_rules import RuleSpec
+from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.requests import CreateRoutingRequest
 
 
-def test_into_create_routing_request_any_address():
-	spec = RuleSpec(
+def test_from_preset_any_address():
+	req = CreateRoutingRequest(
 		domain_name="example.com",
 		target_addresses=[],
 		preset="any_address",
@@ -12,17 +12,17 @@ def test_into_create_routing_request_any_address():
 		catchall=True,
 	)
 
-	req = spec.into_create_routing_request()
 	assert req.domainName == "example.com"
 	assert req.targetAddresses == []
 	# Changed by `preset="any_address"`
 	assert req.matchUser == ""
 	assert req.prefix is True
 	assert req.catchall is False
+	assert req.preset == "any_address"
 
 
-def test_into_create_routing_request_catchall_except_valid():
-	spec = RuleSpec(
+def test_from_preset_catchall_except_valid():
+	req = CreateRoutingRequest(
 		domain_name="example.com",
 		target_addresses=[],
 		preset="catchall_except_valid",
@@ -32,17 +32,17 @@ def test_into_create_routing_request_catchall_except_valid():
 		catchall=False,
 	)
 
-	req = spec.into_create_routing_request()
 	assert req.domainName == "example.com"
 	assert req.targetAddresses == []
 	# Changed by `preset="catchall_except_valid"`
 	assert req.matchUser == ""
 	assert req.prefix is True
 	assert req.catchall is True
+	assert req.preset == "catchall_except_valid"
 
 
-def test_into_create_routing_request_prefix_match():
-	spec = RuleSpec(
+def test_from_preset_prefix_match():
+	req = CreateRoutingRequest(
 		domain_name="example.com",
 		target_addresses=[],
 		preset="prefix_match",
@@ -52,17 +52,17 @@ def test_into_create_routing_request_prefix_match():
 		catchall=True,
 	)
 
-	req = spec.into_create_routing_request()
 	assert req.domainName == "example.com"
 	assert req.targetAddresses == []
 	assert req.matchUser == "user"
 	# Changed by `preset="prefix_match"`
 	assert req.prefix is True
 	assert req.catchall is False
+	assert req.preset == "prefix_match"
 
 
-def test_into_create_routing_request_exact_match():
-	spec = RuleSpec(
+def test_from_preset_exact_match():
+	req = CreateRoutingRequest(
 		domain_name="example.com",
 		target_addresses=[],
 		preset="exact_match",
@@ -72,27 +72,10 @@ def test_into_create_routing_request_exact_match():
 		catchall=True,
 	)
 
-	req = spec.into_create_routing_request()
 	assert req.domainName == "example.com"
 	assert req.targetAddresses == []
 	assert req.matchUser == "user"
 	# Changed by `preset="exact_match"`
 	assert req.prefix is False
 	assert req.catchall is False
-
-
-def test_into_create_routing_request_manual_values():
-	spec = RuleSpec(
-		domain_name="example.com",
-		target_addresses=[],
-		match_user="john",
-		prefix=True,
-		catchall=True,
-	)
-
-	req = spec.into_create_routing_request()
-	assert req.domainName == "example.com"
-	assert req.targetAddresses == []
-	assert req.matchUser == "john"
-	assert req.prefix is True
-	assert req.catchall is True
+	assert req.preset == "exact_match"

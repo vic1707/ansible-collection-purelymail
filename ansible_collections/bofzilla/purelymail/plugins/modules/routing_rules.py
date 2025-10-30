@@ -1,8 +1,4 @@
-from typing import Literal
-
 from ansible.module_utils.basic import AnsibleModule
-from pydantic import ConfigDict
-from pydantic.dataclasses import dataclass
 
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.base_client import PurelymailAPI
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.routing_client import RoutingClient
@@ -154,7 +150,7 @@ def main():
 
 	try:
 		existing_rules = client.list_routing_rules()
-		rules = [RuleSpec(**r).into_create_routing_request() for r in module.params["rules"]]
+		rules = [CreateRoutingRequest(**r) for r in module.params["rules"]]
 
 		extra_rules = [er.id for er in existing_rules.rules if not any(r.matches(er) for r in rules)]
 		missing_rules = [r for r in rules if not any(r.matches(er) for er in existing_rules.rules)]
@@ -187,32 +183,3 @@ def main():
 
 if __name__ == "__main__":
 	main()
-
-
-@dataclass(config=ConfigDict(extra="forbid"))
-class RuleSpec:
-	domain_name: str
-	target_addresses: list[str]
-	match_user: str | None
-	prefix: bool | None
-	catchall: bool | None
-	preset: Literal["any_address", "catchall_except_valid", "prefix_match", "exact_match"] | None = None
-
-	def into_create_routing_request(self) -> CreateRoutingRequest:
-		match self.preset:
-			case "any_address":
-				self.match_user = ""
-				self.prefix = True
-				self.catchall = False
-			case "catchall_except_valid":
-				self.match_user = ""
-				self.prefix = True
-				self.catchall = True
-			case "prefix_match":
-				self.prefix = True
-				self.catchall = False
-			case "exact_match":
-				self.prefix = False
-				self.catchall = False
-		del self.preset
-		return CreateRoutingRequest(**self.__dict__)
