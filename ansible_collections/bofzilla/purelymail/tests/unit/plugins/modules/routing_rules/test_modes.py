@@ -272,3 +272,61 @@ def test_canonical_no_changes_diff_check(run):
 			],
 		},
 	}
+
+
+def test_canonical_deletes_all_when_input_empty(run):
+	data, mocks = run([], canonical=True)
+
+	mocks["RoutingClient"].create_routing_rule.assert_not_called()
+	assert mocks["RoutingClient"].delete_routing_rule.call_count == 2
+	assert data == {"changed": True}
+
+
+def test_noncanonical_empty_input_no_changes(run):
+	data, mocks = run([], canonical=False)
+
+	mocks["RoutingClient"].create_routing_rule.assert_not_called()
+	mocks["RoutingClient"].delete_routing_rule.assert_not_called()
+	assert data == {"changed": False}
+
+
+def test_canonical_partial_overlap(run):
+	# Keep one existing rule, replace the other with a new one
+	input_rules = [
+		EXISTING_RULES_AS_INPUT[0],  # stays
+		NEW_RULE,  # new one added
+	]
+	data, mocks = run(input_rules, canonical=True)
+
+	mocks["RoutingClient"].create_routing_rule.assert_called_once()
+	mocks["RoutingClient"].delete_routing_rule.assert_called_once()  # only one deleted
+	assert data == {"changed": True}
+
+
+def test_canonical_partial_overlap_diff(run):
+	input_rules = [EXISTING_RULES_AS_INPUT[0], NEW_RULE]
+	data, mocks = run(input_rules, canonical=True, diff=True)
+
+	mocks["RoutingClient"].create_routing_rule.assert_called_once()
+	mocks["RoutingClient"].delete_routing_rule.assert_called_once()
+	assert data == {
+		"changed": True,
+		"diff": {
+			"before": [
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+			],
+			"after": [
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": False, "catchall": False, "domainName": "example.com", "matchUser": "newuser", "targetAddresses": ["helpdesk@example.com"]},
+			],
+		},
+	}
+
+
+def test_canonical_check_mode_deletions_only(run):
+	data, mocks = run([], canonical=True, check_mode=True)
+
+	mocks["RoutingClient"].create_routing_rule.assert_not_called()
+	mocks["RoutingClient"].delete_routing_rule.assert_not_called()
+	assert data == {"changed": True}
