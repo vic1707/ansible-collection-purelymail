@@ -9,7 +9,7 @@ from ansible_collections.bofzilla.purelymail.plugins.module_utils.pydantic impor
 PresetType = Literal["any_address", "catchall_except_valid", "prefix_match", "exact_match"]
 
 
-@dataclass(config=ConfigDict(**DEFAULT_CFG, populate_by_name=True))
+@dataclass(config=ConfigDict(**DEFAULT_CFG, validate_by_name=True, validate_by_alias=True))
 class RoutingRule:
 	_adapter: ClassVar[TypeAdapter["RoutingRule"]]
 
