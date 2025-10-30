@@ -15,7 +15,7 @@ class EmptyRequest:
 @dataclass(config=ConfigDict(**DEFAULT_CFG))
 class CreateRoutingRequest(RoutingRule):
 	id: None = Field(default=None, init=False, exclude=True)  # doesn't exist yet
-	_preset: PresetType | None = Field(default=None, exclude=True, alias="preset")
+	_preset: PresetType | None = Field(exclude=True, alias="preset")  # TODO: ty fails if default=None
 
 	def matches(self, rule: RoutingRule) -> bool:
 		return (
@@ -29,15 +29,18 @@ class CreateRoutingRequest(RoutingRule):
 	@model_validator(mode="before")
 	@classmethod
 	def apply_preset(cls, data: ArgsKwargs) -> ArgsKwargs:
-		preset = data.kwargs.get("_preset", None) or data.kwargs.get("preset", None)
-		if not preset:
+		assert data.args == (), "apply_preset only support kwargs."
+		if not data.kwargs:
 			return data
 
-		normalized_field_names = {f.name: getattr(f.default, "alias", None) or f.name for f in cls.__dataclass_fields__.values()}
+		preset = data.kwargs.pop("__preset", None) or data.kwargs.pop("preset", None)
+		if preset:
+			normalized_names = {f.name: getattr(f.default, "alias", None) or f.name for f in cls.__dataclass_fields__.values()}
+			for k, v in PRESET_MAP[preset].items():
+				name = normalized_names.get(k, k)
+				data.kwargs[name] = v
 
-		for k, v in PRESET_MAP[preset].items():
-			name = normalized_field_names.get(k, k)
-			data.kwargs[name] = v
+		data.kwargs["preset"] = None  # TODO: removes when we can default=None
 		return data
 
 
