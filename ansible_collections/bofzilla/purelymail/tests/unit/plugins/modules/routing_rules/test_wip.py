@@ -64,9 +64,20 @@ def test_noncanonical_changes_diff(run):
 	mocks["RoutingClient"].create_routing_rule.assert_called_once()
 	mocks["RoutingClient"].delete_routing_rule.assert_not_called()
 
-	assert data["changed"] is True
-	assert "before" in data["diff"]
-	assert "after" in data["diff"]
+	assert data == {
+		"changed": True,
+		"diff": {
+			"before": [
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+			],
+			"after": [
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+				{"prefix": False, "catchall": False, "domainName": "example.com", "matchUser": "newuser", "targetAddresses": ["helpdesk@example.com"]},
+			],
+		},
+	}
 
 
 def test_noncanonical_no_changes_diff(run):
@@ -75,9 +86,19 @@ def test_noncanonical_no_changes_diff(run):
 	mocks["RoutingClient"].create_routing_rule.assert_not_called()
 	mocks["RoutingClient"].delete_routing_rule.assert_not_called()
 
-	assert data["changed"] is False
-	assert "before" in data["diff"]
-	assert "after" in data["diff"]
+	assert data == {
+		"changed": False,
+		"diff": {
+			"before": [
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+			],
+			"after": [
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+			],
+		},
+	}
 
 
 def test_noncanonical_changes_check(run):
@@ -102,9 +123,20 @@ def test_noncanonical_changes_diff_check(run):
 	mocks["RoutingClient"].create_routing_rule.assert_not_called()
 	mocks["RoutingClient"].delete_routing_rule.assert_not_called()
 
-	assert data["changed"] is True
-	assert "before" in data["diff"]
-	assert "after" in data["diff"]
+	assert data == {
+		"changed": True,
+		"diff": {
+			"before": [
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+			],
+			"after": [
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+				{"prefix": False, "catchall": False, "domainName": "example.com", "matchUser": "newuser", "targetAddresses": ["helpdesk@example.com"]},
+			],
+		},
+	}
 
 
 def test_noncanonical_no_changes_diff_check(run):
@@ -113,9 +145,19 @@ def test_noncanonical_no_changes_diff_check(run):
 	mocks["RoutingClient"].create_routing_rule.assert_not_called()
 	mocks["RoutingClient"].delete_routing_rule.assert_not_called()
 
-	assert data["changed"] is False
-	assert "before" in data["diff"]
-	assert "after" in data["diff"]
+	assert data == {
+		"changed": False,
+		"diff": {
+			"before": [
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+			],
+			"after": [
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+			],
+		},
+	}
 
 
 def test_canonical_changes_normal(run):
@@ -140,9 +182,18 @@ def test_canonical_changes_diff(run):
 	mocks["RoutingClient"].create_routing_rule.assert_called_once()
 	assert mocks["RoutingClient"].delete_routing_rule.call_count == 2
 
-	assert data["changed"] is True
-	assert "before" in data["diff"]
-	assert "after" in data["diff"]
+	assert data == {
+		"changed": True,
+		"diff": {
+			"before": [
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+			],
+			"after": [
+				{"prefix": False, "catchall": False, "domainName": "example.com", "matchUser": "newuser", "targetAddresses": ["helpdesk@example.com"]},
+			],
+		},
+	}
 
 
 def test_canonical_no_changes_diff(run):
@@ -151,9 +202,19 @@ def test_canonical_no_changes_diff(run):
 	mocks["RoutingClient"].create_routing_rule.assert_not_called()
 	mocks["RoutingClient"].delete_routing_rule.assert_not_called()
 
-	assert data["changed"] is False
-	assert "before" in data["diff"]
-	assert "after" in data["diff"]
+	assert data == {
+		"changed": False,
+		"diff": {
+			"before": [
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+			],
+			"after": [
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+			],
+		},
+	}
 
 
 def test_canonical_changes_check(run):
@@ -178,9 +239,18 @@ def test_canonical_changes_diff_check(run):
 	mocks["RoutingClient"].create_routing_rule.assert_not_called()
 	mocks["RoutingClient"].delete_routing_rule.assert_not_called()
 
-	assert data["changed"] is True
-	assert "before" in data["diff"]
-	assert "after" in data["diff"]
+	assert data == {
+		"changed": True,
+		"diff": {
+			"before": [
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+			],
+			"after": [
+				{"prefix": False, "catchall": False, "domainName": "example.com", "matchUser": "newuser", "targetAddresses": ["helpdesk@example.com"]},
+			],
+		},
+	}
 
 
 def test_canonical_no_changes_diff_check(run):
@@ -189,6 +259,16 @@ def test_canonical_no_changes_diff_check(run):
 	mocks["RoutingClient"].create_routing_rule.assert_not_called()
 	mocks["RoutingClient"].delete_routing_rule.assert_not_called()
 
-	assert data["changed"] is False
-	assert "before" in data["diff"]
-	assert "after" in data["diff"]
+	assert data == {
+		"changed": False,
+		"diff": {
+			"before": [
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+			],
+			"after": [
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+			],
+		},
+	}

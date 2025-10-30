@@ -166,7 +166,7 @@ def main():
 			result["diff"]["before"] = existing_rules.dump_no_id()
 			after = existing_rules
 			if module.params["canonical"]:
-				after = after.filter(lambda r: r.id in extra_rules)
+				after = after.filter(lambda r: r.id not in extra_rules)
 			for rule in missing_rules:
 				after = after.with_added(rule)
 
