@@ -8,8 +8,8 @@ from ansible_collections.bofzilla.purelymail.plugins.modules.crud.routing import
 from ansible_collections.bofzilla.purelymail.tests.unit.plugins.mock_utils import make_runner  # noqa: F401
 
 EXISTING_RULES = [
-	RoutingRule(id=1, matchUser="toto", prefix=True, catchall=False, domainName="example.com", targetAddresses=["admin@example.com"]),
-	RoutingRule(id=2, matchUser="admin", prefix=True, catchall=False, domainName="example.com", targetAddresses=["support@example.com"]),
+	RoutingRule(id=1, match_user="toto", prefix=True, catchall=False, domain_name="example.com", target_addresses=["admin@example.com"]),
+	RoutingRule(id=2, match_user="admin", prefix=True, catchall=False, domain_name="example.com", target_addresses=["support@example.com"]),
 ]
 
 
