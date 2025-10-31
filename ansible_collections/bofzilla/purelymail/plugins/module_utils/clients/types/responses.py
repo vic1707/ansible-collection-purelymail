@@ -32,6 +32,7 @@ class ListRoutingResponse:
 		return [r.dump(by_alias=by_alias, exclude=["id"]) for r in self.rules]
 
 	def filter(self, predicate: Callable[[RoutingRule], bool]) -> "ListRoutingResponse":
+		"""True means keep"""
 		return ListRoutingResponse([r for r in self.rules if predicate(r)])
 
 	def with_added(self, new_rule: RoutingRule) -> "ListRoutingResponse":
