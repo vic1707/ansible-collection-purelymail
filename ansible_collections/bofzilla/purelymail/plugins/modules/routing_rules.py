@@ -149,6 +149,15 @@ rules:
       description: List of target email addresses
       type: list
       elements: str
+	preset:
+      description:
+        - WebUI preset to use for this rule.
+        - V(any_address) → C(match_user="", prefix=True, catchall=False)
+        - V(catchall_except_valid) → C(match_user="", prefix=True, catchall=True)
+        - V(prefix_match) → C(prefix=True, catchall=False)
+        - V(exact_match) → C(prefix=False, catchall=False)
+      type: str
+      choices: [any_address, catchall_except_valid, prefix_match, exact_match]
 """
 
 
@@ -217,13 +226,13 @@ def main():
 
 		result = {
 			"changed": (module.params["canonical"] and bool(extra_rules)) or bool(missing_rules),
-			"rules": supposed_after.dump_no_id(),
+			"rules": supposed_after.dump(exclude=['id']),
 		}
 
 		if module._diff:
 			result["diff"] = {
-				"before": existing_rules.dump_no_id(),
-				"after": supposed_after.dump_no_id(),
+				"before": existing_rules.dump(exclude=['id']),
+				"after": supposed_after.dump(exclude=['id']),
 			}
 
 		if not module.check_mode:

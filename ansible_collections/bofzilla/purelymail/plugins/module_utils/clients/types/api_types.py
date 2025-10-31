@@ -1,6 +1,6 @@
 from typing import ClassVar, Literal
 
-from pydantic import ConfigDict, Field, TypeAdapter
+from pydantic import ConfigDict, Field, TypeAdapter, computed_field
 from pydantic.dataclasses import dataclass
 from pydantic.main import IncEx
 
@@ -29,6 +29,7 @@ class RoutingRule:
 	def dump(self, *, by_alias: bool = False, exclude: IncEx | None = None):
 		return RoutingRule._adapter.dump_python(self, by_alias=by_alias, exclude=exclude)
 
+	@computed_field(return_type=PresetType | None)
 	@property
 	def preset(self) -> PresetType | None:
 		for preset, values in PRESET_MAP.items():
