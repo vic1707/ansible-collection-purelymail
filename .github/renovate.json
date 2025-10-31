@@ -8,7 +8,7 @@
 			"groupName": "GitHub Actions"
 		},
 		{
-			"matchManagers": ["mise", "pip_requirements"],
+			"matchManagers": ["mise", "pep621"],
 			"groupName": "Tools"
 		}
 	]
