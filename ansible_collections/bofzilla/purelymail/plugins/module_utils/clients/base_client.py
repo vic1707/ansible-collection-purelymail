@@ -37,6 +37,6 @@ class PurelymailAPI:
 			case ApiSuccess():
 				return response_model(**data.result)
 			case ApiError():
-				return self.__module.fail_json(msg="Purelymail API error", exception=data)
+				return self.__module.fail_json(msg=f"Purelymail API error: {data}", exception=data)
 			case other:
 				raise ValueError(f"Unexpected response type: {other}")
