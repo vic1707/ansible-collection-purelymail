@@ -4,8 +4,10 @@ from pydantic import ConfigDict, Field, TypeAdapter
 from pydantic.dataclasses import dataclass
 from pydantic.main import IncEx
 
+from ansible_collections.bofzilla.purelymail.plugins.module_utils.pydantic import DEFAULT_CFG
 
-@dataclass(config=ConfigDict(extra="forbid", populate_by_name=True))
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG, populate_by_name=True))
 class RoutingRule:
 	_adapter: ClassVar[TypeAdapter["RoutingRule"]]
 

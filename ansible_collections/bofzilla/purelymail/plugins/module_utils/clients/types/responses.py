@@ -6,21 +6,22 @@ from pydantic.dataclasses import dataclass
 from pydantic.main import IncEx
 
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.api_types import RoutingRule
+from ansible_collections.bofzilla.purelymail.plugins.module_utils.pydantic import DEFAULT_CFG
 
 
-@dataclass(config=ConfigDict(extra="forbid"))
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
 class EmptyResponse:
 	pass
 
 
 ## Billing
-@dataclass(config=ConfigDict(extra="forbid"))
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
 class CheckCreditResponse:
 	credit: Json[PositiveFloat]
 
 
 ## Routing
-@dataclass(config=ConfigDict(extra="forbid"))
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
 class ListRoutingResponse:
 	rules: list[RoutingRule]
 
