@@ -37,7 +37,7 @@ RETURN = r"""
 credit:
   description: The current credit of the account
   type: float
-  returned: always
+  returned: success
 """
 
 

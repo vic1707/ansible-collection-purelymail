@@ -35,5 +35,5 @@ class ListRoutingResponse:
 		"""True means keep"""
 		return ListRoutingResponse([r for r in self.rules if predicate(r)])
 
-	def with_added(self, new_rule: RoutingRule) -> "ListRoutingResponse":
-		return ListRoutingResponse(self.rules + [new_rule])
+	def concat(self, new_rules: list[RoutingRule]) -> "ListRoutingResponse":
+		return ListRoutingResponse(self.rules + new_rules)

@@ -92,9 +92,65 @@ author:
   - vic1707
 """
 
-EXAMPLES = r""""""
+EXAMPLES = r"""
+# Example 1: Add a new routing rule (non-canonical)
+- name: Add a new routing rule
+  bofzilla.purelymail.routing_rules:
+    api_token: "{{ purelymail_api_token }}"
+    canonical: false
+    rules:
+      - domain_name: example.com
+        match_user: "newuser"
+        prefix: false
+        catchall: false
+        target_addresses:
+          - "helpdesk@example.com"
+      # You can also use presets like in the WebUI
+      - domain_name: example.com
+        preset: any_address
+        target_addresses: ["admin@example.com"]
 
-RETURN = r""""""
+# Example 2: Replace all existing rules with a single definition
+- name: Replace all routing rules
+  bofzilla.purelymail.routing_rules:
+    api_token: "{{ purelymail_api_token }}"
+    canonical: true
+    rules:
+      - domain_name: example.com
+        match_user: "support"
+        prefix: false
+        catchall: false
+        target_addresses:
+          - "support@example.com"
+"""
+
+RETURN = r"""
+rules:
+  description:
+    - The final list of routing rules after applying changes.
+    - IDs are excluded since we can't predict them ahead of time.
+  returned: success
+  type: list
+  elements: dict
+  contains:
+    domainName:
+      description: Domain the rule applies to
+      type: str
+    matchUser:
+      description: Local part of the user address
+      type: str
+    prefix:
+      description: Whether matchUser is treated as a prefix
+      type: bool
+    catchall:
+      description: Whether this is a catchall rule
+      type: bool
+    targetAddresses:
+      description: List of target email addresses
+      type: list
+      elements: str
+"""
+
 
 module_spec = dict(
 	argument_spec=dict(
@@ -155,20 +211,22 @@ def main():
 		extra_rules = [er.id for er in existing_rules.rules if not any(r.matches(er) for r in rules)]
 		missing_rules = [r for r in rules if not any(r.matches(er) for er in existing_rules.rules)]
 
-		result = {"changed": (module.params["canonical"] and len(extra_rules) != 0) or len(missing_rules) != 0}
+		supposed_after = existing_rules.concat(missing_rules)
+		if module.params["canonical"]:
+			supposed_after = supposed_after.filter(lambda r: r.id not in extra_rules)
+
+		result = {
+			"changed": (module.params["canonical"] and bool(extra_rules)) or bool(missing_rules),
+			"rules": supposed_after.dump_no_id(),
+		}
 
 		if module._diff:
-			result["diff"] = {}
-			result["diff"]["before"] = existing_rules.dump_no_id()
-			after = existing_rules
-			if module.params["canonical"]:
-				after = after.filter(lambda r: r.id not in extra_rules)
-			for rule in missing_rules:
-				after = after.with_added(rule)
+			result["diff"] = {
+				"before": existing_rules.dump_no_id(),
+				"after": supposed_after.dump_no_id(),
+			}
 
-			result["diff"]["after"] = after.dump_no_id()
-
-		if result["changed"] and not module.check_mode:
+		if not module.check_mode:
 			if module.params["canonical"]:
 				for id in extra_rules:
 					client.delete_routing_rule(DeleteRoutingRequest(id))

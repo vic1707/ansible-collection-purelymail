@@ -38,26 +38,27 @@ rules:
   description: List of routing rules
   type: list
   elements: dict
+  returned: success
   contains:
     id:
       description: ID of the routing rule
       type: int
-    domain_name:
+    domainName:
       description: Domain the rule applies to
       type: str
-    match_user:
+    matchUser:
       description: Local part of the user address
       type: str
-    target_addresses:
-      description: List of target email addresses
-      type: list
-      elements: str
     prefix:
-      description: Whether match_user is treated as a prefix
+      description: Whether matchUser is treated as a prefix
       type: bool
     catchall:
       description: Whether this is a catchall rule
       type: bool
+    targetAddresses:
+      description: List of target email addresses
+      type: list
+      elements: str
 """
 
 
