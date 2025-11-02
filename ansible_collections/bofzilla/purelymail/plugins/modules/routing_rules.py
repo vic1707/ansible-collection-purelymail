@@ -226,13 +226,13 @@ def main():
 
 		result = {
 			"changed": (module.params["canonical"] and bool(extra_rules)) or bool(missing_rules),
-			"rules": supposed_after.dump(exclude=['id']),
+			"rules": supposed_after.dump(exclude=["id"]),
 		}
 
 		if module._diff:
 			result["diff"] = {
-				"before": existing_rules.dump(exclude=['id']),
-				"after": supposed_after.dump(exclude=['id']),
+				"before": existing_rules.dump(exclude=["id"]),
+				"after": supposed_after.dump(exclude=["id"]),
 			}
 
 		if not module.check_mode:

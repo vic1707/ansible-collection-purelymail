@@ -50,9 +50,9 @@ def test_noncanonical_changes_normal(run):
 	assert data == {
 		"changed": True,
 		"rules": [
-			{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
-			{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
-			{"prefix": False, 'preset': 'exact_match', "catchall": False, "domainName": "example.com", "matchUser": "newuser", "targetAddresses": ["helpdesk@example.com"]},
+			{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+			{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+			{"prefix": False, "preset": "exact_match", "catchall": False, "domainName": "example.com", "matchUser": "newuser", "targetAddresses": ["helpdesk@example.com"]},
 		],
 	}
 
@@ -65,8 +65,8 @@ def test_noncanonical_no_changes_normal(run):
 	assert data == {
 		"changed": False,
 		"rules": [
-			{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
-			{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+			{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+			{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
 		],
 	}
 
@@ -81,19 +81,19 @@ def test_noncanonical_changes_diff(run):
 		"changed": True,
 		"diff": {
 			"before": [
-				{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
-				{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+				{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
 			],
 			"after": [
-				{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
-				{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
-				{"prefix": False, 'preset': 'exact_match', "catchall": False, "domainName": "example.com", "matchUser": "newuser", "targetAddresses": ["helpdesk@example.com"]},
+				{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+				{"prefix": False, "preset": "exact_match", "catchall": False, "domainName": "example.com", "matchUser": "newuser", "targetAddresses": ["helpdesk@example.com"]},
 			],
 		},
 		"rules": [
-			{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
-			{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
-			{"prefix": False, 'preset': 'exact_match', "catchall": False, "domainName": "example.com", "matchUser": "newuser", "targetAddresses": ["helpdesk@example.com"]},
+			{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+			{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+			{"prefix": False, "preset": "exact_match", "catchall": False, "domainName": "example.com", "matchUser": "newuser", "targetAddresses": ["helpdesk@example.com"]},
 		],
 	}
 
@@ -108,17 +108,17 @@ def test_noncanonical_no_changes_diff(run):
 		"changed": False,
 		"diff": {
 			"before": [
-				{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
-				{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+				{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
 			],
 			"after": [
-				{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
-				{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+				{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
 			],
 		},
 		"rules": [
-			{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
-			{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+			{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+			{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
 		],
 	}
 
@@ -131,9 +131,9 @@ def test_noncanonical_changes_check(run):
 	assert data == {
 		"changed": True,
 		"rules": [
-			{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
-			{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
-			{"prefix": False, 'preset': 'exact_match', "catchall": False, "domainName": "example.com", "matchUser": "newuser", "targetAddresses": ["helpdesk@example.com"]},
+			{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+			{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+			{"prefix": False, "preset": "exact_match", "catchall": False, "domainName": "example.com", "matchUser": "newuser", "targetAddresses": ["helpdesk@example.com"]},
 		],
 	}
 
@@ -146,8 +146,8 @@ def test_noncanonical_no_changes_check(run):
 	assert data == {
 		"changed": False,
 		"rules": [
-			{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
-			{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+			{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+			{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
 		],
 	}
 
@@ -162,19 +162,19 @@ def test_noncanonical_changes_diff_check(run):
 		"changed": True,
 		"diff": {
 			"before": [
-				{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
-				{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+				{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
 			],
 			"after": [
-				{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
-				{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
-				{"prefix": False, 'preset': 'exact_match', "catchall": False, "domainName": "example.com", "matchUser": "newuser", "targetAddresses": ["helpdesk@example.com"]},
+				{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+				{"prefix": False, "preset": "exact_match", "catchall": False, "domainName": "example.com", "matchUser": "newuser", "targetAddresses": ["helpdesk@example.com"]},
 			],
 		},
 		"rules": [
-			{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
-			{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
-			{"prefix": False, 'preset': 'exact_match', "catchall": False, "domainName": "example.com", "matchUser": "newuser", "targetAddresses": ["helpdesk@example.com"]},
+			{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+			{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+			{"prefix": False, "preset": "exact_match", "catchall": False, "domainName": "example.com", "matchUser": "newuser", "targetAddresses": ["helpdesk@example.com"]},
 		],
 	}
 
@@ -189,17 +189,17 @@ def test_noncanonical_no_changes_diff_check(run):
 		"changed": False,
 		"diff": {
 			"before": [
-				{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
-				{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+				{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
 			],
 			"after": [
-				{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
-				{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+				{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
 			],
 		},
 		"rules": [
-			{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
-			{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+			{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+			{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
 		],
 	}
 
@@ -212,7 +212,7 @@ def test_canonical_changes_normal(run):
 	assert data == {
 		"changed": True,
 		"rules": [
-			{"prefix": False, 'preset': 'exact_match', 'preset': 'exact_match', "catchall": False, "domainName": "example.com", "matchUser": "newuser", "targetAddresses": ["helpdesk@example.com"]},
+			{"prefix": False, "preset": "exact_match", "catchall": False, "domainName": "example.com", "matchUser": "newuser", "targetAddresses": ["helpdesk@example.com"]},
 		],
 	}
 
@@ -225,8 +225,8 @@ def test_canonical_no_changes_normal(run):
 	assert data == {
 		"changed": False,
 		"rules": [
-			{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
-			{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+			{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+			{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
 		],
 	}
 
@@ -241,15 +241,15 @@ def test_canonical_changes_diff(run):
 		"changed": True,
 		"diff": {
 			"before": [
-				{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
-				{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+				{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
 			],
 			"after": [
-				{"prefix": False, 'preset': 'exact_match', "catchall": False, "domainName": "example.com", "matchUser": "newuser", "targetAddresses": ["helpdesk@example.com"]},
+				{"prefix": False, "preset": "exact_match", "catchall": False, "domainName": "example.com", "matchUser": "newuser", "targetAddresses": ["helpdesk@example.com"]},
 			],
 		},
 		"rules": [
-			{"prefix": False, 'preset': 'exact_match', "catchall": False, "domainName": "example.com", "matchUser": "newuser", "targetAddresses": ["helpdesk@example.com"]},
+			{"prefix": False, "preset": "exact_match", "catchall": False, "domainName": "example.com", "matchUser": "newuser", "targetAddresses": ["helpdesk@example.com"]},
 		],
 	}
 
@@ -264,17 +264,17 @@ def test_canonical_no_changes_diff(run):
 		"changed": False,
 		"diff": {
 			"before": [
-				{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
-				{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+				{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
 			],
 			"after": [
-				{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
-				{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+				{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
 			],
 		},
 		"rules": [
-			{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
-			{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+			{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+			{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
 		],
 	}
 
@@ -287,7 +287,7 @@ def test_canonical_changes_check(run):
 	assert data == {
 		"changed": True,
 		"rules": [
-			{"prefix": False, 'preset': 'exact_match', 'preset': 'exact_match', "catchall": False, "domainName": "example.com", "matchUser": "newuser", "targetAddresses": ["helpdesk@example.com"]},
+			{"prefix": False, "preset": "exact_match", "catchall": False, "domainName": "example.com", "matchUser": "newuser", "targetAddresses": ["helpdesk@example.com"]},
 		],
 	}
 
@@ -300,8 +300,8 @@ def test_canonical_no_changes_check(run):
 	assert data == {
 		"changed": False,
 		"rules": [
-			{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
-			{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+			{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+			{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
 		],
 	}
 
@@ -316,15 +316,15 @@ def test_canonical_changes_diff_check(run):
 		"changed": True,
 		"diff": {
 			"before": [
-				{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
-				{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+				{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
 			],
 			"after": [
-				{"prefix": False, 'preset': 'exact_match', "catchall": False, "domainName": "example.com", "matchUser": "newuser", "targetAddresses": ["helpdesk@example.com"]},
+				{"prefix": False, "preset": "exact_match", "catchall": False, "domainName": "example.com", "matchUser": "newuser", "targetAddresses": ["helpdesk@example.com"]},
 			],
 		},
 		"rules": [
-			{"prefix": False, 'preset': 'exact_match', "catchall": False, "domainName": "example.com", "matchUser": "newuser", "targetAddresses": ["helpdesk@example.com"]},
+			{"prefix": False, "preset": "exact_match", "catchall": False, "domainName": "example.com", "matchUser": "newuser", "targetAddresses": ["helpdesk@example.com"]},
 		],
 	}
 
@@ -339,17 +339,17 @@ def test_canonical_no_changes_diff_check(run):
 		"changed": False,
 		"diff": {
 			"before": [
-				{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
-				{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+				{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
 			],
 			"after": [
-				{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
-				{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+				{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
 			],
 		},
 		"rules": [
-			{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
-			{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+			{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+			{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
 		],
 	}
 
@@ -373,8 +373,8 @@ def test_noncanonical_empty_input_no_changes(run):
 	assert data == {
 		"changed": False,
 		"rules": [
-			{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
-			{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+			{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+			{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
 		],
 	}
 
@@ -388,8 +388,8 @@ def test_canonical_partial_overlap(run):
 	assert data == {
 		"changed": True,
 		"rules": [
-			{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
-			{"prefix": False, 'preset': 'exact_match', "catchall": False, "domainName": "example.com", "matchUser": "newuser", "targetAddresses": ["helpdesk@example.com"]},
+			{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+			{"prefix": False, "preset": "exact_match", "catchall": False, "domainName": "example.com", "matchUser": "newuser", "targetAddresses": ["helpdesk@example.com"]},
 		],
 	}
 
@@ -404,17 +404,17 @@ def test_canonical_partial_overlap_diff(run):
 		"changed": True,
 		"diff": {
 			"before": [
-				{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
-				{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
+				{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"]},
 			],
 			"after": [
-				{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
-				{"prefix": False, 'preset': 'exact_match', "catchall": False, "domainName": "example.com", "matchUser": "newuser", "targetAddresses": ["helpdesk@example.com"]},
+				{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+				{"prefix": False, "preset": "exact_match", "catchall": False, "domainName": "example.com", "matchUser": "newuser", "targetAddresses": ["helpdesk@example.com"]},
 			],
 		},
 		"rules": [
-			{"prefix": True, 'preset': 'prefix_match', "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
-			{"prefix": False, 'preset': 'exact_match', "catchall": False, "domainName": "example.com", "matchUser": "newuser", "targetAddresses": ["helpdesk@example.com"]},
+			{"prefix": True, "preset": "prefix_match", "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"]},
+			{"prefix": False, "preset": "exact_match", "catchall": False, "domainName": "example.com", "matchUser": "newuser", "targetAddresses": ["helpdesk@example.com"]},
 		],
 	}
 
