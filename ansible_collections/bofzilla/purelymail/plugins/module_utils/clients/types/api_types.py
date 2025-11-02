@@ -29,6 +29,9 @@ class RoutingRule:
 	def dump(self, *, by_alias: bool = False, exclude: IncEx | None = None):
 		return RoutingRule._adapter.dump_python(self, by_alias=by_alias, exclude=exclude)
 
+	def as_api_response(self):
+		return RoutingRule._adapter.dump_python(self, exclude=["preset"])
+
 	@computed_field(return_type=PresetType | None)
 	@property
 	def preset(self) -> PresetType | None:

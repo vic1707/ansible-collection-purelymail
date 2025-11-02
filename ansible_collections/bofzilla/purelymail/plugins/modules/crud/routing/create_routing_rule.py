@@ -97,8 +97,8 @@ def main():
 
 		if module._diff:
 			result["diff"] = {
-				"before": existing_rules.dump_raw(),
-				"after": existing_rules.concat([rule]).dump_raw() if result["changed"] else existing_rules.dump_raw(),
+				"before": existing_rules.as_api_payload(),
+				"after": existing_rules.concat([rule]).as_api_payload() if result["changed"] else existing_rules.as_api_payload(),
 			}
 
 		if result["changed"] and not module.check_mode:
