@@ -15,7 +15,7 @@ dependencies = [
 
 [tool.ruff]
 indent-width = 4
-line-length = 160
+line-length = 180
 
 [tool.ruff.format]
 quote-style = "double"
@@ -38,6 +38,6 @@ select = [
     # isort
     "I",
 ]
-ignore = [
-	"E501", # line-too-long
-]
+
+[tool.ruff.lint.pycodestyle]
+max-line-length = 180
