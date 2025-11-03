@@ -2,7 +2,6 @@ from typing import ClassVar, Literal
 
 from pydantic import ConfigDict, Field, TypeAdapter, computed_field
 from pydantic.dataclasses import dataclass
-from pydantic.main import IncEx
 
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.pydantic import DEFAULT_CFG
 
@@ -26,11 +25,17 @@ class RoutingRule:
 	targetAddresses: list[str] = Field(..., alias="target_addresses")
 	id: int = Field(..., gt=0)
 
-	def dump(self, *, by_alias: bool = False, exclude: IncEx | None = None):
-		return RoutingRule._adapter.dump_python(self, by_alias=by_alias, exclude=exclude)
+	def as_display(self):
+		return RoutingRule._adapter.dump_python(self, exclude=["id"])
 
 	def as_api_response(self):
 		return RoutingRule._adapter.dump_python(self, exclude=["preset"])
+
+	def as_api_payload(self):
+		return RoutingRule._adapter.dump_python(self, exclude=["preset", "id"])
+
+	def as_playbook_input(self):
+		return RoutingRule._adapter.dump_python(self, by_alias=True, exclude=["preset", "id"])
 
 	@computed_field(return_type=PresetType | None)
 	@property

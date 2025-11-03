@@ -202,12 +202,7 @@ def main():
 
 	# Waiting for <https://github.com/ansible/ansible/pull/86074> to remove
 	for idx, rule in enumerate(module.params["rules"]):
-		if (
-			rule.get("preset", None) is None
-			and rule.get("match_user", None) is None
-			and rule.get("prefix", None) is None
-			and rule.get("catchall", None) is None
-		):
+		if rule.get("preset", None) is None and rule.get("match_user", None) is None and rule.get("prefix", None) is None and rule.get("catchall", None) is None:
 			module.fail_json(msg=f"rule[{idx}]: preset is None but any of the following are missing: match_user, prefix, catchall found in rules")
 
 	api = PurelymailAPI(module, module.params["api_token"])
@@ -226,13 +221,13 @@ def main():
 
 		result = {
 			"changed": (module.params["canonical"] and bool(extra_rules)) or bool(missing_rules),
-			"rules": supposed_after.as_result_output(),
+			"rules": supposed_after.as_display(),
 		}
 
 		if module._diff:
 			result["diff"] = {
-				"before": existing_rules.as_result_output(),
-				"after": supposed_after.as_result_output(),
+				"before": existing_rules.as_display(),
+				"after": supposed_after.as_display(),
 			}
 
 		if not module.check_mode:

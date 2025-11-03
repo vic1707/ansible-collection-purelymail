@@ -3,7 +3,6 @@ from typing import Any
 
 from pydantic import ConfigDict, Json, PositiveFloat
 from pydantic.dataclasses import dataclass
-from pydantic.main import IncEx
 
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.api_types import RoutingRule
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.pydantic import DEFAULT_CFG
@@ -25,14 +24,14 @@ class CheckCreditResponse:
 class ListRoutingResponse:
 	rules: list[RoutingRule]
 
-	def dump(self, *, by_alias: bool = False, exclude: IncEx | None = None) -> list[dict[str, Any]]:
-		return [r.dump(by_alias=by_alias, exclude=exclude) for r in self.rules]
+	def as_api_payloads(self) -> list[dict[str, Any]]:
+		return [r.as_api_payload() for r in self.rules]
 
-	def as_api_payload(self, *, by_alias: bool = False) -> list[dict[str, Any]]:
-		return [r.dump(by_alias=by_alias, exclude=["id", "preset"]) for r in self.rules]
+	def as_api_response(self) -> list[dict[str, Any]]:
+		return [r.as_api_response() for r in self.rules]
 
-	def as_result_output(self, *, by_alias: bool = False) -> list[dict[str, Any]]:
-		return [r.dump(by_alias=by_alias, exclude=["id"]) for r in self.rules]
+	def as_display(self) -> list[dict[str, Any]]:
+		return [r.as_display() for r in self.rules]
 
 	def filter(self, predicate: Callable[[RoutingRule], bool]) -> "ListRoutingResponse":
 		"""True means keep"""

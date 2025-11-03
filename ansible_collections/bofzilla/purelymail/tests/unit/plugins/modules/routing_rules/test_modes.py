@@ -13,7 +13,7 @@ EXISTING_RULES = [
 	RoutingRule(id=2, match_user="admin", prefix=True, catchall=False, domain_name="example.com", target_addresses=["support@example.com"]),
 ]
 
-EXISTING_RULES_AS_INPUT = [r.dump(by_alias=True, exclude=["id"]) for r in EXISTING_RULES]
+EXISTING_RULES_AS_INPUT = [r.as_playbook_input() for r in EXISTING_RULES]
 NEW_RULE = dict(
 	domain_name="example.com",
 	match_user="newuser",

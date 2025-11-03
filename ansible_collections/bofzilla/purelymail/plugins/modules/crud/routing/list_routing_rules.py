@@ -71,7 +71,7 @@ def main():
 	client = RoutingClient(api)
 
 	try:
-		rules = client.list_routing_rules().dump(exclude=["preset"])
+		rules = client.list_routing_rules().as_api_response()
 
 		res = {"changed": False}
 
