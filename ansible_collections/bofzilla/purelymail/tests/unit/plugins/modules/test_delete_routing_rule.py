@@ -47,7 +47,7 @@ def test_diff_mode_successful_delete(run):
 				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"], "id": 2},
 			],
 			"after": [
-				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"], "id": 2}
+				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"], "id": 2},
 			],
 		},
 	}

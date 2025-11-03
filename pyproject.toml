@@ -15,7 +15,7 @@ dependencies = [
 
 [tool.ruff]
 indent-width = 4
-line-length = 320 # max
+line-length = 180
 
 [tool.ruff.format]
 quote-style = "double"
