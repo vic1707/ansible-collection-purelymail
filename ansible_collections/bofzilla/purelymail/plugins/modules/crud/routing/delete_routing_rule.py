@@ -74,7 +74,7 @@ def main():
 	except Exception as e:
 		import traceback
 
-		module.fail_json(f"{type(e).__name__}: {e}", exception=traceback.format_exc())
+		module.fail_json(msg=f"{type(e).__name__}: {e}", exception=traceback.format_exc())
 
 
 if __name__ == "__main__":
