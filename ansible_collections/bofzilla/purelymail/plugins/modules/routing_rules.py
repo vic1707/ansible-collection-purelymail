@@ -149,7 +149,7 @@ rules:
       description: List of target email addresses
       type: list
       elements: str
-	preset:
+    preset:
       description:
         - WebUI preset to use for this rule.
         - V(any_address) → C(match_user="", prefix=True, catchall=False)
