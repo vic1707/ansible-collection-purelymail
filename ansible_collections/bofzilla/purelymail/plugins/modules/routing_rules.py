@@ -212,8 +212,8 @@ def main():
 		existing_rules = client.list_routing_rules()
 		rules = [CreateRoutingRequest(**r) for r in module.params["rules"]]
 
-		extra_rules = [er.id for er in existing_rules.rules if not any(r.matches(er) for r in rules)]
-		missing_rules = [r for r in rules if not any(r.matches(er) for er in existing_rules.rules)]
+		extra_rules = [er.id for er in existing_rules.rules if not any(r.eq(er) for r in rules)]
+		missing_rules = [r for r in rules if not any(r.eq(er) for er in existing_rules.rules)]
 
 		supposed_after = existing_rules.concat(missing_rules)
 		if module.params["canonical"]:

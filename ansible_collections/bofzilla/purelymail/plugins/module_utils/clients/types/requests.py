@@ -17,7 +17,7 @@ class CreateRoutingRequest(RoutingRule):
 	id: None = Field(default=None, init=False, exclude=True)  # doesn't exist yet
 	_preset: PresetType | None = Field(exclude=True, alias="preset")  # TODO: ty fails if default=None
 
-	def matches(self, rule: RoutingRule) -> bool:
+	def eq(self, rule: RoutingRule) -> bool:
 		return (
 			self.prefix == rule.prefix
 			and self.catchall == rule.catchall

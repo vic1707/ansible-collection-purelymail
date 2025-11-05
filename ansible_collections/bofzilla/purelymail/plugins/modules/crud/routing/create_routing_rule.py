@@ -93,7 +93,7 @@ def main():
 
 		existing_rules = client.list_routing_rules()
 
-		result = {"changed": not any(rule.matches(r) for r in existing_rules.rules)}
+		result = {"changed": not any(rule.eq(r) for r in existing_rules.rules)}
 
 		if module._diff:
 			result["diff"] = {
