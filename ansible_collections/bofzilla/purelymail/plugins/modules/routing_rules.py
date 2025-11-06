@@ -17,7 +17,7 @@ description:
     - (Any address starting with) → C(match_user="<anything you want>", prefix=True, catchall=False)
     - (The exact address) → C(match_user="<anything you want>", prefix=False, catchall=False)
   - When using presets, you can provide the preset name in the rule instead of manually setting prefix/catchall/match_user.
-  - Optionally, `canonical` can be set to true to remove any rules not explicitly defined in the input list.
+  - By default, this module is `canonical`, meaning it removes any existing rules that are not explicitly defined
 
 options:
   api_token:
@@ -26,10 +26,15 @@ options:
     type: str
 
   canonical:
-    description: If true, remove any existing rules not specified in `rules`
-    type: bool
+    description:
+      - Canonical means we remove any existing rules not specified in `rules`
+      - Should be a list of domain names to be canonical of
+      - Defaults to a set of all domain names referenced in C(rules) and currently present on the API
+      - Use V([]) to disable
+    type: list
     required: false
-    default: false
+    elements: str
+    default: list of all referenced domains in C(rules) + already present on API
 
   rules:
     description: List of routing rules to apply
@@ -97,7 +102,7 @@ EXAMPLES = r"""
 - name: Add a new routing rule
   bofzilla.purelymail.routing_rules:
     api_token: "{{ purelymail_api_token }}"
-    canonical: false
+    canonical: [] # Disable canonical for every domain
     rules:
       - domain_name: example.com
         match_user: "newuser"
@@ -114,7 +119,7 @@ EXAMPLES = r"""
 - name: Replace all routing rules
   bofzilla.purelymail.routing_rules:
     api_token: "{{ purelymail_api_token }}"
-    canonical: true
+    canonical: [example.com] # can also be omitted
     rules:
       - domain_name: example.com
         match_user: "support"
@@ -160,11 +165,10 @@ rules:
       choices: [any_address, catchall_except_valid, prefix_match, exact_match]
 """
 
-
 module_spec = dict(
 	argument_spec=dict(
 		api_token=dict(type="str", required=True, no_log=True),
-		canonical=dict(type="bool", required=False, default=False),
+		canonical=dict(type="list", elements="str", required=False),
 		rules=dict(
 			type="list",
 			required=True,
@@ -211,16 +215,18 @@ def main():
 	try:
 		existing_rules = client.list_routing_rules()
 		rules = [CreateRoutingRequest(**r) for r in module.params["rules"]]
+	
+		canonical_domains: None | list[str] = module.params.get("canonical")
+		if canonical_domains is None:
+			canonical_domains = list[str]({r.domainName for r in rules + existing_rules.rules})
 
-		extra_rules = [er.id for er in existing_rules.rules if not any(r.eq(er) for r in rules)]
+		extra_rules = [er.id for er in existing_rules.rules if not any(r.eq(er) for r in rules) and er.domainName in canonical_domains]
 		missing_rules = [r for r in rules if not any(r.eq(er) for er in existing_rules.rules)]
 
-		supposed_after = existing_rules.concat(missing_rules)
-		if module.params["canonical"]:
-			supposed_after = supposed_after.filter(lambda r: r.id not in extra_rules)
+		supposed_after = existing_rules.concat(missing_rules).filter(lambda r: r.id not in extra_rules)
 
 		result = {
-			"changed": (module.params["canonical"] and bool(extra_rules)) or bool(missing_rules),
+			"changed": bool(extra_rules) or bool(missing_rules),
 			"rules": supposed_after.as_display(),
 		}
 
@@ -231,9 +237,8 @@ def main():
 			}
 
 		if not module.check_mode:
-			if module.params["canonical"]:
-				for id in extra_rules:
-					client.delete_routing_rule(DeleteRoutingRequest(id))
+			for id in extra_rules:
+				client.delete_routing_rule(DeleteRoutingRequest(id))
 
 			for rule in missing_rules:
 				client.create_routing_rule(rule)
