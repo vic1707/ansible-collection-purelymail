@@ -1,0 +1,16 @@
+---
+- name: purelymail_internal_preset_rules | main | Include `any_address` rules
+  ansible.builtin.include_tasks: any_address/main.yml
+
+- name: purelymail_internal_preset_rules | main | Include `catchall_except_valid` rules
+  ansible.builtin.include_tasks: catchall_except_valid/main.yml
+
+- name: purelymail_internal_preset_rules | main | Include `exact_match` rules
+  ansible.builtin.include_tasks: exact_match/main.yml
+
+- name: purelymail_internal_preset_rules | main | Include `prefix_match` rules
+  ansible.builtin.include_tasks: prefix_match/main.yml
+
+- name: purelymail_internal_preset_rules | main | Unused preset combinations
+  ansible.builtin.include_tasks: unused_presets_combinations.yml
+

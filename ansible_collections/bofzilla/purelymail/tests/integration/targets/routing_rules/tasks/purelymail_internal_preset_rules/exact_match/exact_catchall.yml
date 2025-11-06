@@ -1,0 +1,27 @@
+---
+- name: exact_match | exact_catchall | Create rules
+  bofzilla.purelymail.routing_rules:
+    api_token: "{{ PURELYMAIL_API_TOKEN }}"
+    inferred_safety: false
+    rules:
+      - domain_name: "{{ PURELYMAIL_DOMAIN }}"
+        preset: exact_match
+        target_addresses: ["exact@{{ PURELYMAIL_DOMAIN }}"]
+        match_user: admin@{{ PURELYMAIL_DOMAIN }}
+      - domain_name: "{{ PURELYMAIL_DOMAIN }}"
+        preset: catchall_except_valid
+        target_addresses: ["catch@{{ PURELYMAIL_DOMAIN }}"]
+  environment:
+    PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+  register: result
+
+- name: exact_match | exact_catchall | Debug result
+  ansible.builtin.debug:
+    var: result
+
+- name: exact_match | exact_catchall | Assert SUCCESS
+  ansible.builtin.assert:
+    that:
+      - result is not failed
+      - result.changed is true
+      - result.rules | length == 2

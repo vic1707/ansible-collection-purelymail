@@ -1,0 +1,124 @@
+## We have
+#      PRESET NAME          | prefix | catchall | matchUser |
+# any_address               |   ✅   |    ❌    |     ""    |
+# catchall_except_valid     |   ✅   |    ✅    |     ""    |
+# prefix_match              |   ✅   |    ❌    |   <any>   |
+# exact_match               |   ❌   |    ❌    |   <any>   |
+
+## [MISSINGS]
+# catchall_no_prefix_empty  |   ❌   |    ✅    |     ""    |
+# catchall_no_prefix_any    |   ❌   |    ✅    |   <any>   |
+# all_any                   |   ✅   |    ✅    |   <any>   |
+
+## [Actually matches]
+# all_false_empty           |   ❌   |    ❌    |     ""    | # technically matches exact_match
+---
+- name: purelymail_internal_preset_rules | unused_presets_combinations | (catchall_no_prefix_empty)
+  bofzilla.purelymail.routing_rules:
+    api_token: "{{ PURELYMAIL_API_TOKEN }}"
+    inferred_safety: false
+    rules:
+      - domain_name: "{{ PURELYMAIL_DOMAIN }}"
+        target_addresses: []
+        catchall: true
+        prefix: false
+        match_user: ""
+  environment:
+    PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+  register: result
+
+- name: purelymail_internal_preset_rules | unused_presets_combinations | Debug result (catchall_no_prefix_empty)
+  ansible.builtin.debug:
+    var: result
+
+- name: purelymail_internal_preset_rules | unused_presets_combinations | Assert matches exact_match (catchall_no_prefix_empty)
+  ansible.builtin.assert:
+    that:
+      - result is not failed
+      - result.rules | length == 1
+      - result.rules[0].preset == None
+      - result.rules[0].catchall == True
+      - result.rules[0].prefix == False
+      - result.rules[0].matchUser == ''
+
+- name: purelymail_internal_preset_rules | unused_presets_combinations | (catchall_no_prefix_any)
+  bofzilla.purelymail.routing_rules:
+    api_token: "{{ PURELYMAIL_API_TOKEN }}"
+    inferred_safety: false
+    rules:
+      - domain_name: "{{ PURELYMAIL_DOMAIN }}"
+        target_addresses: []
+        catchall: true
+        prefix: false
+        match_user: "admin@{{ PURELYMAIL_DOMAIN }}"
+  environment:
+    PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+  register: result
+
+- name: purelymail_internal_preset_rules | unused_presets_combinations | Debug result (catchall_no_prefix_any)
+  ansible.builtin.debug:
+    var: result
+
+- name: purelymail_internal_preset_rules | unused_presets_combinations | Assert matches exact_match (catchall_no_prefix_any)
+  ansible.builtin.assert:
+    that:
+      - result is not failed
+      - result.rules | length == 1
+      - result.rules[0].preset == None
+      - result.rules[0].catchall == True
+      - result.rules[0].prefix == False
+      - result.rules[0].matchUser == "admin@{{ PURELYMAIL_DOMAIN }}"
+
+- name: purelymail_internal_preset_rules | unused_presets_combinations | (all_any)
+  bofzilla.purelymail.routing_rules:
+    api_token: "{{ PURELYMAIL_API_TOKEN }}"
+    inferred_safety: false
+    rules:
+      - domain_name: "{{ PURELYMAIL_DOMAIN }}"
+        target_addresses: []
+        catchall: true
+        prefix: true
+        match_user: "admin@{{ PURELYMAIL_DOMAIN }}"
+  environment:
+    PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+  register: result
+
+- name: purelymail_internal_preset_rules | unused_presets_combinations | Debug result (all_any)
+  ansible.builtin.debug:
+    var: result
+
+- name: purelymail_internal_preset_rules | unused_presets_combinations | Assert matches exact_match (all_any)
+  ansible.builtin.assert:
+    that:
+      - result is not failed
+      - result.rules[0].preset == None
+      - result.rules[0].catchall == True
+      - result.rules[0].prefix == True
+      - result.rules[0].matchUser == "admin@{{ PURELYMAIL_DOMAIN }}"
+
+- name: purelymail_internal_preset_rules | unused_presets_combinations | (all_false_empty)
+  bofzilla.purelymail.routing_rules:
+    api_token: "{{ PURELYMAIL_API_TOKEN }}"
+    inferred_safety: false
+    rules:
+      - domain_name: "{{ PURELYMAIL_DOMAIN }}"
+        target_addresses: []
+        catchall: false
+        prefix: false
+        match_user: ""
+  environment:
+    PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+  register: result
+
+- name: purelymail_internal_preset_rules | unused_presets_combinations | Debug result (all_false_empty)
+  ansible.builtin.debug:
+    var: result
+
+- name: purelymail_internal_preset_rules | unused_presets_combinations | Assert matches exact_match (all_false_empty)
+  ansible.builtin.assert:
+    that:
+      - result is not failed
+      - result.rules[0].preset == 'exact_match'
+      - result.rules[0].catchall == False
+      - result.rules[0].prefix == False
+      - result.rules[0].matchUser == ''

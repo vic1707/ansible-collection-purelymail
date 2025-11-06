@@ -1,9 +1,5 @@
 # Waiting for <https://github.com/ansible/ansible/pull/86074>
 ---
-- name: missing_preset_or_settings |  Import integration_config.yml
-  ansible.builtin.include_vars:
-    file: "{{ playbook_dir }}/integration_config.yml"
-
 - name: missing_preset_or_settings | Routing rules management (should fail)
   bofzilla.purelymail.routing_rules:
     api_token: "{{ PURELYMAIL_API_TOKEN }}"
@@ -24,5 +20,5 @@
 - name: missing_preset_or_settings | Assert that the module failed and that the state is correct
   ansible.builtin.assert:
     that:
-      - result.failed is true
+      - result is failed
       - '"rule[0]: preset is None but any of the following are missing: match_user, prefix, catchall found in rules" == result.msg'
