@@ -232,6 +232,26 @@ def main():
 		if canonical_domains is None:
 			canonical_domains = list[str]({r.domainName for r in rules + existing_rules.rules})
 
+		if module.params["inferred_safety"]:
+			for idx, rule in enumerate(rules):
+				# Rule 1: must match a known UI preset
+				if rule.preset is None:
+					module.fail_json(msg=f"Rule nº{idx} doesn't match any existing preset.")
+
+				# Rule 2: certain presets must be unique (even between each others)
+				if rule.preset in ("any_address", "catchall_except_valid"):
+					conflict_in_rules = any(i != idx and r.preset in ("any_address", "catchall_except_valid") and r.domainName == rule.domainName for i, r in enumerate(rules))
+					conflict_in_existing = rule.domainName in module.params["canonical"] and any(
+						er.preset in ("any_address", "catchall_except_valid") and er.domainName == rule.domainName for er in existing_rules.rules
+					)
+
+					if conflict_in_rules or conflict_in_existing:
+						module.fail_json(msg=f"Rule #{idx}: only one `any_address` or `catchall_except_valid` rule is allowed per domain ({rule.domainName}).")
+
+				# Rule 3: C(match_user="", prefix=False, catchall=False) fails as it is a "The exact address" preset but empty `match_user` isn't valid.
+				if rule.preset == "exact_match" and rule.matchUser == "":
+					module.fail_json(msg=f"Rule nº{idx} technically matches `exact_match` preset but empty 'match_user' isn't allowed.")
+
 		extra_rules = [er.id for er in existing_rules.rules if not any(r.eq(er) for r in rules) and er.domainName in canonical_domains]
 		missing_rules = [r for r in rules if not any(r.eq(er) for er in existing_rules.rules)]
 
