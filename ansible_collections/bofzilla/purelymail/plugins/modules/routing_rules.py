@@ -35,6 +35,17 @@ options:
     required: false
     elements: str
     default: list of all referenced domains in C(rules) + already present on API
+  inferred_safety:
+    description:
+      - If true, enables best-effort consistency checks inferred from observed Purelymail API behavior.
+      - These safeguards are *not* officially documented by Purelymail and may occasionally reject configurations that the API technically accepts.
+      - Current rules:
+        - Fails if a rule doesn't match a UI preset
+        - You can only have one rule of each preset [any_address,catchall_except_valid]
+        - Unknown preset fails (technically the API defaultes them to `any_address`)
+    type: bool
+    required: false
+    default: true
 
   rules:
     description: List of routing rules to apply
@@ -169,6 +180,7 @@ module_spec = dict(
 	argument_spec=dict(
 		api_token=dict(type="str", required=True, no_log=True),
 		canonical=dict(type="list", elements="str", required=False),
+		inferred_safety=dict(type="bool", required=False, default=True),
 		rules=dict(
 			type="list",
 			required=True,

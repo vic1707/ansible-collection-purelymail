@@ -38,7 +38,7 @@ def run(make_runner):  # noqa: F811
 	@functools.wraps(runner_run)
 	def inner_run(rules: list[dict], *, canonical: bool, **kwargs):
 		canonical_param = {} if canonical else {"canonical": []}
-		params = {"rules": rules, **canonical_param}
+		params = {"rules": rules, **canonical_param, "inferred_safety": True}
 		return runner_run(params=params, **kwargs)
 
 	return inner_run
