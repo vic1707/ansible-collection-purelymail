@@ -1,0 +1,12 @@
+---
+- name: exact_match | main | Include Exact + Any test
+  ansible.builtin.include_tasks: exact_any.yml
+
+- name: exact_match | main | Include Exact + Catchall test
+  ansible.builtin.include_tasks: exact_catchall.yml
+
+- name: exact_match | main | Include Exact + Exact test
+  ansible.builtin.include_tasks: exact_exact.yml
+
+- name: exact_match | main | Include Exact + Prefix test
+  ansible.builtin.include_tasks: exact_prefix.yml

@@ -25,6 +25,17 @@ run = "ansible-test units --coverage --python-interpreter $(which python)"
 [tasks.tests]
 depends = ["unit-tests", "integration-tests"]
 
+[tasks.clean]
+run = """
+rm -fr .ruff_cache
+rm -fr ansible_collections/bofzilla/purelymail/tests/output
+"""
+
+[tasks.tests-coverage]
+depends = ["clean", "tests"]
+dir = "{{ config_root }}/ansible_collections/bofzilla/purelymail"
+run = "ansible-test coverage html"
+
 [tools]
 actionlint = "1.7.8"
 jq = "1.8.1"

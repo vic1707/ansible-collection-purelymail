@@ -1,0 +1,12 @@
+---
+- name: any_address | main | Include Any + Any test
+  ansible.builtin.include_tasks: any_any.yml
+
+- name: any_address | main | Include Any + Catchall test
+  ansible.builtin.include_tasks: any_catchall.yml
+
+- name: any_address | main | Include Any + Exact test
+  ansible.builtin.include_tasks: any_exact.yml
+
+- name: any_address | main | Include Any + Prefix test
+  ansible.builtin.include_tasks: any_prefix.yml

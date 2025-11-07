@@ -1,0 +1,26 @@
+---
+- name: catchall_except_valid | catchall_catchall | Create rules
+  bofzilla.purelymail.routing_rules:
+    api_token: "{{ PURELYMAIL_API_TOKEN }}"
+    inferred_safety: false
+    rules:
+      - domain_name: "{{ PURELYMAIL_DOMAIN }}"
+        preset: catchall_except_valid
+        target_addresses: ["catch@{{ PURELYMAIL_DOMAIN }}"]
+      - domain_name: "{{ PURELYMAIL_DOMAIN }}"
+        preset: catchall_except_valid
+        target_addresses: ["catch2@{{ PURELYMAIL_DOMAIN }}"]
+  environment:
+    PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+  register: result
+  ignore_errors: true
+
+- name: catchall_except_valid | catchall_catchall | Debug result
+  ansible.builtin.debug:
+    var: result
+
+- name: catchall_except_valid | catchall_catchall | Assert FAILURE
+  ansible.builtin.assert:
+    that:
+      - result is failed
+      - '"Purelymail API error: [ruleAlreadyExists] Routing rule conflicts with an existing rule" == result.msg'

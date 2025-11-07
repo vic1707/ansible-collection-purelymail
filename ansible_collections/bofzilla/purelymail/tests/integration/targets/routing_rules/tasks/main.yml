@@ -1,3 +1,24 @@
 ---
+- name: Import integration_config.yml
+  ansible.builtin.include_vars:
+    file: "{{ playbook_dir }}/integration_config.yml"
+
 - name: Include Missing preset or settings test
   ansible.builtin.include_tasks: missing_preset_or_settings.yml
+
+- name: Include Purelymail internal preset rules
+  ansible.builtin.include_tasks: purelymail_internal_preset_rules/main.yml
+
+- name: Cleanup
+  bofzilla.purelymail.routing_rules:
+    api_token: "{{ PURELYMAIL_API_TOKEN }}"
+    rules: []
+  environment:
+    PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+  register: result
+
+- name: Assert cleanup success
+  ansible.builtin.assert:
+    that:
+      - result is not failed
+      - result.changed == true

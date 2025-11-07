@@ -1,0 +1,12 @@
+---
+- name: catchall_except_valid | main | Include Catchall + Any test
+  ansible.builtin.include_tasks: catchall_any.yml
+
+- name: catchall_except_valid | main | Include Catchall + Catchall test
+  ansible.builtin.include_tasks: catchall_catchall.yml
+
+- name: catchall_except_valid | main | Include Catchall + Exact test
+  ansible.builtin.include_tasks: catchall_exact.yml
+
+- name: catchall_except_valid | main | Include Catchall + Prefix test
+  ansible.builtin.include_tasks: catchall_prefix.yml

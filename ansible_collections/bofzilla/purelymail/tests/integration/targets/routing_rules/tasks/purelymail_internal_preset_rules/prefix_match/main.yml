@@ -1,0 +1,12 @@
+---
+- name: prefix_match | main | Include Prefix + Any test
+  ansible.builtin.include_tasks: prefix_any.yml
+
+- name: prefix_match | main | Include Prefix + Catchall test
+  ansible.builtin.include_tasks: prefix_catchall.yml
+
+- name: prefix_match | main | Include Prefix + Exact test
+  ansible.builtin.include_tasks: prefix_exact.yml
+
+- name: prefix_match | main | Include Prefix + Prefix test
+  ansible.builtin.include_tasks: prefix_prefix.yml

@@ -1,0 +1,28 @@
+---
+- name: prefix_match | prefix_exact | Create rules
+  bofzilla.purelymail.routing_rules:
+    api_token: "{{ PURELYMAIL_API_TOKEN }}"
+    inferred_safety: false
+    rules:
+      - domain_name: "{{ PURELYMAIL_DOMAIN }}"
+        preset: prefix_match
+        target_addresses: ["prefix@{{ PURELYMAIL_DOMAIN }}"]
+        match_user: admin
+      - domain_name: "{{ PURELYMAIL_DOMAIN }}"
+        preset: exact_match
+        target_addresses: ["exact@{{ PURELYMAIL_DOMAIN }}"]
+        match_user: admin@{{ PURELYMAIL_DOMAIN }}
+  environment:
+    PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+  register: result
+
+- name: prefix_match | prefix_exact | Debug result
+  ansible.builtin.debug:
+    var: result
+
+- name: prefix_match | prefix_exact | Assert SUCCESS
+  ansible.builtin.assert:
+    that:
+      - result is not failed
+      - result.changed is true
+      - result.rules | length == 2
