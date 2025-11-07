@@ -215,7 +215,7 @@ def main():
 	try:
 		existing_rules = client.list_routing_rules()
 		rules = [CreateRoutingRequest(**r) for r in module.params["rules"]]
-	
+
 		canonical_domains: None | list[str] = module.params.get("canonical")
 		if canonical_domains is None:
 			canonical_domains = list[str]({r.domainName for r in rules + existing_rules.rules})
@@ -245,7 +245,9 @@ def main():
 
 		module.exit_json(**result)
 	except Exception as e:
-		module.fail_json(msg=str(e))
+		import traceback
+
+		module.fail_json(msg=f"{type(e).__name__}: {e}", exception=traceback.format_exc())
 
 
 if __name__ == "__main__":
