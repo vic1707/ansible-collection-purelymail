@@ -5,7 +5,7 @@
 # prefix_match              |   ✅   |    ❌    |   <any>   |
 # exact_match               |   ❌   |    ❌    |   <any>   |
 
-## [MISSINGS]
+## [MISSING]
 # catchall_no_prefix_empty  |   ❌   |    ✅    |     ""    |
 # catchall_no_prefix_any    |   ❌   |    ✅    |   <any>   |
 # all_any                   |   ✅   |    ✅    |   <any>   |
