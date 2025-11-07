@@ -13,4 +13,3 @@
 
 - name: purelymail_internal_preset_rules | main | Unused preset combinations
   ansible.builtin.include_tasks: unused_presets_combinations.yml
-
