@@ -62,8 +62,11 @@ def test_conflict_any_rule_canonical(run):
 
 def test_can_safely_add_restricted_preset_to_other_domain(run):
 	data, _ = run(
-		[{"preset": "any_address", "domain_name": "toto.com", "target_addresses": []}],
-		canonical=[],
+		[
+			{"preset": "any_address", "domain_name": "toto.com", "target_addresses": []},
+			{"preset": "any_address", "domain_name": "valid.com", "target_addresses": []},
+		],
+		canonical=["valid.com"],
 		inferred_safety=True,
 		expect=AnsibleExitJson,
 	)
@@ -74,6 +77,7 @@ def test_can_safely_add_restricted_preset_to_other_domain(run):
 			{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "", "targetAddresses": ["admin@example.com"], "preset": "any_address"},
 			{"prefix": False, "catchall": False, "domainName": "toto.com", "matchUser": "toto", "targetAddresses": ["admin@toto.com"], "preset": "exact_match"},
 			{"prefix": True, "catchall": False, "domainName": "toto.com", "matchUser": "", "targetAddresses": [], "preset": "any_address"},
+			{"prefix": True, "catchall": False, "domainName": "valid.com", "matchUser": "", "targetAddresses": [], "preset": "any_address"},
 		],
 	}
 
