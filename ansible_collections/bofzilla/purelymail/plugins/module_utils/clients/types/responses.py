@@ -4,7 +4,7 @@ from typing import Any
 from pydantic import ConfigDict, Json, PositiveFloat
 from pydantic.dataclasses import dataclass
 
-from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.api_types import RoutingRule
+from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.api_types import ApiDomainInfo, RoutingRule
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.pydantic import DEFAULT_CFG
 
 
@@ -39,3 +39,14 @@ class ListRoutingResponse:
 
 	def concat(self, new_rules: list[RoutingRule]) -> "ListRoutingResponse":
 		return ListRoutingResponse(self.rules + new_rules)
+
+
+## Domain
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class GetOwnershipCodeResponse:
+	code: str
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class ListDomainsResponse:
+	domains: list[ApiDomainInfo]

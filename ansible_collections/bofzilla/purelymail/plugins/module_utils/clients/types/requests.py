@@ -47,3 +47,27 @@ class CreateRoutingRequest(RoutingRule):
 @dataclass(config=ConfigDict(**DEFAULT_CFG))
 class DeleteRoutingRequest:
 	routingRuleId: int = Field(..., alias="routing_rule_id")
+
+
+## Domain
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class AddDomainRequest:
+	domainName: str = Field(..., alias="domain_name")
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class ListDomainsRequest:
+	includeShared: bool = Field(default=False, alias="include_shared")  # TODO: default?
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class UpdateDomainSettingsRequest:
+	name: str
+	allowAccountReset: bool | None = Field(default=None, alias="allow_account_reset")
+	symbolicSubaddressing: bool | None = Field(default=None, alias="symbolic_subaddressing")
+	recheckDns: bool = Field(default=False, alias="recheck_dns")
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class DeleteDomainRequest:
+	name: str

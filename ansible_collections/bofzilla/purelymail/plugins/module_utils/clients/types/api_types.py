@@ -47,3 +47,20 @@ class RoutingRule:
 
 
 RoutingRule._adapter = TypeAdapter(RoutingRule)
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class ApiDomainDnsSummary:
+	passesMx: bool
+	passesSpf: bool
+	passesDkim: bool
+	passesDmarc: bool
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class ApiDomainInfo:
+	name: str
+	allowAccountReset: bool
+	symbolicSubaddressing: bool
+	isShared: bool
+	dnsSummary: ApiDomainDnsSummary
