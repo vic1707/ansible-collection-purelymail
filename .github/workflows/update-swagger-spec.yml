@@ -41,7 +41,7 @@ jobs:
       - name: Check for changes
         id: git-diff
         run: |
-          if [[ -n "$(git status --porcelain)" ]]; then
+          if git status --porcelain | grep 'spec.jsonc'; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
           else
             echo "changed=false" >> "$GITHUB_OUTPUT"
