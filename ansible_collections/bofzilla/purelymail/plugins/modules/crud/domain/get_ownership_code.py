@@ -62,10 +62,13 @@ def main():
 	try:
 		data = client.get_ownership_code()
 		data = {"code": data.code, "value": data.value}
-		res = {"changed": False, **data}
+		res = {"changed": False}
 
 		if module._diff:
-			res["diff"] = {"before": {}, "after": data}
+			res["diff"] = {"before": data, "after": data}
+
+		if not module.check_mode:
+			res.update(data)
 
 		module.exit_json(**res)
 	except Exception as e:

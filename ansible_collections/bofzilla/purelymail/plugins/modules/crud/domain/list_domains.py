@@ -88,15 +88,16 @@ def main():
 	client = DomainClient(api)
 
 	try:
-		req_params = module.params
-		del req_params["api_token"]
-		req = ListDomainsRequest(**req_params)
+		req = ListDomainsRequest(module.params["include_shared"])
 		domains = client.list_domains(req).as_api_response()
 
-		res = {"changed": False, "domains": domains}
+		res = {"changed": False}
 
 		if module._diff:
-			res["diff"] = {"before": {}, "after": {"domains": res["domains"]}}
+			res["diff"] = {"before": domains, "after": domains}
+
+		if not module.check_mode:
+			res["domains"] = domains
 
 		module.exit_json(**res)
 	except Exception as e:
