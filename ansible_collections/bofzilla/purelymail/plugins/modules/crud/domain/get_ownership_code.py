@@ -35,7 +35,9 @@ EXAMPLES = r"""
 
 RETURN = r"""
 code:
-  description: The full DNS TXT record value required for domain verification.
+  description:
+    - The full DNS TXT record value required for domain verification.
+    - *SENSITIVE*: This value should be treated as secret.
   type: str
   returned: success
   sample:
@@ -45,6 +47,7 @@ value:
   description:
     - The extracted verification code, without the "purelymail_ownership_proof=" prefix.
     - *WARNING*: This is a non-standard custom field added for convenience. It is not part of the Purelymail API response.
+    - *SENSITIVE*: This value should be treated as secret.
   type: str
   returned: success
   sample:
@@ -72,6 +75,7 @@ def main():
 		if not module.check_mode:
 			res.update(data)
 
+		module.no_log_values = {data["code"], data["value"]}
 		module.exit_json(**res)
 	except Exception as e:
 		import traceback
