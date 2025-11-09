@@ -59,8 +59,16 @@ class ApiDomainDnsSummary:
 
 @dataclass(config=ConfigDict(**DEFAULT_CFG))
 class ApiDomainInfo:
+	_adapter: ClassVar[TypeAdapter["ApiDomainInfo"]]
+
 	name: str
 	allowAccountReset: bool
 	symbolicSubaddressing: bool
 	isShared: bool
 	dnsSummary: ApiDomainDnsSummary
+
+	def as_api_response(self):
+		return ApiDomainInfo._adapter.dump_python(self)
+
+
+ApiDomainInfo._adapter = TypeAdapter(ApiDomainInfo)
