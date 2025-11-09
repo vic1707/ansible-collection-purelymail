@@ -20,6 +20,7 @@ options:
     required: false
     type: bool
     default: false
+
 attributes:
   check_mode:
     support: full
@@ -27,6 +28,7 @@ attributes:
     support: full
   idempotent:
     support: full
+
 author:
   - vic1707
 """

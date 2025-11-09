@@ -14,6 +14,7 @@ options:
     description: Purelymail API token
     required: true
     type: str
+
 attributes:
   check_mode:
     support: full
@@ -21,6 +22,7 @@ attributes:
     support: full
   idempotent:
     support: full
+
 author:
   - vic1707
 """
