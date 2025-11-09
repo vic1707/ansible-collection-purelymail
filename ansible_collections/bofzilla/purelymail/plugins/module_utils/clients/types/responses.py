@@ -1,7 +1,7 @@
 from collections.abc import Callable
 from typing import Any
 
-from pydantic import ConfigDict, Field, Json, PositiveFloat
+from pydantic import ConfigDict, Field, Json, PositiveFloat, computed_field
 from pydantic.dataclasses import dataclass
 
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.api_types import ApiDomainInfo, RoutingRule
@@ -45,6 +45,11 @@ class ListRoutingResponse:
 @dataclass(config=ConfigDict(**DEFAULT_CFG))
 class GetOwnershipCodeResponse:
 	code: str = Field(..., pattern=r"^purelymail_ownership_proof=[A-Za-z0-9]+$")
+
+	@computed_field(return_type=str)
+	@property
+	def value(self) -> str:
+		return self.code.split("=")[1]
 
 
 @dataclass(config=ConfigDict(**DEFAULT_CFG))
