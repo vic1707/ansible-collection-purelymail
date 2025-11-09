@@ -58,3 +58,7 @@ class ListDomainsResponse:
 
 	def as_api_response(self) -> list[dict[str, Any]]:
 		return [r.as_api_response() for r in self.domains]
+
+	def filter(self, predicate: Callable[[ApiDomainInfo], bool]) -> "ListDomainsResponse":
+		"""True means keep"""
+		return ListDomainsResponse([d for d in self.domains if predicate(d)])
