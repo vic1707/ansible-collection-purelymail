@@ -59,15 +59,16 @@ def main():
 		id = module.params["routing_rule_id"]
 		existing_rules = client.list_routing_rules()
 
-		result = {"changed": any(r.id == id for r in existing_rules.rules)}
+		exists = any(r.id == id for r in existing_rules.rules)
+		result = {"changed": exists}
 
 		if module._diff:
 			result["diff"] = {
 				"before": existing_rules.as_api_response(),
-				"after": existing_rules.filter(lambda r: r.id != id).as_api_response() if result["changed"] else existing_rules.as_api_response(),
+				"after": existing_rules.filter(lambda r: r.id != id).as_api_response() if exists else existing_rules.as_api_response(),
 			}
 
-		if result["changed"] and not module.check_mode:
+		if exists and not module.check_mode:
 			_ = client.delete_routing_rule(DeleteRoutingRequest(id))
 
 		module.exit_json(**result)
