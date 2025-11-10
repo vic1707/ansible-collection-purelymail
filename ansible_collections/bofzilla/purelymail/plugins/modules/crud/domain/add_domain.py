@@ -2,6 +2,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.base_client import PurelymailAPI
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.domain_client import DomainClient
+from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.api_types import ApiDomainInfo
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.requests import AddDomainRequest, ListDomainsRequest
 
 DOCUMENTATION = r"""
@@ -69,8 +70,11 @@ def main():
 		if module._diff:
 			result["diff"] = {
 				"before": existing_domains.as_api_response(),
-				# TODO: properly generate `after`
-				"after": existing_domains.concat([]).as_api_response() if result["changed"] else existing_domains.as_api_response(),
+				"after": existing_domains.concat(
+					[ApiDomainInfo.DEFAULT(domain_name)],
+				).as_api_response()
+				if result["changed"]
+				else existing_domains.as_api_response(),
 			}
 
 		if result["changed"] and not module.check_mode:

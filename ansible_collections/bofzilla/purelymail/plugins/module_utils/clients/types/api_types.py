@@ -70,5 +70,18 @@ class ApiDomainInfo:
 	def as_api_response(self):
 		return ApiDomainInfo._adapter.dump_python(self)
 
+	def DEFAULT(domain_name: str) -> "ApiDomainInfo":
+		"""
+		AddDomain doesn't return anything, but accepted domains should return this.
+		*Note*: dnsSummary is all True because else the create call would fail.
+		"""
+		return ApiDomainInfo(
+			name=domain_name,
+			allowAccountReset=True,
+			symbolicSubaddressing=True,
+			isShared=False,
+			dnsSummary=ApiDomainDnsSummary(True, True, True, True),
+		)
+
 
 ApiDomainInfo._adapter = TypeAdapter(ApiDomainInfo)
