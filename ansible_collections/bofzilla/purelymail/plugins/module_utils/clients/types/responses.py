@@ -62,3 +62,6 @@ class ListDomainsResponse:
 	def filter(self, predicate: Callable[[ApiDomainInfo], bool]) -> "ListDomainsResponse":
 		"""True means keep"""
 		return ListDomainsResponse([d for d in self.domains if predicate(d)])
+
+	def concat(self, new_domains: list[ApiDomainInfo]) -> "ListDomainsResponse":
+		return ListDomainsResponse(self.domains + new_domains)
