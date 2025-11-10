@@ -19,6 +19,10 @@ options:
     description: Name of the domain to add
     required: true
     type: str
+
+notes:
+  - The module accepts an internal parameter C(__include_shared) (default: false), this is only used for idempotency and diff generation.
+
 attributes:
   check_mode:
     support: full
@@ -26,6 +30,7 @@ attributes:
     support: full
   idempotent:
     support: full
+
 author:
   - vic1707
 """
@@ -45,6 +50,7 @@ def main():
 		argument_spec=dict(
 			api_token=dict(type="str", required=True, no_log=True),
 			domain_name=dict(type="str", required=True),
+			__include_shared=dict(type="bool", required=False, default=False),
 		),
 		supports_check_mode=True,
 	)
@@ -55,7 +61,7 @@ def main():
 	try:
 		domain_name = module.params["domain_name"]
 
-		existing_domains = client.list_domains(ListDomainsRequest(include_shared=True))
+		existing_domains = client.list_domains(ListDomainsRequest(module.params["__include_shared"]))
 		already_exists = any(d.name == domain_name for d in existing_domains.domains)
 
 		result = {"changed": not already_exists}
