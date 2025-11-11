@@ -27,7 +27,8 @@ def run(make_runner):  # noqa: F811
 
 	@functools.wraps(runner_run)
 	def inner_run(domain_name: str, **kwargs):
-		return runner_run(params={"domain_name": domain_name}, **kwargs)
+		# __include_shared not tested (internal parameter)
+		return runner_run(params={"domain_name": domain_name, "__include_shared": True}, **kwargs)
 
 	return inner_run
 
