@@ -4,7 +4,8 @@ DEFAULT_CFG = ConfigDict(
 	extra="forbid",
 	frozen=True,
 	# strict=True,
-	validation_error_cause=True,
+    validate_assignment=True,
 	validate_default=True,
 	validate_return=True,
+	validation_error_cause=True,
 )
