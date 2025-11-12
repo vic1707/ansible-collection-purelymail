@@ -81,7 +81,7 @@ def main():
 		current: ApiDomainInfo | None = next((d for d in existing_domains.domains if d.name == module.params["name"]), None)
 
 		if not current:
-			module.fail_json(msg="TODO")
+			module.fail_json(msg=f"Error, domain '{module.params['name']}' does not exist")
 
 		req_params = module.params
 		del req_params["api_token"], req_params["__include_shared"]
@@ -90,10 +90,10 @@ def main():
 		result = {"changed": req.updates(current)}
 
 		if module._diff:
-			result["diff"] = {"before": {}, "after": module.params}
+			result["diff"] = {"before": current, "after": req.update(current)}
 
 		if not module.check_mode:
-			client.update_domain_settings(req)
+			_ = client.update_domain_settings(req)
 
 		module.exit_json(**result)
 	except Exception as e:

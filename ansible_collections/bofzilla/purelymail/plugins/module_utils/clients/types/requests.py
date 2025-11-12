@@ -74,6 +74,15 @@ class UpdateDomainSettingsRequest:
 			and self.symbolicSubaddressing == domain.symbolicSubaddressing
 		)
 
+	def update(self, domain: ApiDomainInfo) -> ApiDomainInfo:
+		return ApiDomainInfo(
+			name=domain.name,
+			allowAccountReset=(self.allowAccountReset if self.allowAccountReset is not None else domain.allowAccountReset),
+			symbolicSubaddressing=(self.symbolicSubaddressing if self.symbolicSubaddressing is not None else domain.symbolicSubaddressing),
+			isShared=domain.isShared,
+			dnsSummary=domain.dnsSummary,
+		)
+
 
 @dataclass(config=ConfigDict(**DEFAULT_CFG))
 class DeleteDomainRequest:
