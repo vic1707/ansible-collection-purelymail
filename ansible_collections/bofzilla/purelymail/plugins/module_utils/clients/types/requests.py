@@ -2,7 +2,7 @@ from pydantic import ConfigDict, Field, model_validator
 from pydantic.dataclasses import dataclass
 from pydantic_core import ArgsKwargs
 
-from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.api_types import PRESET_MAP, PresetType, RoutingRule
+from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.api_types import PRESET_MAP, ApiDomainInfo, PresetType, RoutingRule
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.pydantic import DEFAULT_CFG
 
 
@@ -66,6 +66,13 @@ class UpdateDomainSettingsRequest:
 	allowAccountReset: bool | None = Field(default=None, alias="allow_account_reset")
 	symbolicSubaddressing: bool | None = Field(default=None, alias="symbolic_subaddressing")
 	recheckDns: bool = Field(default=False, alias="recheck_dns")
+
+	def updates(self, domain: ApiDomainInfo) -> bool:
+		return (
+			not self.recheckDns  # assume changes so we request
+			and self.allowAccountReset == domain.allowAccountReset
+			and self.symbolicSubaddressing == domain.symbolicSubaddressing
+		)
 
 
 @dataclass(config=ConfigDict(**DEFAULT_CFG))

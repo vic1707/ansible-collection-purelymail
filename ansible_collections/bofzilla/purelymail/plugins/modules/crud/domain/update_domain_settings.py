@@ -2,6 +2,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.base_client import PurelymailAPI
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.domain_client import DomainClient
+from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.api_types import ApiDomainInfo
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.requests import ListDomainsRequest, UpdateDomainSettingsRequest
 
 DOCUMENTATION = r"""
@@ -77,20 +78,22 @@ def main():
 
 	try:
 		existing_domains = client.list_domains(ListDomainsRequest(module.params["__include_shared"]))
+		current: ApiDomainInfo | None = next((d for d in existing_domains.domains if d.name == module.params["name"]), None)
+
+		if not current:
+			module.fail_json(msg="TODO")
 
 		req_params = module.params
 		del req_params["api_token"], req_params["__include_shared"]
+		req = UpdateDomainSettingsRequest(**req_params)
 
-		## Not exist how?
-		exists = any(d.name == module.params["name"] for d in existing_domains.domains)
-
-		result = {"changed": exists}
+		result = {"changed": req.updates(current)}
 
 		if module._diff:
 			result["diff"] = {"before": {}, "after": module.params}
 
-		if exists and not module.check_mode:
-			client.update_domain_settings(UpdateDomainSettingsRequest(**req_params))
+		if not module.check_mode:
+			client.update_domain_settings(req)
 
 		module.exit_json(**result)
 	except Exception as e:
