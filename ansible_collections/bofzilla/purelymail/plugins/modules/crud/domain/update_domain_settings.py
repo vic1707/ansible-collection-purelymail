@@ -82,6 +82,7 @@ def main():
 
 		if not current:
 			module.fail_json(msg=f"Error, domain '{module.params['name']}' does not exist")
+		assert isinstance(current, ApiDomainInfo) # TODO: remove when `ty` doesn't need it
 
 		req_params = module.params
 		del req_params["api_token"], req_params["__include_shared"]
