@@ -78,11 +78,11 @@ def main():
 
 	try:
 		existing_domains = client.list_domains(ListDomainsRequest(module.params["__include_shared"]))
-		current: ApiDomainInfo | None = next((d for d in existing_domains.domains if d.name == module.params["name"]), None)
+		current = next((d for d in existing_domains.domains if d.name == module.params["name"]), None)
 
 		if not current:
 			module.fail_json(msg=f"Error, domain '{module.params['name']}' does not exist")
-		assert isinstance(current, ApiDomainInfo) # TODO: remove when `ty` doesn't need it
+		assert isinstance(current, ApiDomainInfo)  # TODO: remove when `ty` supports it
 
 		req_params = module.params
 		del req_params["api_token"], req_params["__include_shared"]
