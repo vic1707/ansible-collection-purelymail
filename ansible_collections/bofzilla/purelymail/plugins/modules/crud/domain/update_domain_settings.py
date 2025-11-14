@@ -81,7 +81,7 @@ def main():
 		current = next((d for d in existing_domains.domains if d.name == module.params["name"]), None)
 
 		if not current:
-			module.fail_json(msg=f"Error, domain '{module.params['name']}' does not exist")
+			module.fail_json(msg=f"Error: domain '{module.params['name']}' does not exist.")
 		assert isinstance(current, ApiDomainInfo)  # TODO: remove when `ty` supports it
 
 		req_params = module.params
