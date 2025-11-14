@@ -27,5 +27,5 @@ class ApiError(Exception):
 type ApiResponse[T] = Annotated[ApiSuccess[T] | ApiError, Field(..., discriminator="type")]
 
 
-def parse_api_response(data: dict) -> ApiSuccess[T] | ApiError:
-	return TypeAdapter(ApiResponse[T]).validate_python(data, extra="forbid")
+def parse_api_response(data: dict, response_model: type[T]) -> ApiSuccess[T] | ApiError:
+	return TypeAdapter(ApiResponse[response_model]).validate_python(data, extra="forbid")
