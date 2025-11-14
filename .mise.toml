@@ -21,7 +21,7 @@ run = "ansible-test integration --coverage --python-interpreter $(which python)"
 [tasks.unit-tests]
 depends = ["clean"]
 dir = "{{ config_root }}/ansible_collections/bofzilla/purelymail"
-run = "ansible-test units --coverage --python-interpreter $(which python)"
+run = "ansible-test units --coverage -vv --python-interpreter $(which python)"
 
 [tasks.tests]
 depends = ["unit-tests", "integration-tests"]
