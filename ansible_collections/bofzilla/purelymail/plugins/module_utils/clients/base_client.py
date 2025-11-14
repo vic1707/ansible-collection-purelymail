@@ -32,10 +32,11 @@ class PurelymailAPI:
 		)
 		resp.raise_for_status()
 
-		data = parse_api_response(resp.json())
+		data = parse_api_response(resp.json(), response_model)
 		match data:
 			case ApiSuccess():
-				return response_model(**data.result)
+				assert isinstance(data.result, response_model)  # TODO: remove when `ty` supports it
+				return data.result
 			case ApiError():
 				return self.__module.fail_json(msg=f"Purelymail API error: {data}", exception=data)
 			case other:
