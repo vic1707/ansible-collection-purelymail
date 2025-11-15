@@ -93,7 +93,7 @@ def main():
 		if module._diff:
 			result["diff"] = {"before": current, "after": req.update(current)}
 
-		if not module.check_mode:
+		if result["changed"] and not module.check_mode:
 			_ = client.update_domain_settings(req)
 
 		module.exit_json(**result)

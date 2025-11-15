@@ -69,9 +69,9 @@ class UpdateDomainSettingsRequest:
 
 	def updates(self, domain: ApiDomainInfo) -> bool:
 		return (
-			not self.recheckDns  # assume changes so we request
-			and self.allowAccountReset == domain.allowAccountReset
-			and self.symbolicSubaddressing == domain.symbolicSubaddressing
+			self.recheckDns  # assume changes so we request
+			or (self.allowAccountReset is not None and self.allowAccountReset != domain.allowAccountReset)
+			or (self.symbolicSubaddressing is not None and self.symbolicSubaddressing != domain.symbolicSubaddressing)
 		)
 
 	def update(self, domain: ApiDomainInfo) -> ApiDomainInfo:
