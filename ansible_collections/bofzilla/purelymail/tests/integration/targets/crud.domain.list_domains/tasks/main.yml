@@ -1,0 +1,24 @@
+---
+- name: Import integration_config.yml
+  ansible.builtin.include_vars:
+    # playbook_dir == "<collection_dir>/tests/integration"
+    file: "{{ playbook_dir }}/integration_config.yml"
+
+- name: Get account domains
+  bofzilla.purelymail.crud.domain.list_domains:
+    api_token: "{{ PURELYMAIL_API_TOKEN }}"
+  register: result
+  environment:
+    PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+
+- name: Debug result
+  ansible.builtin.debug:
+    var: result
+
+- name: Assert module returns domains
+  ansible.builtin.assert:
+    that:
+      - result is not failed
+      - result.changed == false
+      - result.domains is defined
+      - result.domains | length >= 0

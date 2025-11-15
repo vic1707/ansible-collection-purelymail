@@ -47,3 +47,41 @@ class RoutingRule:
 
 
 RoutingRule._adapter = TypeAdapter(RoutingRule)
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class ApiDomainDnsSummary:
+	passesMx: bool
+	passesSpf: bool
+	passesDkim: bool
+	passesDmarc: bool
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class ApiDomainInfo:
+	_adapter: ClassVar[TypeAdapter["ApiDomainInfo"]]
+
+	name: str
+	allowAccountReset: bool
+	symbolicSubaddressing: bool
+	isShared: bool
+	dnsSummary: ApiDomainDnsSummary
+
+	def as_api_response(self):
+		return ApiDomainInfo._adapter.dump_python(self)
+
+	def DEFAULT(domain_name: str) -> "ApiDomainInfo":
+		"""
+		AddDomain doesn't return anything, but accepted domains should return this.
+		*Note*: dnsSummary is all True because else the create call would fail.
+		"""
+		return ApiDomainInfo(
+			name=domain_name,
+			allowAccountReset=True,
+			symbolicSubaddressing=True,
+			isShared=False,
+			dnsSummary=ApiDomainDnsSummary(True, True, True, True),
+		)
+
+
+ApiDomainInfo._adapter = TypeAdapter(ApiDomainInfo)

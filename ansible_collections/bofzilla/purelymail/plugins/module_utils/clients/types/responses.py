@@ -1,10 +1,10 @@
 from collections.abc import Callable
 from typing import Any
 
-from pydantic import ConfigDict, Json, PositiveFloat
+from pydantic import ConfigDict, Field, Json, PositiveFloat, computed_field
 from pydantic.dataclasses import dataclass
 
-from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.api_types import RoutingRule
+from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.api_types import ApiDomainInfo, RoutingRule
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.pydantic import DEFAULT_CFG
 
 
@@ -39,3 +39,29 @@ class ListRoutingResponse:
 
 	def concat(self, new_rules: list[RoutingRule]) -> "ListRoutingResponse":
 		return ListRoutingResponse(self.rules + new_rules)
+
+
+## Domain
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class GetOwnershipCodeResponse:
+	code: str = Field(..., pattern=r"^purelymail_ownership_proof=[A-Za-z0-9]+$")
+
+	@computed_field(return_type=str)
+	@property
+	def value(self) -> str:
+		return self.code.split("=")[1]
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class ListDomainsResponse:
+	domains: list[ApiDomainInfo]
+
+	def as_api_response(self) -> list[dict[str, Any]]:
+		return [r.as_api_response() for r in self.domains]
+
+	def filter(self, predicate: Callable[[ApiDomainInfo], bool]) -> "ListDomainsResponse":
+		"""True means keep"""
+		return ListDomainsResponse([d for d in self.domains if predicate(d)])
+
+	def concat(self, new_domains: list[ApiDomainInfo]) -> "ListDomainsResponse":
+		return ListDomainsResponse(self.domains + new_domains)
