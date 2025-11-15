@@ -37,7 +37,7 @@ RETURN = r"""
 code:
   description:
     - The full DNS TXT record value required for domain verification.
-    - *SENSITIVE*: This value should be treated as secret.
+    - "*SENSITIVE*: This value should be treated as secret."
   type: str
   returned: success
   sample:
@@ -46,8 +46,8 @@ code:
 value:
   description:
     - The extracted verification code, without the "purelymail_ownership_proof=" prefix.
-    - *WARNING*: This is a non-standard custom field added for convenience. It is not part of the Purelymail API response.
-    - *SENSITIVE*: This value should be treated as secret.
+    - "*WARNING*: This is a non-standard custom field added for convenience. It is not part of the Purelymail API response."
+    - "*SENSITIVE*: This value should be treated as secret."
   type: str
   returned: success
   sample:
