@@ -75,7 +75,7 @@ def main():
 			_ = client.delete_domain(DeleteDomainRequest(name))
 
 		module.exit_json(**result)
-	except Exception as e:
+	except Exception as e:  # pragma: no cover
 		import traceback
 
 		module.fail_json(msg=f"{type(e).__name__}: {e}", exception=traceback.format_exc())

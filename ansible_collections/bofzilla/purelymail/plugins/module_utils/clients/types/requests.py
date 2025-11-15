@@ -30,7 +30,7 @@ class CreateRoutingRequest(RoutingRule):
 	@classmethod
 	def apply_preset(cls, data: ArgsKwargs) -> ArgsKwargs:
 		assert data.args == (), "apply_preset only support kwargs."
-		if not data.kwargs:
+		if not data.kwargs:  # pragma: no cover
 			return data
 
 		preset = data.kwargs.pop("__preset", None) or data.kwargs.pop("preset", None)

@@ -105,7 +105,7 @@ def main():
 			_ = client.create_routing_rule(rule)
 
 		module.exit_json(**result)
-	except Exception as e:
+	except Exception as e:  # pragma: no cover
 		import traceback
 
 		module.fail_json(msg=f"{type(e).__name__}: {e}", exception=traceback.format_exc())

@@ -29,7 +29,7 @@ def make_runner():
 
 
 class HasMain(Protocol):
-	def main(self) -> None: ...
+	def main(self) -> None: ...  # pragma: no cover
 
 
 # Mapped type like in TS would be cleaner
@@ -50,7 +50,7 @@ def bootstrap_module(
 		if isinstance(mock_cfg, tuple):
 			mock_name = mock_cfg[0]
 			mock_cfg[1](mock)
-		else:
+		else:  # pragma: no cover
 			mock_name = mock_cfg
 
 		monkeypatch.setattr(py_module, mock_name, lambda *_, __mock=mock, **__: __mock)

@@ -2,15 +2,15 @@
 name = "ansible-collection-purelymail"
 version = "0.0.1"
 dependencies = [
-    "ansible==12.2.0",
-    "ansible-lint==25.11.0",
-    "coverage==7.6.1",
-    "pydantic==2.12.4",
-    "pytest==9.0.1",
-    "pytest-ansible==25.11.1",
-    "requests==2.32.5",
-    "ruff==0.14.5",
-    "ty==0.0.1a26",
+	"ansible==12.2.0",
+	"ansible-lint==25.11.0",
+	"coverage==7.6.1",
+	"pydantic==2.12.4",
+	"pytest==9.0.1",
+	"pytest-ansible==25.11.1",
+	"requests==2.32.5",
+	"ruff==0.14.5",
+	"ty==0.0.1a26",
 ]
 
 [tool.ruff]
@@ -25,18 +25,18 @@ line-ending = "lf"
 
 [tool.ruff.lint]
 select = [
-    # pycodestyle
-    "E",
-    # Pyflakes
-    "F",
-    # pyupgrade
-    "UP",
-    # flake8-bugbear
-    "B",
-    # flake8-simplify
-    "SIM",
-    # isort
-    "I",
+	# pycodestyle
+	"E",
+	# Pyflakes
+	"F",
+	# pyupgrade
+	"UP",
+	# flake8-bugbear
+	"B",
+	# flake8-simplify
+	"SIM",
+	# isort
+	"I",
 ]
 
 [tool.ruff.lint.pycodestyle]

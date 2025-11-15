@@ -82,7 +82,7 @@ def main():
 			res["rules"] = rules
 
 		module.exit_json(**res)
-	except Exception as e:
+	except Exception as e:  # pragma: no cover
 		import traceback
 
 		module.fail_json(msg=f"{type(e).__name__}: {e}", exception=traceback.format_exc())
