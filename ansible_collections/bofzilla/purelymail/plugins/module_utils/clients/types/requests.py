@@ -68,6 +68,7 @@ class UpdateDomainSettingsRequest:
 	recheckDns: bool = Field(default=False, alias="recheck_dns")
 
 	def updates(self, domain: ApiDomainInfo) -> bool:
+		assert self.name == domain.name
 		return (
 			self.recheckDns  # assume changes so we request
 			or (self.allowAccountReset is not None and self.allowAccountReset != domain.allowAccountReset)
@@ -75,6 +76,7 @@ class UpdateDomainSettingsRequest:
 		)
 
 	def update(self, domain: ApiDomainInfo) -> ApiDomainInfo:
+		assert self.name == domain.name
 		return ApiDomainInfo(
 			name=domain.name,
 			allowAccountReset=(self.allowAccountReset if self.allowAccountReset is not None else domain.allowAccountReset),
