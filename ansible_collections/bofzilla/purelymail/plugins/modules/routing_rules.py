@@ -100,7 +100,9 @@ attributes:
   check_mode:
     support: full
   diff_mode:
-    support: none
+    support: full
+    details:
+      - Purelymail's internal IDs are omitted as we can't guess them.
   idempotent:
     support: full
 

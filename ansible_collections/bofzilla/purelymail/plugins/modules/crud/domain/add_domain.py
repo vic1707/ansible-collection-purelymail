@@ -29,6 +29,8 @@ attributes:
     support: full
   diff_mode:
     support: full
+    details:
+      - Future state is idealised and based on previous Purelymail's defaults, it assumes DNS check passes, please report incorrect defaults.
   idempotent:
     support: full
 

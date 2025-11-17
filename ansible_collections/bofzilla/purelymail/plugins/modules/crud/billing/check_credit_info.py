@@ -18,10 +18,16 @@ options:
 attributes:
   check_mode:
     support: full
+    details:
+      - This action does not modify state.
   diff_mode:
     support: full
+    details:
+      - This action does not modify state.
   idempotent:
     support: full
+    details:
+      - This action does not modify state.
 
 author:
   - vic1707

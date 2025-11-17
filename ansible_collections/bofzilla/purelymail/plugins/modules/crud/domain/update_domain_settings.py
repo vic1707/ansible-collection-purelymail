@@ -42,6 +42,8 @@ attributes:
     support: full
   diff_mode:
     support: full
+    details:
+      - Future state is idealised, `recheck_dns` can fail
   idempotent:
     support: full
 
