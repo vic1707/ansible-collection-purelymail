@@ -67,9 +67,76 @@ author:
   - vic1707
 """
 
-EXAMPLES = r""""""
+EXAMPLES = r"""
+# Ensure domain exists without checking the settings
+- name: Add example.com with default settings
+  bofzilla.purelymail.domains:
+    api_token: "{{ purelymail_api_token }}"
+    domains:
+      - name: example.com
 
-RETURN = r""""""
+# Ensure domain exists with specified settings
+- name: Enable symbolic subaddressing on example.com
+  bofzilla.purelymail.domains:
+    api_token: "{{ purelymail_api_token }}"
+    domains:
+      - name: example.com
+        symbolic_subaddressing: true
+
+# Canonical mode: remove domains not in the list
+- name: Only keep the two listed domains
+  bofzilla.purelymail.domains:
+    api_token: "{{ purelymail_api_token }}"
+    canonical: true
+    domains:
+      - name: example.com
+      - name: example.net
+
+# Trigger DNS recheck
+- name: Recheck DNS while keeping other settings unchanged
+  bofzilla.purelymail.domains:
+    api_token: "{{ purelymail_api_token }}"
+    domains:
+      - name: example.com
+        recheck_dns: true
+"""
+
+RETURN = r"""
+domains:
+  description: List of domains accessible to the account
+  type: list
+  elements: dict
+  returned: success
+  contains:
+    name:
+      description: The domain name
+      type: str
+    allowAccountReset:
+      description: Whether password resets are allowed for users on this domain
+      type: bool
+    symbolicSubaddressing:
+      description: Whether symbolic (“+tag”) subaddressing is enabled for this domain
+      type: bool
+    isShared:
+      description: Whether this domain is a shared Purelymail domain
+      type: bool
+    dnsSummary:
+      description: Summary of the domain’s DNS status
+      type: dict
+      contains:
+        passesMx:
+          description: Whether the MX record check passes
+          type: bool
+        passesSpf:
+          description: Whether the SPF record check passes
+          type: bool
+        passesDkim:
+          description: Whether the DKIM record check passes
+          type: bool
+        passesDmarc:
+          description: Whether the DMARC record check passes
+          type: bool
+"""
 
 
 def main():
