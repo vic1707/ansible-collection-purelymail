@@ -100,7 +100,7 @@ def main():
 		domains = [UpdateDomainSettingsRequest(**d) for d in module.params["domains"]]
 
 		extra_domains = [ed.name for ed in existing_domains.domains if not any(d.name == ed.name for d in domains) and module.params["canonical"]]
-		domain_updates = [d for d in domains if any(d.updates(ed) and d.name == ed.name for ed in existing_domains.domains)]
+		domain_updates = [d for d in domains if any(d.name == ed.name and d.updates(ed) for ed in existing_domains.domains)]
 		missing_domains = [d for d in domains if not any(d.name == ed.name for ed in existing_domains.domains)]
 
 		supposed_after = (
