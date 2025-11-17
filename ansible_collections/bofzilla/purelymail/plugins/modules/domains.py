@@ -2,7 +2,13 @@ from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.base_client import PurelymailAPI
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.domain_client import DomainClient
-from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.requests import ListDomainsRequest
+from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.api_types import ApiDomainInfo
+from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.requests import (
+	AddDomainRequest,
+	DeleteDomainRequest,
+	ListDomainsRequest,
+	UpdateDomainSettingsRequest,
+)
 
 DOCUMENTATION = r"""
 module: domains
@@ -91,8 +97,38 @@ def main():
 
 	try:
 		existing_domains = client.list_domains(ListDomainsRequest(False))
+		domains = [UpdateDomainSettingsRequest(**d) for d in module.params["domains"]]
 
-		result = {}
+		extra_domains = [ed.name for ed in existing_domains.domains if not any(d.name == ed.name for d in domains) and module.params["canonical"]]
+		domain_updates = [d for d in domains if any(d.updates(ed) and d.name == ed.name for ed in existing_domains.domains)]
+		missing_domains = [d for d in domains if not any(d.name == ed.name for ed in existing_domains.domains)]
+
+		supposed_after = (
+			existing_domains.filter(lambda r: r.name not in extra_domains).apply_updates(domain_updates).concat([d.update(ApiDomainInfo.DEFAULT(d.name)) for d in missing_domains])
+		)
+
+		result = {
+			"changed": bool(extra_domains) or bool(domain_updates) or bool(missing_domains),
+			"rules": supposed_after.as_display(),
+		}
+
+		if module._diff:
+			result["diff"] = {
+				"before": existing_domains.as_display(),
+				"after": supposed_after.as_display(),
+			}
+
+		if not module.check_mode:
+			for name in extra_domains:
+				_ = client.delete_domain(DeleteDomainRequest(name))
+
+			for domain in domain_updates:
+				_ = client.update_domain_settings(domain)
+
+			for domain in missing_domains:
+				_ = client.add_domain(AddDomainRequest(domain.name))
+				if domain.updates(ApiDomainInfo.DEFAULT(domain.name)):
+					_ = client.update_domain_settings(domain)
 
 		module.exit_json(**result)
 	except Exception as e:  # pragma: no cover
