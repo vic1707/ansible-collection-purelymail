@@ -272,10 +272,10 @@ def main():
 
 		if not module.check_mode:
 			for id in extra_rules:
-				client.delete_routing_rule(DeleteRoutingRequest(id))
+				_ = client.delete_routing_rule(DeleteRoutingRequest(id))
 
 			for rule in missing_rules:
-				client.create_routing_rule(rule)
+				_ = client.create_routing_rule(rule)
 
 		module.exit_json(**result)
 	except Exception as e:  # pragma: no cover
