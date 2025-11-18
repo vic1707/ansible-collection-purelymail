@@ -176,7 +176,7 @@ def main():
 
 		result = {
 			"changed": bool(extra_domains) or bool(domain_updates) or bool(missing_domains),
-			"rules": supposed_after.as_display(),
+			"domains": supposed_after.as_display(),
 		}
 
 		if module._diff:
