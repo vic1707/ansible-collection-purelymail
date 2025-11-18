@@ -482,3 +482,141 @@ def test_canonical_partial_overlap(run):
 			},
 		],
 	}
+
+
+def test_dns_recheck_noncanonical(run):
+	data, mocks = run(
+		[{"name": "example.com", "recheck_dns": True}],
+		canonical=False,
+	)
+
+	mocks["DomainClient"].update_domain_settings.assert_called_once()
+	assert data == {
+		"changed": True,
+		"domains": [
+			{
+				"name": "example.com",
+				"allowAccountReset": True,
+				"symbolicSubaddressing": True,
+				"isShared": False,
+				"dnsSummary": {"passesMx": True, "passesSpf": True, "passesDkim": True, "passesDmarc": True},
+			},
+			{
+				"name": "testdomain.net",
+				"allowAccountReset": False,
+				"symbolicSubaddressing": False,
+				"isShared": True,
+				"dnsSummary": {"passesMx": True, "passesSpf": True, "passesDkim": True, "passesDmarc": True},
+			},
+			{
+				"name": "another.org",
+				"allowAccountReset": True,
+				"symbolicSubaddressing": False,
+				"isShared": False,
+				"dnsSummary": {"passesMx": True, "passesSpf": True, "passesDkim": True, "passesDmarc": True},
+			},
+		],
+	}
+
+
+def test_dns_recheck_noncanonical_new_domain(run):
+	data, mocks = run(
+		[{"name": "brandnew.com", "recheck_dns": True}],
+		canonical=False,
+	)
+
+	mocks["DomainClient"].add_domain.assert_called_once()
+
+	assert data == {
+		"changed": True,
+		"domains": [
+			{
+				"name": "example.com",
+				"allowAccountReset": True,
+				"symbolicSubaddressing": True,
+				"isShared": False,
+				"dnsSummary": {"passesMx": True, "passesSpf": True, "passesDkim": True, "passesDmarc": True},
+			},
+			{
+				"name": "testdomain.net",
+				"allowAccountReset": False,
+				"symbolicSubaddressing": False,
+				"isShared": True,
+				"dnsSummary": {"passesMx": True, "passesSpf": True, "passesDkim": True, "passesDmarc": True},
+			},
+			{
+				"name": "another.org",
+				"allowAccountReset": True,
+				"symbolicSubaddressing": False,
+				"isShared": False,
+				"dnsSummary": {"passesMx": True, "passesSpf": True, "passesDkim": True, "passesDmarc": True},
+			},
+			{
+				"name": "brandnew.com",
+				"allowAccountReset": True,
+				"symbolicSubaddressing": True,
+				"isShared": False,
+				"dnsSummary": {"passesMx": True, "passesSpf": True, "passesDkim": True, "passesDmarc": True},
+			},
+		],
+	}
+
+
+def test_dns_recheck_canonical(run):
+	data, mocks = run(
+		[{"name": "example.com", "recheck_dns": True}],
+		canonical=True,
+	)
+
+	mocks["DomainClient"].update_domain_settings.assert_called_once()
+	assert mocks["DomainClient"].delete_domain.call_count == 2
+
+	assert data == {
+		"changed": True,
+		"domains": [
+			{
+				"name": "example.com",
+				"allowAccountReset": True,
+				"symbolicSubaddressing": True,
+				"isShared": False,
+				"dnsSummary": {"passesMx": True, "passesSpf": True, "passesDkim": True, "passesDmarc": True},
+			}
+		],
+	}
+
+
+def test_dns_recheck_check_mode(run):
+	data, mocks = run(
+		[{"name": "example.com", "recheck_dns": True}],
+		canonical=False,
+		check_mode=True,
+	)
+
+	mocks["DomainClient"].update_domain_settings.assert_not_called()
+
+	assert data == {
+		"changed": True,
+		"domains": [
+			{
+				"name": "example.com",
+				"allowAccountReset": True,
+				"symbolicSubaddressing": True,
+				"isShared": False,
+				"dnsSummary": {"passesMx": True, "passesSpf": True, "passesDkim": True, "passesDmarc": True},
+			},
+			{
+				"name": "testdomain.net",
+				"allowAccountReset": False,
+				"symbolicSubaddressing": False,
+				"isShared": True,
+				"dnsSummary": {"passesMx": True, "passesSpf": True, "passesDkim": True, "passesDmarc": True},
+			},
+			{
+				"name": "another.org",
+				"allowAccountReset": True,
+				"symbolicSubaddressing": False,
+				"isShared": False,
+				"dnsSummary": {"passesMx": True, "passesSpf": True, "passesDkim": True, "passesDmarc": True},
+			},
+		],
+	}
