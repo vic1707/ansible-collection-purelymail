@@ -60,7 +60,7 @@ class ListDomainsRequest:
 	includeShared: bool = Field(default=False, alias="include_shared")  # TODO: default?
 
 
-@dataclass(config=ConfigDict(**DEFAULT_CFG))
+@dataclass(config=ConfigDict(**DEFAULT_CFG, validate_by_name=True))
 class UpdateDomainSettingsRequest:
 	name: str
 	allowAccountReset: bool | None = Field(default=None, alias="allow_account_reset")
