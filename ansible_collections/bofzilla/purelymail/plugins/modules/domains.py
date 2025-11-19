@@ -194,7 +194,7 @@ def main():
 
 			for domain in missing_domains:
 				_ = client.add_domain(AddDomainRequest(domain.name))
-				if domain.updates(ApiDomainInfo.DEFAULT(domain.name)):
+				if domain.updates(ApiDomainInfo.DEFAULT(domain.name), ignore_recheck_dns=True):  # we just created it
 					_ = client.update_domain_settings(domain)
 
 		module.exit_json(**result)
