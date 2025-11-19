@@ -126,6 +126,7 @@ def test_noncanonical_updates(run):
 
 	mocks["DomainClient"].update_domain_settings.assert_called_once()
 	mocks["DomainClient"].add_domain.assert_not_called()
+	mocks["DomainClient"].delete_domain.assert_not_called()
 
 	assert data == {
 		"changed": True,
@@ -161,6 +162,10 @@ def test_noncanonical_diff(run):
 		canonical=False,
 		diff=True,
 	)
+
+	mocks["DomainClient"].add_domain.assert_called_once()
+	mocks["DomainClient"].update_domain_settings.assert_not_called()
+	mocks["DomainClient"].delete_domain.assert_not_called()
 
 	assert data == {
 		"changed": True,
@@ -259,7 +264,10 @@ def test_noncanonical_check_mode(run):
 		check_mode=True,
 	)
 
+	mocks["DomainClient"].update_domain_settings.assert_not_called()
 	mocks["DomainClient"].add_domain.assert_not_called()
+	mocks["DomainClient"].delete_domain.assert_not_called()
+
 	assert data == {
 		"changed": True,
 		"domains": [
@@ -300,6 +308,7 @@ def test_canonical_removes_extra(run):
 
 	assert mocks["DomainClient"].delete_domain.call_count == 2
 	mocks["DomainClient"].add_domain.assert_not_called()
+	mocks["DomainClient"].update_domain_settings.assert_not_called()
 
 	assert data == {
 		"changed": True,
@@ -363,6 +372,7 @@ def test_canonical_adds_and_deletes(run):
 	)
 
 	mocks["DomainClient"].add_domain.assert_called_once()
+	mocks["DomainClient"].update_domain_settings.assert_not_called()
 	assert mocks["DomainClient"].delete_domain.call_count == 2
 
 	assert data == {
@@ -392,6 +402,10 @@ def test_canonical_diff(run):
 		canonical=True,
 		diff=True,
 	)
+
+	mocks["DomainClient"].add_domain.assert_not_called()
+	mocks["DomainClient"].update_domain_settings.assert_not_called()
+	assert mocks["DomainClient"].delete_domain.call_count == 2
 
 	assert data == {
 		"changed": True,
@@ -450,6 +464,7 @@ def test_canonical_check_mode(run):
 
 	mocks["DomainClient"].add_domain.assert_not_called()
 	mocks["DomainClient"].delete_domain.assert_not_called()
+	mocks["DomainClient"].update_domain_settings.assert_not_called()
 
 	assert data == {"changed": True, "domains": []}
 
@@ -461,7 +476,7 @@ def test_canonical_partial_overlap(run):
 	)
 
 	mocks["DomainClient"].add_domain.assert_called_once()
-	mocks["DomainClient"].delete_domain.assert_called()
+	assert mocks["DomainClient"].delete_domain.call_count == 2
 
 	assert data == {
 		"changed": True,
@@ -490,7 +505,10 @@ def test_dns_recheck_noncanonical(run):
 		canonical=False,
 	)
 
+	mocks["DomainClient"].add_domain.assert_not_called()
+	mocks["DomainClient"].delete_domain.assert_not_called()
 	mocks["DomainClient"].update_domain_settings.assert_called_once()
+
 	assert data == {
 		"changed": True,
 		"domains": [
@@ -526,6 +544,8 @@ def test_dns_recheck_noncanonical_new_domain(run):
 	)
 
 	mocks["DomainClient"].add_domain.assert_called_once()
+	mocks["DomainClient"].update_domain_settings.assert_not_called()
+	mocks["DomainClient"].delete_domain.assert_not_called()
 
 	assert data == {
 		"changed": True,
@@ -568,6 +588,7 @@ def test_dns_recheck_canonical(run):
 		canonical=True,
 	)
 
+	mocks["DomainClient"].add_domain.assert_not_called()
 	mocks["DomainClient"].update_domain_settings.assert_called_once()
 	assert mocks["DomainClient"].delete_domain.call_count == 2
 
@@ -592,7 +613,9 @@ def test_dns_recheck_check_mode(run):
 		check_mode=True,
 	)
 
+	mocks["DomainClient"].add_domain.assert_not_called()
 	mocks["DomainClient"].update_domain_settings.assert_not_called()
+	mocks["DomainClient"].delete_domain.assert_not_called()
 
 	assert data == {
 		"changed": True,
