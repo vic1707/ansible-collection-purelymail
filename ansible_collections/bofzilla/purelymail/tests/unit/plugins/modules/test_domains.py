@@ -643,3 +643,27 @@ def test_dns_recheck_check_mode(run):
 			},
 		],
 	}
+
+
+def test_new_domain_with_non_default(run):
+	data, mocks = run(
+		[{"name": "brandnew.com", "symbolic_subaddressing": False}],
+		canonical=True,
+	)
+
+	mocks["DomainClient"].add_domain.assert_called_once()
+	mocks["DomainClient"].update_domain_settings.assert_called_once()
+	assert mocks["DomainClient"].delete_domain.call_count == 3
+
+	assert data == {
+		"changed": True,
+		"domains": [
+			{
+				"name": "brandnew.com",
+				"allowAccountReset": True,
+				"symbolicSubaddressing": False,
+				"isShared": False,
+				"dnsSummary": {"passesMx": True, "passesSpf": True, "passesDkim": True, "passesDmarc": True},
+			}
+		],
+	}
