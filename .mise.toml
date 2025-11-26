@@ -41,8 +41,8 @@ run = "ansible-test coverage html"
 actionlint = "1.7.9"
 jq = "1.8.1"
 python = "3.14.0"
-typos = "1.39.2"
-uv = "0.9.11"
+typos = "1.40.0"
+uv = "0.9.13"
 zizmor = "1.16.3"
 
 [alias]
