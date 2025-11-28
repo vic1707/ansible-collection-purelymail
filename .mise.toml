@@ -50,7 +50,10 @@ zizmor = "asdf:vic1707/asdf-zizmor"
 
 [settings.python]
 compile = false     ## Forces download of precompiled bin
-uv_venv_auto = true
+# uv_venv_auto = true # <https://github.com/jdx/mise-action/issues/295>
+
+[hooks] # <https://github.com/jdx/mise-action/issues/295>
+postinstall = "uv sync"
 
 [settings]
 experimental = true # needed for uv venv
