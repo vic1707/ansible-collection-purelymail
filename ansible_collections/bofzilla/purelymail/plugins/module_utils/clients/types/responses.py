@@ -5,6 +5,7 @@ from pydantic import ConfigDict, Field, Json, PositiveFloat, computed_field
 from pydantic.dataclasses import dataclass
 
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.api_types import ApiDomainInfo, RoutingRule
+from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.requests import UpdateDomainSettingsRequest
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.pydantic import DEFAULT_CFG
 
 
@@ -59,9 +60,17 @@ class ListDomainsResponse:
 	def as_api_response(self) -> list[dict[str, Any]]:
 		return [r.as_api_response() for r in self.domains]
 
+	def as_display(self) -> list[dict[str, Any]]:
+		return [r.as_display() for r in self.domains]
+
 	def filter(self, predicate: Callable[[ApiDomainInfo], bool]) -> "ListDomainsResponse":
 		"""True means keep"""
 		return ListDomainsResponse([d for d in self.domains if predicate(d)])
 
 	def concat(self, new_domains: list[ApiDomainInfo]) -> "ListDomainsResponse":
 		return ListDomainsResponse(self.domains + new_domains)
+
+	def apply_updates(self, updates: list[UpdateDomainSettingsRequest]) -> "ListDomainsResponse":
+		update_map = {u.name: u for u in updates}
+
+		return ListDomainsResponse([update_map[d.name].update(d) if d.name in update_map else d for d in self.domains])

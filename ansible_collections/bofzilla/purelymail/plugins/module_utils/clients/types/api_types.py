@@ -70,6 +70,9 @@ class ApiDomainInfo:
 	def as_api_response(self):
 		return ApiDomainInfo._adapter.dump_python(self)
 
+	def as_display(self):
+		return ApiDomainInfo._adapter.dump_python(self)
+
 	def DEFAULT(domain_name: str) -> "ApiDomainInfo":
 		"""
 		AddDomain doesn't return anything, but accepted domains should return this.

@@ -67,9 +67,9 @@ def main():
 		argument_spec=dict(
 			api_token=dict(type="str", required=True, no_log=True),
 			name=dict(type="str", required=True),
-			allow_account_reset=dict(type="bool"),
-			symbolic_subaddressing=dict(type="bool"),
-			recheck_dns=dict(type="bool", default=False),
+			allow_account_reset=dict(type="bool", required=False),
+			symbolic_subaddressing=dict(type="bool", required=False),
+			recheck_dns=dict(type="bool", required=False, default=False),
 			__include_shared=dict(type="bool", required=False, default=False),
 		),
 		supports_check_mode=True,

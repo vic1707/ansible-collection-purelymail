@@ -60,21 +60,23 @@ class ListDomainsRequest:
 	includeShared: bool = Field(default=False, alias="include_shared")  # TODO: default?
 
 
-@dataclass(config=ConfigDict(**DEFAULT_CFG))
+@dataclass(config=ConfigDict(**DEFAULT_CFG, validate_by_name=True))
 class UpdateDomainSettingsRequest:
 	name: str
 	allowAccountReset: bool | None = Field(default=None, alias="allow_account_reset")
 	symbolicSubaddressing: bool | None = Field(default=None, alias="symbolic_subaddressing")
 	recheckDns: bool = Field(default=False, alias="recheck_dns")
 
-	def updates(self, domain: ApiDomainInfo) -> bool:
+	def updates(self, domain: ApiDomainInfo, *, ignore_recheck_dns: bool = False) -> bool:
+		assert self.name == domain.name
 		return (
-			self.recheckDns  # assume changes so we request
+			(self.recheckDns and not ignore_recheck_dns)
 			or (self.allowAccountReset is not None and self.allowAccountReset != domain.allowAccountReset)
 			or (self.symbolicSubaddressing is not None and self.symbolicSubaddressing != domain.symbolicSubaddressing)
 		)
 
 	def update(self, domain: ApiDomainInfo) -> ApiDomainInfo:
+		assert self.name == domain.name
 		return ApiDomainInfo(
 			name=domain.name,
 			allowAccountReset=(self.allowAccountReset if self.allowAccountReset is not None else domain.allowAccountReset),
