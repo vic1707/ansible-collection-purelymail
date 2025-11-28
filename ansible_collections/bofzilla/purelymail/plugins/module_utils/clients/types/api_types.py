@@ -26,16 +26,16 @@ class RoutingRule:
 	id: int = Field(..., gt=0)
 
 	def as_display(self):
-		return RoutingRule._adapter.dump_python(self, exclude=["id"])
+		return RoutingRule._adapter.dump_python(self, exclude={"id"})
 
 	def as_api_response(self):
-		return RoutingRule._adapter.dump_python(self, exclude=["preset"])
+		return RoutingRule._adapter.dump_python(self, exclude={"preset"})
 
 	def as_api_payload(self):
-		return RoutingRule._adapter.dump_python(self, exclude=["preset", "id"])
+		return RoutingRule._adapter.dump_python(self, exclude={"preset", "id"})
 
 	def as_playbook_input(self):
-		return RoutingRule._adapter.dump_python(self, by_alias=True, exclude=["preset", "id"])
+		return RoutingRule._adapter.dump_python(self, by_alias=True, exclude={"preset", "id"})
 
 	@computed_field(return_type=PresetType | None)
 	@property
