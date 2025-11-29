@@ -1,7 +1,6 @@
 [env]
 _.path = "{{ env.PATH }}:{{ config_root }}/bin"
 _.python.venv = { path = "{{ config_root }}/.venv", create = true }
-ANSIBLE_HOME = "{{ config_root }}/.ansible"
 
 [tasks.generate-integration-config]
 env = { _.file = ".env" }
