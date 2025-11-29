@@ -1,0 +1,17 @@
+---
+- name: Import integration_config.yml
+  ansible.builtin.include_vars:
+    file: "{{ playbook_dir }}/integration_config.yml"
+
+- name: Call the lookup plugin
+  ansible.legacy.set_fact:
+    pm_data: >-
+      {{ lookup('bofzilla.purelymail.purelymail_ownership_code',
+                 api_token="{{ PURELYMAIL_API_TOKEN }}") }}
+
+- name: Ensure lookup returned an object
+  ansible.builtin.assert:
+    that:
+      - pm_data is defined
+      - pm_data.code is defined
+      - pm_data.value is defined
