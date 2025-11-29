@@ -37,8 +37,6 @@ EXAMPLES = r"""
 RETURN = r"""
 _raw:
   description:
-    - The lookup returns a list containing one structured object of type
-      C(GetOwnershipCodeResponse).
     - The object provides two useful attributes:
         - C(code): The full DNS TXT value (e.g. C(purelymail_ownership_proof=dQw4w9WgXcQ))
         - C(value): The extracted verification code without the prefix (e.g. C(dQw4w9WgXcQ))
@@ -53,8 +51,7 @@ _raw:
 
 class LookupModule(LookupBase):
 	def run(self, terms, variables=None, **kwargs):
-		self.set_options(var_options=variables, direct=kwargs)
-		api_token = self.get_option("api_token")
+		api_token = kwargs["api_token"]
 
 		api = PurelymailAPI(api_token)
 		client = DomainClient(api)

@@ -7,7 +7,8 @@ from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.
 
 
 @pytest.fixture(scope="module")
-def lookup_module(monkeypatch: pytest.MonkeyPatch) -> purelymail_ownership_code.LookupModule:
+def lookup_module() -> purelymail_ownership_code.LookupModule:
+	monkeypatch = pytest.MonkeyPatch()
 	domain_client = MagicMock()
 	domain_client.get_ownership_code.return_value = GetOwnershipCodeResponse(code="purelymail_ownership_proof=dQw4w9WgXcQ")
 	monkeypatch.setattr(purelymail_ownership_code, "DomainClient", lambda *_, **__: domain_client)
