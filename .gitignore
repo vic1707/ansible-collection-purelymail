@@ -1,6 +1,4 @@
 .git/
-.ansible/
-!.ansible/collections/ansible_collections/bofzilla
 .venv/
 __pycache__/
 .ruff_cache/
