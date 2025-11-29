@@ -3,9 +3,8 @@ from dataclasses import dataclass
 from typing import TypeVar
 
 import requests
-from ansible.module_utils.basic import AnsibleModule
 
-from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.response_wrapper import ApiError, ApiSuccess, parse_api_response
+from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.response_wrapper import ApiSuccess, parse_api_response
 
 Rep = TypeVar("Rep")
 Req = TypeVar("Req")
@@ -13,7 +12,6 @@ Req = TypeVar("Req")
 
 @dataclass()
 class PurelymailAPI:
-	__module: AnsibleModule
 	api_token: str
 	base_url: str = "https://purelymail.com/api"
 	api_version: str = "v0"
@@ -30,6 +28,7 @@ class PurelymailAPI:
 			json=payload.__dict__,
 			verify=self.TLS_VERIFY,
 		)
+
 		resp.raise_for_status()
 
 		data = parse_api_response(resp.json(), response_model)
@@ -37,7 +36,5 @@ class PurelymailAPI:
 			case ApiSuccess():
 				assert isinstance(data.result, response_model)  # TODO: remove when `ty` supports it
 				return data.result
-			case ApiError():
-				return self.__module.fail_json(msg=f"Purelymail API error: {data}", exception=data)
-			case other:  # pragma: no cover
-				raise ValueError(f"Unexpected response type: {other}")
+			case err:
+				raise err

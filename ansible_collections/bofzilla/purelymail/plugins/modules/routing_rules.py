@@ -3,6 +3,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.base_client import PurelymailAPI
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.routing_client import RoutingClient
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.requests import CreateRoutingRequest, DeleteRoutingRequest
+from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.response_wrapper import ApiError
 
 DOCUMENTATION = r"""
 module: routing_rules
@@ -223,7 +224,7 @@ def main():
 		if rule.get("preset", None) is None and rule.get("match_user", None) is None and rule.get("prefix", None) is None and rule.get("catchall", None) is None:
 			module.fail_json(msg=f"rule[{idx}]: preset is None but any of the following are missing: match_user, prefix, catchall found in rules")
 
-	api = PurelymailAPI(module, module.params["api_token"])
+	api = PurelymailAPI(module.params["api_token"])
 	client = RoutingClient(api)
 
 	try:
@@ -278,10 +279,12 @@ def main():
 				_ = client.create_routing_rule(rule)
 
 		module.exit_json(**result)
-	except Exception as e:  # pragma: no cover
+	except ApiError as err:  # pragma: no cover
+		module.fail_json(msg=f"Purelymail API error: {err}", exception=err)
+	except Exception as err:  # pragma: no cover
 		import traceback
 
-		module.fail_json(msg=f"{type(e).__name__}: {e}", exception=traceback.format_exc())
+		module.fail_json(msg=f"{type(err).__name__}: {err}", exception=traceback.format_exc())
 
 
 if __name__ == "__main__":

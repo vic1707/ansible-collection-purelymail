@@ -4,6 +4,7 @@ from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.base_c
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.domain_client import DomainClient
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.api_types import ApiDomainInfo
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.requests import ListDomainsRequest, UpdateDomainSettingsRequest
+from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.response_wrapper import ApiError
 
 DOCUMENTATION = r"""
 ---
@@ -75,7 +76,7 @@ def main():
 		supports_check_mode=True,
 	)
 
-	api = PurelymailAPI(module, module.params["api_token"])
+	api = PurelymailAPI(module.params["api_token"])
 	client = DomainClient(api)
 
 	try:
@@ -99,10 +100,12 @@ def main():
 			_ = client.update_domain_settings(req)
 
 		module.exit_json(**result)
-	except Exception as e:  # pragma: no cover
+	except ApiError as err:  # pragma: no cover
+		module.fail_json(msg=f"Purelymail API error: {err}", exception=err)
+	except Exception as err:  # pragma: no cover
 		import traceback
 
-		module.fail_json(msg=f"{type(e).__name__}: {e}", exception=traceback.format_exc())
+		module.fail_json(msg=f"{type(err).__name__}: {err}", exception=traceback.format_exc())
 
 
 if __name__ == "__main__":
