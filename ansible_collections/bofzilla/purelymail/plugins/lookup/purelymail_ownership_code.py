@@ -51,7 +51,9 @@ _raw:
 
 class LookupModule(LookupBase):
 	def run(self, terms, variables=None, **kwargs):
-		api_token = kwargs["api_token"]
+		assert len(terms) == 0
+		self.set_options(var_options=variables, direct=kwargs)
+		api_token = self.get_option("api_token")
 
 		api = PurelymailAPI(api_token)
 		client = DomainClient(api)
