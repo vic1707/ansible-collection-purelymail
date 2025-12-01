@@ -89,3 +89,8 @@ class UpdateDomainSettingsRequest:
 @dataclass(config=ConfigDict(**DEFAULT_CFG))
 class DeleteDomainRequest:
 	name: str
+
+## User
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class DeleteUserRequest:
+	userName: str
