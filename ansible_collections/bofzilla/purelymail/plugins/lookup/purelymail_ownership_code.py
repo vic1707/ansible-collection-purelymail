@@ -7,7 +7,7 @@ from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.
 
 DOCUMENTATION = r"""
 ---
-lookup: purelymail_ownership_code
+name: purelymail_ownership_code
 short_description: Retrieve the Purelymail ownership DNS record value
 description:
   - This lookup retrieves the DNS TXT record value used to verify domain ownership
