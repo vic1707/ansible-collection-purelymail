@@ -57,7 +57,7 @@ class AddDomainRequest:
 
 @dataclass(config=ConfigDict(**DEFAULT_CFG))
 class ListDomainsRequest:
-	includeShared: bool = Field(default=False, alias="include_shared")  # TODO: default?
+	includeShared: bool = Field(alias="include_shared")
 
 
 @dataclass(config=ConfigDict(**DEFAULT_CFG, validate_by_name=True))
