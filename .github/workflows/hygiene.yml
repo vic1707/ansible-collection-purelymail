@@ -1,4 +1,4 @@
-name: Lint & Format
+name: Code hygiene
 
 on:
   push:
@@ -15,8 +15,8 @@ on:
 permissions: {}
 
 jobs:
-  linters:
-    name: linters
+  hygiene:
+    name: hygiene
     runs-on: ubuntu-latest
     steps:
       - name: Harden the runner (Audit all outbound calls)
@@ -30,24 +30,24 @@ jobs:
       - uses: jdx/mise-action@146a28175021df8ca24f8ee1828cc2a60f980bd5 # v3.5.1
 
       - name: Zizmor
-        run: zizmor .
+        run: mise zizmor
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Actionlint
-        run: actionlint
+        run: mise actionlint
 
       - name: Typos
-        run: typos -c .config/.typos.toml
+        run: mise typos
 
       - name: Ansible-lint
-        run: ansible-lint -c .config/.ansible-lint.yml
+        run: mise ansible-lint
 
       - name: ty
-        run: ty check
+        run: mise ty
 
       - name: ruff (lint)
-        run: ruff check
+        run: mise ruff:lint
 
       - name: ruff (format)
-        run: ruff format --check
+        run: mise ruff:format

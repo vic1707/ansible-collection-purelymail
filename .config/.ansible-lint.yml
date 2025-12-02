@@ -1,6 +1,4 @@
 ---
-# .ansible-lint
-
 profile: production
 strict: true
 

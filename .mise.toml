@@ -1,40 +1,12 @@
+redactions = ["PURELYMAIL_API_TOKEN"]
+
 [env]
 _.path = "{{ env.PATH }}:{{ config_root }}/bin"
-_.python.venv = { path = "{{ config_root }}/.venv", create = true }
+_.python.venv = { path = ".venv", create = true }
 
-[tasks.generate-integration-config]
-env = { _.file = ".env" }
-dir = "{{ config_root }}/ansible_collections/bofzilla/purelymail/tests/integration"
-run = '''
-rm -f integration_config.yml
-while read -r line; do
-    eval 'echo "'"$line"'"' >> integration_config.yml
-done < integration_config.yml.tpl
-'''
-
-[tasks.integration-tests]
-depends = ["clean", "generate-integration-config"]
-dir = "{{ config_root }}/ansible_collections/bofzilla/purelymail"
-run = "ansible-test integration --coverage --python-interpreter $(which python)"
-
-[tasks.unit-tests]
-depends = ["clean"]
-dir = "{{ config_root }}/ansible_collections/bofzilla/purelymail"
-run = "ansible-test units --coverage --python-interpreter $(which python)"
-
-[tasks.tests]
-depends = ["unit-tests", "integration-tests"]
-
-[tasks.clean]
-run = """
-rm -fr .ruff_cache
-rm -fr ansible_collections/bofzilla/purelymail/tests/output
-"""
-
-[tasks.tests-coverage]
-depends = ["tests"]
-dir = "{{ config_root }}/ansible_collections/bofzilla/purelymail"
-run = "ansible-test coverage html"
+[task_config]
+dir = "{{ config_root }}"
+includes = [".config/tasks.mise.toml"]
 
 [tools]
 actionlint = "1.7.9"

@@ -1,0 +1,60 @@
+actionlint = "actionlint"
+ansible-lint = "ansible-lint -c .config/.ansible-lint.yml"
+"ansible-lint:fix" = "ansible-lint -c .config/.ansible-lint.yml --fix"
+"ruff:lint" = "ruff check"
+"ruff:lint:fix" = "ruff check --fix --unsafe-fixes"
+"ruff:format" = "ruff format --check"
+"ruff:format:fix" = "ruff format"
+typos = "typos -c .config/.typos.toml"
+ty = "ty check"
+zizmor = "zizmor ."
+
+clean = """
+rm -fr .ruff_cache .ansible
+find ansible_collections/bofzilla/purelymail \
+	-type d -name '__pycache__' -o -path '*/tests/output' \
+	| xargs rm -rf
+"""
+
+[format]
+depends = ["ruff:format"]
+
+["format:fix"]
+depends = ["ruff:format:fix"]
+
+[actions-lint]
+depends = ["actionlint", "zizmor"]
+
+[lint]
+depends = ["ansible-lint", "ty", "typos", "ruff:lint"]
+
+["lint:fix"]
+depends = ["ansible-lint:fix", "ty", "ruff:lint:fix"]
+
+[generate-integration-config]
+env = { _.file = ".env" }
+dir = "{{ config_root }}/ansible_collections/bofzilla/purelymail/tests/integration"
+run = '''
+rm -f integration_config.yml
+while read -r line; do
+    eval 'echo "'"$line"'"' >> integration_config.yml
+done < integration_config.yml.tpl
+'''
+
+[integration-tests]
+depends = ["clean", "generate-integration-config"]
+dir = "{{ config_root }}/ansible_collections/bofzilla/purelymail"
+run = "ansible-test integration --coverage --python-interpreter $(which python)"
+
+[unit-tests]
+depends = ["clean"]
+dir = "{{ config_root }}/ansible_collections/bofzilla/purelymail"
+run = "ansible-test units --coverage --python-interpreter $(which python)"
+
+[tests]
+depends = ["unit-tests", "integration-tests"]
+
+[tests-coverage]
+depends = ["tests"]
+dir = "{{ config_root }}/ansible_collections/bofzilla/purelymail"
+run = "ansible-test coverage html"
