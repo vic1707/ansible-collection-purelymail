@@ -2,7 +2,13 @@ from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.responses import CheckCreditResponse, EmptyResponse, ListRoutingResponse
 
 MOCK_SUCCESSES = [
-	({"result": {"rules": []}, "type": "success"}, ListRoutingResponse),
+	(
+		{
+			"result": {"rules": [{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"], "id": 1}]},
+			"type": "success",
+		},
+		ListRoutingResponse,
+	),
 	({"result": {"credit": "19.1607994830137318004587841289974404320987654320987654320987654320987598"}, "type": "success"}, CheckCreditResponse),
 	({"result": {}, "type": "success"}, EmptyResponse),
 ]
