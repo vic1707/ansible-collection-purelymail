@@ -10,7 +10,7 @@ ty = "ty check"
 zizmor = "zizmor ."
 
 clean = """
-rm -fr .ruff_cache .ansible
+rm -fr .ruff_cache .ansible .pytest_cache
 find ansible_collections/bofzilla/purelymail \
 	-type d -name '__pycache__' -o -path '*/tests/output' \
 	| xargs rm -rf
