@@ -3,14 +3,14 @@ name = "ansible-collection-purelymail"
 version = "0.0.1"
 dependencies = [
 	"ansible==13.0.0",
-	"ansible-lint==25.11.1",
-	"coverage==7.10.7",
+	"ansible-lint==25.12.0",
+	"coverage==7.12.0",
 	"pydantic==2.12.5",
-	"pytest==9.0.1",
-	"pytest-ansible==25.11.1",
+	"pytest==9.0.2",
+	"pytest-ansible==25.12.0",
 	"requests==2.32.5",
-	"ruff==0.14.6",
-	"ty==0.0.1a28",
+	"ruff==0.14.8",
+	"ty==0.0.1a32",
 ]
 
 [tool.ruff]
