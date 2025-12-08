@@ -12,7 +12,7 @@ def run(make_runner):  # noqa: F811
 		(
 			(
 				"BillingClient",
-				lambda mock: setattr(mock.check_account_credit, "return_value", CheckCreditResponse(credit="12.34")),
+				lambda mock: setattr(mock.check_account_credit, "return_value", CheckCreditResponse("12.34")),  # TODO: # ty:ignore[invalid-argument-type]
 			),
 		),
 	)
