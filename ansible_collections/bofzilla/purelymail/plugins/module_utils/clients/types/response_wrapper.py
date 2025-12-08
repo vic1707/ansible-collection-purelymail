@@ -29,4 +29,4 @@ type ApiResponse[T] = Annotated[ApiSuccess[T] | ApiError, Field(..., discriminat
 
 def parse_api_response(data: dict, response_model: type[T]) -> ApiSuccess[T] | ApiError:
 	# strict=False because we input a dict for parsing, the method still returns an instance
-	return TypeAdapter(ApiResponse[response_model]).validate_python(data, strict=False, extra="forbid")
+	return TypeAdapter(ApiResponse[response_model]).validate_python(data, strict=False, extra="forbid")  # TODO: # ty:ignore[invalid-type-form]
