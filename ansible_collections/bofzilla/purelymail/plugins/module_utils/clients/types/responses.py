@@ -74,3 +74,9 @@ class ListDomainsResponse:
 		update_map = {u.name: u for u in updates}
 
 		return ListDomainsResponse([update_map[d.name].update(d) if d.name in update_map else d for d in self.domains])
+
+
+## User
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class ListUsersResponse:
+	users: list[str]
