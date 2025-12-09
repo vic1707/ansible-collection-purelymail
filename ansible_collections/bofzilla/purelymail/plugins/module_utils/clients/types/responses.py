@@ -80,3 +80,10 @@ class ListDomainsResponse:
 @dataclass(config=ConfigDict(**DEFAULT_CFG))
 class ListUsersResponse:
 	users: list[str]
+
+	def as_api_response(self) -> list[str]:
+		return [u for u in self.users]
+
+	def filter(self, predicate: Callable[[str], bool]) -> "ListUsersResponse":
+		"""True means keep"""
+		return ListUsersResponse([u for u in self.users if predicate(u)])

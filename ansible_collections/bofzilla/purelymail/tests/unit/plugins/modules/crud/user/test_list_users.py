@@ -1,5 +1,3 @@
-import functools
-
 import pytest
 
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.responses import ListUsersResponse
@@ -21,13 +19,7 @@ def run(make_runner):  # noqa: F811
 		),
 	)
 
-	@functools.wraps(runner_run)
-	def inner_run(**kwargs):
-		# include_shared doesn't matter as we don't test purelymail's API
-		# only this module behaviors
-		return runner_run(params={"include_shared": True}, **kwargs)
-
-	return inner_run
+	return runner_run
 
 
 def test_diff(run):
