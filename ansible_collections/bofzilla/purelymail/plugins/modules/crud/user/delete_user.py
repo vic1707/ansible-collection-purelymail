@@ -48,7 +48,6 @@ def main():
 		argument_spec=dict(
 			api_token=dict(type="str", required=True, no_log=True),
 			username=dict(type="str", required=True),
-			__include_shared=dict(type="bool", required=False, default=False),
 		),
 		supports_check_mode=True,
 	)
