@@ -88,3 +88,16 @@ class ApiDomainInfo:
 
 
 ApiDomainInfo._adapter = TypeAdapter(ApiDomainInfo)
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class UserPasswordResetMethodType:
+	pass
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class GetUserPasswordResetMethod:
+	type: UserPasswordResetMethodType
+	target: str
+	description: str
+	allowMfaReset: bool

@@ -95,3 +95,8 @@ class DeleteDomainRequest:
 @dataclass(config=ConfigDict(**DEFAULT_CFG))
 class DeleteUserRequest:
 	userName: str
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class GetUserRequest:
+	userName: str

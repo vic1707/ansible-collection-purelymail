@@ -1,10 +1,10 @@
 from collections.abc import Callable
-from typing import Any
+from typing import Any, ClassVar
 
-from pydantic import ConfigDict, Field, Json, PositiveFloat, computed_field
+from pydantic import ConfigDict, Field, Json, PositiveFloat, TypeAdapter, computed_field
 from pydantic.dataclasses import dataclass
 
-from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.api_types import ApiDomainInfo, RoutingRule
+from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.api_types import ApiDomainInfo, GetUserPasswordResetMethod, RoutingRule
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.requests import UpdateDomainSettingsRequest
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.pydantic import DEFAULT_CFG
 
@@ -87,3 +87,20 @@ class ListUsersResponse:
 	def filter(self, predicate: Callable[[str], bool]) -> "ListUsersResponse":
 		"""True means keep"""
 		return ListUsersResponse([u for u in self.users if predicate(u)])
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class GetUserResponse:
+	_adapter: ClassVar[TypeAdapter["GetUserResponse"]]
+
+	enableSearchIndexing: bool
+	recoveryEnabled: bool
+	requireTwoFactorAuthentication: bool
+	enableSpamFiltering: bool
+	resetMethods: list[GetUserPasswordResetMethod]
+
+	def as_api_response(self) -> dict:
+		return GetUserResponse._adapter.dump_python(self)
+
+
+GetUserResponse._adapter = TypeAdapter(GetUserResponse)

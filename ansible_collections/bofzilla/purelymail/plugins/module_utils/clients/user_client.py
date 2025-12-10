@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.base_client import PurelymailAPI
-from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.requests import DeleteUserRequest, EmptyRequest
-from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.responses import EmptyResponse, ListUsersResponse
+from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.requests import DeleteUserRequest, EmptyRequest, GetUserRequest
+from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.responses import EmptyResponse, GetUserResponse, ListUsersResponse
 
 
 @dataclass()
@@ -21,8 +21,8 @@ class UserClient:
 	# def modify_user(self, req: ModifyUserRequest) -> EmptyResponse:
 	# 	return self.api.post("/api/v0/modifyUser", req, EmptyResponse)
 
-	# def get_user(self, req: GetUserRequest) -> GetUserResponse:
-	# 	return self.api.post("/api/v0/getUser", req, GetUserResponse)
+	def get_user(self, req: GetUserRequest) -> GetUserResponse:
+		return self.api.post("/api/v0/getUser", req, GetUserResponse)
 
 	# def upsert_password_reset(self, req: UpsertPasswordResetRequest) -> EmptyResponse:
 	# 	return self.api.post("/api/v0/upsertPasswordReset", req, EmptyResponse)
