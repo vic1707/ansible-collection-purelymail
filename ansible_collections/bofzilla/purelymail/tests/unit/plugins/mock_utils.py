@@ -4,6 +4,7 @@ from typing import Any, Protocol
 from unittest.mock import MagicMock
 
 import pytest
+import requests
 
 
 @pytest.fixture(scope="module")
@@ -15,9 +16,10 @@ def make_runner():
 	def _make_runner(
 		py_module: HasMain,
 		mock_setup: tuple[tuple[str, Callable[[MagicMock], None]] | str, ...],
+		mock_api_response: Callable[[dict], FakeApiResponse] | None = None,
 	) -> Callable[..., tuple[dict, dict[str, MagicMock]]]:
 		monkeypatch = pytest.MonkeyPatch()
-		mocks = bootstrap_module(monkeypatch, py_module, mocks=mock_setup)
+		mocks = bootstrap_module(monkeypatch, py_module, mock_setup, mock_api_response)
 
 		@functools.wraps(run_module_test)
 		def run_with_params(**kwargs):
@@ -36,7 +38,8 @@ class HasMain(Protocol):
 def bootstrap_module(
 	monkeypatch: pytest.MonkeyPatch,
 	py_module: HasMain,
-	mocks: tuple[tuple[str, Callable[[MagicMock], None]] | str, ...] = (),
+	mocks: tuple[tuple[str, Callable[[MagicMock], None]] | str, ...],
+	mock_api_response: Callable[[dict], "FakeApiResponse"] | None = None,
 ) -> dict[str, MagicMock]:
 	module = MagicMock()
 	module.exit_json.side_effect = exit_json
@@ -44,6 +47,9 @@ def bootstrap_module(
 	monkeypatch.setattr(py_module, "AnsibleModule", lambda *_, **__: module)
 
 	ret = {"AnsibleModule": module}
+
+	if mock_api_response:
+		monkeypatch.setattr(requests, "post", lambda *_, **kwargs: mock_api_response(kwargs.get("json")))
 
 	for mock_cfg in mocks:
 		mock = MagicMock()
@@ -57,6 +63,25 @@ def bootstrap_module(
 		ret[mock_name] = mock
 
 	return ret
+
+
+class FakeApiResponse:
+	def __init__(self, payload):
+		self._payload = payload
+
+	@classmethod
+	def success(cls, payload: dict) -> "FakeApiResponse":
+		return FakeApiResponse({"type": "success", "result": payload})
+
+	@classmethod
+	def error(cls, message: str, *, code: str = "internalError") -> "FakeApiResponse":
+		return FakeApiResponse({"type": "error", "code": code, "message": message})
+
+	def json(self):
+		return self._payload
+
+	def raise_for_status(self):
+		pass
 
 
 class AnsibleExitJson(BaseException):
