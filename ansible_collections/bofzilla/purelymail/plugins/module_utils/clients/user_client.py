@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.base_client import PurelymailAPI
-from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.requests import DeleteUserRequest, EmptyRequest, GetUserRequest
+from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.requests import CreateUserRequest, DeleteUserRequest, EmptyRequest, GetUserRequest
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.responses import EmptyResponse, GetUserResponse, ListUsersResponse
 
 
@@ -9,8 +9,8 @@ from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.
 class UserClient:
 	api: PurelymailAPI
 
-	# def create_user(self, req: CreateUserRequest) -> EmptyResponse:
-	# 	return self.api.post("/api/v0/createUser", req, EmptyResponse)
+	def create_user(self, req: CreateUserRequest) -> EmptyResponse:
+		return self.api.post("/api/v0/createUser", req, EmptyResponse)
 
 	def delete_user(self, req: DeleteUserRequest) -> EmptyResponse:
 		return self.api.post("/api/v0/deleteUser", req, EmptyResponse)

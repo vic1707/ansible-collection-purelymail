@@ -100,3 +100,21 @@ class DeleteUserRequest:
 @dataclass(config=ConfigDict(**DEFAULT_CFG))
 class GetUserRequest:
 	userName: str
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class CreateUserRequest:
+	userName: str = Field(alias="user_name")
+	domainName: str = Field(alias="domain_name")
+	password: str = Field(alias="password")
+	enablePasswordReset: bool = Field(alias="enable_password_reset")
+	recoveryEmail: str = Field(alias="recovery_email")
+	recoveryEmailDescription: str = Field(alias="recovery_email_description")
+	recoveryPhone: str = Field(alias="recovery_phone")
+	recoveryPhoneDescription: str = Field(alias="recovery_phone_description")
+	enableSearchIndexing: bool = Field(alias="enable_search_indexing")
+	sendWelcomeEmail: bool = Field(alias="send_welcome_email")
+
+	@property
+	def email(self) -> str:
+		return f"{self.userName}@{self.domainName}"

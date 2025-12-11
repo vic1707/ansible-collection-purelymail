@@ -88,6 +88,9 @@ class ListUsersResponse:
 		"""True means keep"""
 		return ListUsersResponse([u for u in self.users if predicate(u)])
 
+	def concat(self, new_users: list[str]) -> "ListUsersResponse":
+		return ListUsersResponse(self.users + new_users)
+
 
 @dataclass(config=ConfigDict(**DEFAULT_CFG))
 class GetUserResponse:
