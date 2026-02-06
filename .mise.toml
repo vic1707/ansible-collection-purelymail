@@ -9,11 +9,11 @@ dir = "{{ config_root }}"
 includes = [".config/tasks.mise.toml"]
 
 [tools]
-actionlint = "1.7.9"
+actionlint = "1.7.10"
 jq = "1.8.1"
-python = "3.14.2"
-typos = "1.40.0"
-uv = "0.9.16"
+python = "3.14.3"
+typos = "1.43.3"
+uv = "0.10.0"
 zizmor = "1.16.3"
 
 [alias]
