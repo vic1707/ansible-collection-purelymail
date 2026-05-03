@@ -15,7 +15,7 @@ class EmptyRequest:
 @dataclass(config=ConfigDict(**DEFAULT_CFG))
 class CreateRoutingRequest(RoutingRule):
 	id: None = Field(default=None, init=False, exclude=True)  # doesn't exist yet
-	_preset: PresetType | None = Field(exclude=True, alias="preset")  # TODO: make default=None when `ty` supports it
+	_preset: PresetType | None = Field(default=None, exclude=True, alias="preset")
 
 	def eq(self, rule: RoutingRule) -> bool:
 		return (
@@ -40,7 +40,6 @@ class CreateRoutingRequest(RoutingRule):
 				name = normalized_names.get(k, k)
 				data.kwargs[name] = v
 
-		data.kwargs["preset"] = None  # TODO: remove when `ty` supports it
 		return data
 
 

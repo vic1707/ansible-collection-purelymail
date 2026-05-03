@@ -1,3 +1,5 @@
+from typing import Any
+
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.base_client import PurelymailAPI
@@ -61,7 +63,7 @@ def main():
 		existing_rules = client.list_routing_rules()
 
 		exists = any(r.id == id for r in existing_rules.rules)
-		result = {"changed": exists}
+		result: dict[str, Any] = {"changed": exists}
 
 		if module._diff:
 			result["diff"] = {

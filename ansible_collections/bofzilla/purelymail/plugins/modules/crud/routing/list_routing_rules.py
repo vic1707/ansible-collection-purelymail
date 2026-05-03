@@ -1,3 +1,5 @@
+from typing import Any
+
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.base_client import PurelymailAPI
@@ -80,7 +82,7 @@ def main():
 	try:
 		rules = client.list_routing_rules().as_api_response()
 
-		res = {"changed": False}
+		res: dict[str, Any] = {"changed": False}
 
 		if module._diff:
 			res["diff"] = {"before": rules, "after": rules}

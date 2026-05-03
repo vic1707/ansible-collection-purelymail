@@ -1,3 +1,5 @@
+from typing import Any
+
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.base_client import PurelymailAPI
@@ -175,7 +177,7 @@ def main():
 			existing_domains.filter(lambda r: r.name not in extra_domains).apply_updates(domain_updates).concat([d.update(ApiDomainInfo.DEFAULT(d.name)) for d in missing_domains])
 		)
 
-		result = {
+		result: dict[str, Any] = {
 			"changed": bool(extra_domains) or bool(domain_updates) or bool(missing_domains),
 			"domains": supposed_after.as_display(),
 		}

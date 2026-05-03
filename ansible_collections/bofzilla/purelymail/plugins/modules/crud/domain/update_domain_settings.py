@@ -1,8 +1,9 @@
+from typing import Any
+
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.base_client import PurelymailAPI
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.domain_client import DomainClient
-from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.api_types import ApiDomainInfo
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.requests import ListDomainsRequest, UpdateDomainSettingsRequest
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.response_wrapper import ApiError
 
@@ -85,13 +86,12 @@ def main():
 
 		if not current:
 			module.fail_json(msg=f"Error: domain '{module.params['name']}' does not exist.")
-		assert isinstance(current, ApiDomainInfo)  # TODO: remove when `ty` supports it
 
 		req_params = module.params
 		del req_params["api_token"], req_params["__include_shared"]
 		req = UpdateDomainSettingsRequest(**req_params)
 
-		result = {"changed": req.updates(current)}
+		result: dict[str, Any] = {"changed": req.updates(current)}
 
 		if module._diff:
 			result["diff"] = {"before": current, "after": req.update(current)}
