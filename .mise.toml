@@ -9,14 +9,14 @@ dir = "{{ config_root }}"
 includes = [".config/tasks.mise.toml"]
 
 [tools]
-actionlint = "1.7.9"
+actionlint = "1.7.12"
 jq = "1.8.1"
 python = "3.14.2"
-typos = "1.40.0"
-uv = "0.9.16"
-zizmor = "1.16.3"
+typos = "1.46.0"
+uv = "0.11.8"
+zizmor = "1.24.1"
 
-[alias]
+[plugins]
 zizmor = "asdf:vic1707/asdf-zizmor"
 
 [settings.python]
