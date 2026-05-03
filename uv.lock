@@ -42,11 +42,11 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "ansible", specifier = "==13.0.0" },
-    { name = "ansible-lint", specifier = "==25.12.0" },
+    { name = "ansible-lint", specifier = "==26.4.0" },
     { name = "coverage", specifier = "==7.10.7" },
     { name = "pydantic", specifier = "==2.12.5" },
     { name = "pytest", specifier = "==9.0.2" },
-    { name = "pytest-ansible", specifier = "==25.12.0" },
+    { name = "pytest-ansible", specifier = "==26.4.0" },
     { name = "requests", specifier = "==2.32.5" },
     { name = "ruff", specifier = "==0.14.8" },
     { name = "ty", specifier = "==0.0.1a32" },
@@ -54,7 +54,7 @@ requires-dist = [
 
 [[package]]
 name = "ansible-compat"
-version = "25.12.0"
+version = "26.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ansible-core" },
@@ -63,9 +63,9 @@ dependencies = [
     { name = "pyyaml" },
     { name = "subprocess-tee" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/75/62/fb3aee58827ba6eacee561183b02b4a49cf4819f405df2409e23bad69a00/ansible_compat-25.12.0.tar.gz", hash = "sha256:d38a149c5f95bb0d529c3b5e5fa3200b26f5e938ec7c31d8bb01d87c1f634410", size = 193698, upload-time = "2025-12-02T15:36:37.831Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/04/42/53ba59f8116e716ec0af8dc47ef65b15f5e3bc28131e8e6cbe87e50203f5/ansible_compat-26.3.0.tar.gz", hash = "sha256:15f0ea5ff6fcc5587b6b11a4a436fdeefd0fd4a46afe92d4e483c28370082ae0", size = 216754, upload-time = "2026-03-31T15:47:58.193Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/7f/cb/be446a7db8b7ade13ebea507a7075a1eb8fd900c068c12ceee537a06ae9f/ansible_compat-25.12.0-py3-none-any.whl", hash = "sha256:322ccc7002030a91588d1fdba21e934703d64736f0e483dc6afe8ecd93a75614", size = 27731, upload-time = "2025-12-02T15:36:36.072Z" },
+    { url = "https://files.pythonhosted.org/packages/60/a1/3cf5e81f192a2ae4086f80d37d80e257c7552cd7f319b0160c78251bbfea/ansible_compat-26.3.0-py3-none-any.whl", hash = "sha256:4fb48f324383033cf24df5ccb63bca4da766cb4ebbd4bc9dbad91b108f512a73", size = 27723, upload-time = "2026-03-31T15:47:56.534Z" },
 ]
 
 [[package]]
@@ -86,7 +86,7 @@ wheels = [
 
 [[package]]
 name = "ansible-lint"
-version = "25.12.0"
+version = "26.4.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ansible-compat" },
@@ -106,9 +106,9 @@ dependencies = [
     { name = "wcmatch" },
     { name = "yamllint" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/15/4c/e3e33869fe2bad5d263474f61bb606272ad2b913e5004b503b1f6adc50a8/ansible_lint-25.12.0.tar.gz", hash = "sha256:84fa30130fe8771d8d8997bff09fd2a762a053ae9530d498fa3e66eb74608fe9", size = 716893, upload-time = "2025-12-02T15:47:18.115Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e4/39/54f7cc264f7f02c635af786c4a57da4ab993865140f90e031cdec39dd514/ansible_lint-26.4.0.tar.gz", hash = "sha256:29e0438f8af685a4fec96f9ea3404a3beb50d2911bc8df43f283256954ceea5b", size = 736853, upload-time = "2026-04-01T14:41:02.138Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/16/cb/271dd004bb9b2eef240b76c3e0bbaa24a2bd34b49ce13231810e3ffd9283/ansible_lint-25.12.0-py3-none-any.whl", hash = "sha256:df8385af857a1f509145e680850845efb783c3bf2ccb8d95acaced92e01100e3", size = 323024, upload-time = "2025-12-02T15:47:16.401Z" },
+    { url = "https://files.pythonhosted.org/packages/a5/97/803cde1dba6c5cc24f1401b37df8404a2793bd26dc3f11c0a9722109b859/ansible_lint-26.4.0-py3-none-any.whl", hash = "sha256:f33c4823544a5a8e5e36614866e111d1a929eeffee5e84481ede10d524a9d6d6", size = 330939, upload-time = "2026-04-01T14:41:00.083Z" },
 ]
 
 [[package]]
@@ -464,11 +464,11 @@ wheels = [
 
 [[package]]
 name = "pathspec"
-version = "0.12.1"
+version = "1.0.4"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/ca/bc/f35b8446f4531a7cb215605d100cd88b7ac6f44ab3fc94870c120ab3adbf/pathspec-0.12.1.tar.gz", hash = "sha256:a482d51503a1ab33b1c67a6c3813a26953dbdc71c31dacaef9a838c4e29f5712", size = 51043, upload-time = "2023-12-10T22:30:45Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/fa/36/e27608899f9b8d4dff0617b2d9ab17ca5608956ca44461ac14ac48b44015/pathspec-1.0.4.tar.gz", hash = "sha256:0210e2ae8a21a9137c0d470578cb0e595af87edaa6ebf12ff176f14a02e0e645", size = 131200, upload-time = "2026-01-27T03:59:46.938Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/cc/20/ff623b09d963f88bfde16306a54e12ee5ea43e9b597108672ff3a408aad6/pathspec-0.12.1-py3-none-any.whl", hash = "sha256:a0d503e138a4c123b27490a4f7beda6a01c6f288df0e4a8b79c7eb0dc7b4cc08", size = 31191, upload-time = "2023-12-10T22:30:43.14Z" },
+    { url = "https://files.pythonhosted.org/packages/ef/3c/2c197d226f9ea224a9ab8d197933f9da0ae0aac5b6e0f884e2b8d9c8e9f7/pathspec-1.0.4-py3-none-any.whl", hash = "sha256:fb6ae2fd4e7c921a165808a552060e722767cfa526f99ca5156ed2ce45a5c723", size = 55206, upload-time = "2026-01-27T03:59:45.137Z" },
 ]
 
 [[package]]
@@ -579,7 +579,7 @@ wheels = [
 
 [[package]]
 name = "pytest-ansible"
-version = "25.12.0"
+version = "26.4.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ansible-compat" },
@@ -587,39 +587,12 @@ dependencies = [
     { name = "cffi" },
     { name = "packaging" },
     { name = "pytest" },
-    { name = "pytest-plus" },
-    { name = "pytest-sugar" },
     { name = "pytest-xdist" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/40/c8/4a89525a2ec2e1229d9d9d436583a0f720fa4765e83b1620d0eee6c00b47/pytest_ansible-25.12.0.tar.gz", hash = "sha256:8a8b7afb30274a1a992a37408b775ad5fe5219a7c3b36904523d1276fe089ccd", size = 184678, upload-time = "2025-12-02T15:41:25.234Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/4f/c1/29eb44787b9a76227077fbbf3fd147d873a61235ffad1afdd9688c16f3c1/pytest_ansible-26.4.0.tar.gz", hash = "sha256:50c2c5f05472e5a41a8d9b29c38e98292c1605f57a70954fc20b51b1f5cabb82", size = 192858, upload-time = "2026-04-01T14:39:38.079Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/7f/81/3b83d011ddcf4c5ee714405429b977da3b743d2b6519b18b302129d43abd/pytest_ansible-25.12.0-py3-none-any.whl", hash = "sha256:c7ebf507eea6cb97949e0bae5e015d892bae6c461d0c7f526cce4c961560990c", size = 31219, upload-time = "2025-12-02T15:41:23.608Z" },
-]
-
-[[package]]
-name = "pytest-plus"
-version = "0.8.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "pytest" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/83/8d/c5acdd43847e975b31173f12fe3660174fb4f274f5bbe0b7efb5fa5d91fb/pytest_plus-0.8.1.tar.gz", hash = "sha256:02dfb28f1a914e8df3b6e3525df7e94feabc0681ecea626912e8028e9355f02c", size = 15444, upload-time = "2025-02-02T10:05:05.071Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/12/ae/35aac382af0d72c57df397deb753bca71a879a0a51f52b3ce77b3d2e7643/pytest_plus-0.8.1-py3-none-any.whl", hash = "sha256:2b8e9037716c9d7b708074863933897681f86d852d9c4e9717271be143dbdfb6", size = 6235, upload-time = "2025-02-02T10:05:03.701Z" },
-]
-
-[[package]]
-name = "pytest-sugar"
-version = "1.1.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "pytest" },
-    { name = "termcolor" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/0b/4e/60fed105549297ba1a700e1ea7b828044842ea27d72c898990510b79b0e2/pytest-sugar-1.1.1.tar.gz", hash = "sha256:73b8b65163ebf10f9f671efab9eed3d56f20d2ca68bda83fa64740a92c08f65d", size = 16533, upload-time = "2025-08-23T12:19:35.737Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/87/d5/81d38a91c1fdafb6711f053f5a9b92ff788013b19821257c2c38c1e132df/pytest_sugar-1.1.1-py3-none-any.whl", hash = "sha256:2f8319b907548d5b9d03a171515c1d43d2e38e32bd8182a1781eb20b43344cc8", size = 11440, upload-time = "2025-08-23T12:19:34.894Z" },
+    { url = "https://files.pythonhosted.org/packages/4d/96/e6f7b885ef8cf94b399a15485b972d4e1fb16a087a2914e9ad192e1eb7d2/pytest_ansible-26.4.0-py3-none-any.whl", hash = "sha256:146c3adbae17d5fcfa8bc60b8b92301c1b613d6814d42061fbc26d6e2ddab1dd", size = 31426, upload-time = "2026-04-01T14:39:36.427Z" },
 ]
 
 [[package]]
@@ -789,15 +762,6 @@ wheels = [
 ]
 
 [[package]]
-name = "termcolor"
-version = "3.2.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/87/56/ab275c2b56a5e2342568838f0d5e3e66a32354adcc159b495e374cda43f5/termcolor-3.2.0.tar.gz", hash = "sha256:610e6456feec42c4bcd28934a8c87a06c3fa28b01561d46aa09a9881b8622c58", size = 14423, upload-time = "2025-10-25T19:11:42.586Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/f9/d5/141f53d7c1eb2a80e6d3e9a390228c3222c27705cbe7f048d3623053f3ca/termcolor-3.2.0-py3-none-any.whl", hash = "sha256:a10343879eba4da819353c55cb8049b0933890c2ebf9ad5d3ecd2bb32ea96ea6", size = 7698, upload-time = "2025-10-25T19:11:41.536Z" },
-]
-
-[[package]]
 name = "ty"
 version = "0.0.1a32"
 source = { registry = "https://pypi.org/simple" }
@@ -866,13 +830,13 @@ wheels = [
 
 [[package]]
 name = "yamllint"
-version = "1.37.1"
+version = "1.38.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pathspec" },
     { name = "pyyaml" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/46/f2/cd8b7584a48ee83f0bc94f8a32fea38734cefcdc6f7324c4d3bfc699457b/yamllint-1.37.1.tar.gz", hash = "sha256:81f7c0c5559becc8049470d86046b36e96113637bcbe4753ecef06977c00245d", size = 141613, upload-time = "2025-05-04T08:25:54.355Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/28/a0/8fc2d68e132cf918f18273fdc8a1b8432b60d75ac12fdae4b0ef5c9d2e8d/yamllint-1.38.0.tar.gz", hash = "sha256:09e5f29531daab93366bb061e76019d5e91691ef0a40328f04c927387d1d364d", size = 142446, upload-time = "2026-01-13T07:47:53.276Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/dd/b9/be7a4cfdf47e03785f657f94daea8123e838d817be76c684298305bd789f/yamllint-1.37.1-py3-none-any.whl", hash = "sha256:364f0d79e81409f591e323725e6a9f4504c8699ddf2d7263d8d2b539cd66a583", size = 68813, upload-time = "2025-05-04T08:25:52.552Z" },
+    { url = "https://files.pythonhosted.org/packages/05/92/aed08e68de6e6a3d7c2328ce7388072cd6affc26e2917197430b646aed02/yamllint-1.38.0-py3-none-any.whl", hash = "sha256:fc394a5b3be980a4062607b8fdddc0843f4fa394152b6da21722f5d59013c220", size = 68940, upload-time = "2026-01-13T07:47:51.343Z" },
 ]
