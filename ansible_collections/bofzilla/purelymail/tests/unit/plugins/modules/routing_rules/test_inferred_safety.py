@@ -38,7 +38,7 @@ def run(make_runner):  # noqa: F811
 
 
 def test_unknown_preset(run):
-	rule = CreateRoutingRequest(catchall=True, prefix=True, match_user="toto", domain_name="example.com", target_addresses=[])  # ty: ignore[missing-argument]
+	rule = CreateRoutingRequest(catchall=True, prefix=True, match_user="toto", domain_name="example.com", target_addresses=[])
 	assert rule.preset is None
 
 	data, _ = run(

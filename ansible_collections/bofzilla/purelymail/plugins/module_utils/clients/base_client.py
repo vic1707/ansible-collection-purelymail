@@ -34,7 +34,6 @@ class PurelymailAPI:
 		data = parse_api_response(resp.json(), response_model)
 		match data:
 			case ApiSuccess():
-				assert isinstance(data.result, response_model)  # TODO: remove when `ty` supports it
 				return data.result
 			case err:
 				raise err

@@ -1,3 +1,5 @@
+from typing import Any
+
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.base_client import PurelymailAPI
@@ -74,7 +76,7 @@ def main():
 	try:
 		data = client.get_ownership_code()
 		data = {"code": data.code, "value": data.value}
-		res = {"changed": False}
+		res: dict[str, Any] = {"changed": False}
 
 		if module._diff:
 			res["diff"] = {"before": data, "after": data}

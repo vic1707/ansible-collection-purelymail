@@ -1,3 +1,5 @@
+from typing import Any
+
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.base_client import PurelymailAPI
@@ -68,7 +70,7 @@ def main():
 		existing_domains = client.list_domains(ListDomainsRequest(module.params["__include_shared"]))
 		already_exists = any(d.name == domain_name for d in existing_domains.domains)
 
-		result = {"changed": not already_exists}
+		result: dict[str, Any] = {"changed": not already_exists}
 
 		if module._diff:
 			result["diff"] = {

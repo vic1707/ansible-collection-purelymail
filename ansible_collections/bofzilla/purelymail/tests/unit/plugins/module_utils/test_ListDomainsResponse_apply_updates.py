@@ -20,7 +20,7 @@ def test_apply_updates_no_updates():
 
 def test_apply_updates_partial_update():
 	updates = [
-		UpdateDomainSettingsRequest(name="testdomain.net", allowAccountReset=True, symbolicSubaddressing=True),
+		UpdateDomainSettingsRequest(name="testdomain.net", allowAccountReset=True, symbolicSubaddressing=True),  # ty:ignore[unknown-argument]
 	]
 
 	updated = STATE.apply_updates(updates)
@@ -36,7 +36,7 @@ def test_apply_updates_partial_update():
 
 def test_consider_update_when_recheckDNS():
 	updates = [
-		UpdateDomainSettingsRequest(name="testdomain.net", recheckDns=True),
+		UpdateDomainSettingsRequest(name="testdomain.net", recheckDns=True),  # ty:ignore[unknown-argument]
 	]
 
 	updated = STATE.apply_updates(updates)
@@ -48,8 +48,8 @@ def test_consider_update_when_recheckDNS():
 
 def test_apply_updates_multiple_updates_mixed_fields():
 	updates = [
-		UpdateDomainSettingsRequest(name="example.com", symbolicSubaddressing=False),
-		UpdateDomainSettingsRequest(name="another.org", allowAccountReset=False),
+		UpdateDomainSettingsRequest(name="example.com", symbolicSubaddressing=False),  # ty:ignore[unknown-argument]
+		UpdateDomainSettingsRequest(name="another.org", allowAccountReset=False),  # ty:ignore[unknown-argument]
 	]
 
 	updated = STATE.apply_updates(updates)
@@ -67,7 +67,7 @@ def test_apply_updates_multiple_updates_mixed_fields():
 
 def test_apply_updates_no_match_ignored():
 	updates = [
-		UpdateDomainSettingsRequest(name="ghost-domain.com", allowAccountReset=False),
+		UpdateDomainSettingsRequest(name="ghost-domain.com", allowAccountReset=False),  # ty:ignore[unknown-argument]
 	]
 
 	updated = STATE.apply_updates(updates)

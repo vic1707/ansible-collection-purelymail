@@ -1,4 +1,4 @@
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from typing import Any
 
 from pydantic import ConfigDict, Field, Json, PositiveFloat, computed_field
@@ -38,8 +38,8 @@ class ListRoutingResponse:
 		"""True means keep"""
 		return ListRoutingResponse([r for r in self.rules if predicate(r)])
 
-	def concat(self, new_rules: list[RoutingRule]) -> "ListRoutingResponse":
-		return ListRoutingResponse(self.rules + new_rules)
+	def concat(self, new_rules: Sequence[RoutingRule]) -> "ListRoutingResponse":
+		return ListRoutingResponse(self.rules + list(new_rules))
 
 
 ## Domain

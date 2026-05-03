@@ -1,3 +1,5 @@
+from typing import Any
+
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.base_client import PurelymailAPI
@@ -260,7 +262,7 @@ def main():
 
 		supposed_after = existing_rules.concat(missing_rules).filter(lambda r: r.id not in extra_rules)
 
-		result = {
+		result: dict[str, Any] = {
 			"changed": bool(extra_rules) or bool(missing_rules),
 			"rules": supposed_after.as_display(),
 		}
