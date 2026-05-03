@@ -54,10 +54,16 @@ def test_conflict_any_rule_canonical(run):
 		[{"preset": "any_address", "domain_name": "example.com", "target_addresses": []}],
 		canonical=["example.com"],
 		inferred_safety=True,
-		expect=AnsibleFailJson,
+		expect=AnsibleExitJson,
 	)
 
-	assert data == {"msg": "Rule #0: only one `any_address` or `catchall_except_valid` rule is allowed per domain (example.com)."}
+	assert data == {
+		"changed": True,
+		"rules": [
+			{"prefix": False, "catchall": False, "domainName": "toto.com", "matchUser": "toto", "targetAddresses": ["admin@toto.com"], "preset": "exact_match"},
+			{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "", "targetAddresses": [], "preset": "any_address"},
+		],
+	}
 
 
 def test_can_safely_add_restricted_preset_to_other_domain(run):
@@ -87,10 +93,16 @@ def test_conflict_catchall_rule_canonical(run):
 		[{"preset": "catchall_except_valid", "domain_name": "example.com", "target_addresses": []}],
 		canonical=["example.com"],
 		inferred_safety=True,
-		expect=AnsibleFailJson,
+		expect=AnsibleExitJson,
 	)
 
-	assert data == {"msg": "Rule #0: only one `any_address` or `catchall_except_valid` rule is allowed per domain (example.com)."}
+	assert data == {
+		"changed": True,
+		"rules": [
+			{"prefix": False, "catchall": False, "domainName": "toto.com", "matchUser": "toto", "targetAddresses": ["admin@toto.com"], "preset": "exact_match"},
+			{"prefix": True, "catchall": True, "domainName": "example.com", "matchUser": "", "targetAddresses": [], "preset": "catchall_except_valid"},
+		],
+	}
 
 
 def test_illegal_exact_match_config(run):
