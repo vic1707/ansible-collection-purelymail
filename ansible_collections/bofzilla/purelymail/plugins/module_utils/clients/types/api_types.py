@@ -90,9 +90,7 @@ class ApiDomainInfo:
 ApiDomainInfo._adapter = TypeAdapter(ApiDomainInfo)
 
 
-@dataclass(config=ConfigDict(**DEFAULT_CFG))
-class UserPasswordResetMethodType:
-	pass
+UserPasswordResetMethodType = Literal["email", "phone"]
 
 
 @dataclass(config=ConfigDict(**DEFAULT_CFG))
@@ -107,7 +105,7 @@ class GetUserPasswordResetMethod:
 class ListPasswordResetResponseItem:
 	_adapter: ClassVar[TypeAdapter["ListPasswordResetResponseItem"]]
 
-	type: str
+	type: UserPasswordResetMethodType
 	target: str
 	description: str
 	allowMfaReset: bool

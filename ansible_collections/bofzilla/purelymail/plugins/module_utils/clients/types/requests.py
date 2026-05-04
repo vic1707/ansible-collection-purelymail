@@ -2,7 +2,7 @@ from pydantic import ConfigDict, Field, model_validator
 from pydantic.dataclasses import dataclass
 from pydantic_core import ArgsKwargs
 
-from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.api_types import PRESET_MAP, ApiDomainInfo, PresetType, RoutingRule
+from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.api_types import PRESET_MAP, ApiDomainInfo, PresetType, RoutingRule, UserPasswordResetMethodType
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.pydantic import DEFAULT_CFG
 
 
@@ -145,7 +145,7 @@ class ModifyUserRequest:
 ## User Password Reset
 @dataclass(config=ConfigDict(**DEFAULT_CFG, validate_by_name=True, validate_by_alias=True))
 class UpsertPasswordResetRequest:
-	type: str
+	type: UserPasswordResetMethodType
 	target: str
 	userName: str = Field(..., alias="user_name")
 	existingTarget: str | None = Field(default=None, alias="existing_target")
