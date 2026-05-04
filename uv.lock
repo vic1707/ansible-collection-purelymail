@@ -33,7 +33,7 @@ dependencies = [
     { name = "coverage" },
     { name = "pydantic" },
     { name = "pytest" },
-    { name = "pytest-ansible" },
+    { name = "pytest-xdist" },
     { name = "requests" },
     { name = "ruff" },
     { name = "ty" },
@@ -46,7 +46,7 @@ requires-dist = [
     { name = "coverage", specifier = "==7.13.5" },
     { name = "pydantic", specifier = "==2.13.3" },
     { name = "pytest", specifier = "==9.0.3" },
-    { name = "pytest-ansible", specifier = "==26.4.0" },
+    { name = "pytest-xdist", specifier = "==3.8.0" },
     { name = "requests", specifier = "==2.33.1" },
     { name = "ruff", specifier = "==0.15.12" },
     { name = "ty", specifier = "==0.0.34" },
@@ -594,24 +594,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/7d/0d/549bd94f1a0a402dc8cf64563a117c0f3765662e2e668477624baeec44d5/pytest-9.0.3.tar.gz", hash = "sha256:b86ada508af81d19edeb213c681b1d48246c1a91d304c6c81a427674c17eb91c", size = 1572165, upload-time = "2026-04-07T17:16:18.027Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/d4/24/a372aaf5c9b7208e7112038812994107bc65a84cd00e0354a88c2c77a617/pytest-9.0.3-py3-none-any.whl", hash = "sha256:2c5efc453d45394fdd706ade797c0a81091eccd1d6e4bccfcd476e2b8e0ab5d9", size = 375249, upload-time = "2026-04-07T17:16:16.13Z" },
-]
-
-[[package]]
-name = "pytest-ansible"
-version = "26.4.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "ansible-compat" },
-    { name = "ansible-core" },
-    { name = "cffi" },
-    { name = "packaging" },
-    { name = "pytest" },
-    { name = "pytest-xdist" },
-    { name = "typing-extensions" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/4f/c1/29eb44787b9a76227077fbbf3fd147d873a61235ffad1afdd9688c16f3c1/pytest_ansible-26.4.0.tar.gz", hash = "sha256:50c2c5f05472e5a41a8d9b29c38e98292c1605f57a70954fc20b51b1f5cabb82", size = 192858, upload-time = "2026-04-01T14:39:38.079Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/4d/96/e6f7b885ef8cf94b399a15485b972d4e1fb16a087a2914e9ad192e1eb7d2/pytest_ansible-26.4.0-py3-none-any.whl", hash = "sha256:146c3adbae17d5fcfa8bc60b8b92301c1b613d6814d42061fbc26d6e2ddab1dd", size = 31426, upload-time = "2026-04-01T14:39:36.427Z" },
 ]
 
 [[package]]
