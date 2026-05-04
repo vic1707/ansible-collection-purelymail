@@ -49,7 +49,7 @@ def bootstrap_module(
 	ret = {"AnsibleModule": module}
 
 	if mock_api_response:
-		monkeypatch.setattr(requests, "post", lambda *_, **kwargs: mock_api_response(kwargs.get("json")))
+		monkeypatch.setattr(requests, "post", lambda *_, **kwargs: mock_api_response(kwargs.get("json") or {}))
 
 	for mock_cfg in mocks:
 		mock = MagicMock()

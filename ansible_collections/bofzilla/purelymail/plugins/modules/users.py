@@ -26,9 +26,8 @@ description:
   - By default, this module is `canonical`, meaning it removes any user not specified in C(users).
   - Recovery methods are derived from O(users[].recovery_email) and O(users[].recovery_phone)
     (with their `_description` and `_allow_mfa_reset` companions). For existing users they
-    are reconciled fully:
-      * non-empty target → ensure that method exists exactly with the declared description/MFA flag,
-      * empty target → delete any reset method of that kind.
+    are reconciled fully; non-empty target ensures the method exists exactly with the declared
+    description and MFA flag; empty target deletes any reset method of that kind.
 
 options:
   api_token:
