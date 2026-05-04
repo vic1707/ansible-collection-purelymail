@@ -23,15 +23,15 @@ author:
 """
 
 EXAMPLES = r"""
-- name: Get just the TXT record
+- name: Get the full TXT record value
   ansible.builtin.debug:
     msg: >-
-      {{ lookup("bofzilla.purelymail.purelymail_ownership_code", api_token=lookup('env','PURELYMAIL_API_TOKEN').code }}
+      {{ lookup('bofzilla.purelymail.purelymail_ownership_code', api_token=lookup('env', 'PURELYMAIL_API_TOKEN')).code }}
 
-- name: Get just the verification code
+- name: Get just the verification code (without prefix)
   ansible.builtin.debug:
     msg: >-
-      {{ lookup("bofzilla.purelymail.purelymail_ownership_code", api_token=lookup('env','PURELYMAIL_API_TOKEN').value }}
+      {{ lookup('bofzilla.purelymail.purelymail_ownership_code', api_token=lookup('env', 'PURELYMAIL_API_TOKEN')).value }}
 """
 
 RETURN = r"""
@@ -61,6 +61,6 @@ class LookupModule(LookupBase):
 		try:
 			return [client.get_ownership_code()]
 		except ApiError as err:  # pragma: no cover
-			AnsibleError(f"Purelymail API error: {err}")
+			raise AnsibleError(f"Purelymail API error: {err}") from err
 		except Exception as err:  # pragma: no cover
-			AnsibleError(f"{type(err).__name__}: {err}")
+			raise AnsibleError(f"{type(err).__name__}: {err}") from err
