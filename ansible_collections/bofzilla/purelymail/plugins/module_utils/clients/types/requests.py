@@ -88,3 +88,90 @@ class UpdateDomainSettingsRequest:
 @dataclass(config=ConfigDict(**DEFAULT_CFG))
 class DeleteDomainRequest:
 	name: str
+
+
+## User
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class DeleteUserRequest:
+	userName: str
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class GetUserRequest:
+	userName: str
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class CreateUserRequest:
+	userName: str = Field(alias="user_name")
+	domainName: str = Field(alias="domain_name")
+	password: str = Field(alias="password")
+	enablePasswordReset: bool = Field(alias="enable_password_reset")
+	recoveryEmail: str = Field(alias="recovery_email")
+	recoveryEmailDescription: str = Field(alias="recovery_email_description")
+	recoveryPhone: str = Field(alias="recovery_phone")
+	recoveryPhoneDescription: str = Field(alias="recovery_phone_description")
+	enableSearchIndexing: bool = Field(alias="enable_search_indexing")
+	sendWelcomeEmail: bool = Field(alias="send_welcome_email")
+
+	@property
+	def email(self) -> str:
+		return f"{self.userName}@{self.domainName}"
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG, validate_by_name=True, validate_by_alias=True))
+class ModifyUserRequest:
+	userName: str = Field(..., alias="user_name")
+	newUserName: str | None = Field(default=None, alias="new_user_name")
+	newPassword: str | None = Field(default=None, alias="new_password")
+	enableSearchIndexing: bool | None = Field(default=None, alias="enable_search_indexing")
+	enablePasswordReset: bool | None = Field(default=None, alias="enable_password_reset")
+	requireTwoFactorAuthentication: bool | None = Field(default=None, alias="require_two_factor_authentication")
+
+	def has_changes(self) -> bool:
+		"""True if any modifying field is set (other than userName)."""
+		return any(
+			getattr(self, f) is not None
+			for f in (
+				"newUserName",
+				"newPassword",
+				"enableSearchIndexing",
+				"enablePasswordReset",
+				"requireTwoFactorAuthentication",
+			)
+		)
+
+
+## User Password Reset
+@dataclass(config=ConfigDict(**DEFAULT_CFG, validate_by_name=True, validate_by_alias=True))
+class UpsertPasswordResetRequest:
+	type: str
+	target: str
+	userName: str = Field(..., alias="user_name")
+	existingTarget: str | None = Field(default=None, alias="existing_target")
+	description: str = ""
+	allowMfaReset: bool = Field(default=True, alias="allow_mfa_reset")
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG, validate_by_name=True, validate_by_alias=True))
+class DeletePasswordResetRequest:
+	userName: str = Field(..., alias="user_name")
+	target: str | None = None
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG, validate_by_name=True, validate_by_alias=True))
+class ListPasswordResetRequest:
+	userName: str = Field(..., alias="user_name")
+
+
+## User App Password
+@dataclass(config=ConfigDict(**DEFAULT_CFG, validate_by_name=True, validate_by_alias=True))
+class CreateAppPasswordRequest:
+	userHandle: str = Field(..., alias="user_handle")
+	name: str = ""
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG, validate_by_name=True, validate_by_alias=True))
+class DeleteAppPasswordRequest:
+	userName: str = Field(..., alias="user_name")
+	appPassword: str = Field(..., alias="app_password")

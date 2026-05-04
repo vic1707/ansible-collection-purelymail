@@ -88,3 +88,32 @@ class ApiDomainInfo:
 
 
 ApiDomainInfo._adapter = TypeAdapter(ApiDomainInfo)
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class UserPasswordResetMethodType:
+	pass
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class GetUserPasswordResetMethod:
+	type: UserPasswordResetMethodType
+	target: str
+	description: str
+	allowMfaReset: bool
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class ListPasswordResetResponseItem:
+	_adapter: ClassVar[TypeAdapter["ListPasswordResetResponseItem"]]
+
+	type: str
+	target: str
+	description: str
+	allowMfaReset: bool
+
+	def as_api_response(self) -> dict:
+		return ListPasswordResetResponseItem._adapter.dump_python(self)
+
+
+ListPasswordResetResponseItem._adapter = TypeAdapter(ListPasswordResetResponseItem)
