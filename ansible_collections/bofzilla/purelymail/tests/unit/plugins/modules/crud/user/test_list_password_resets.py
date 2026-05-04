@@ -45,7 +45,7 @@ def test_normal(run):
 
 def test_check_mode(run):
 	data, _ = run(check_mode=True)
-	assert data == {"changed": False}
+	assert data == {"changed": False, "methods": EXPECTED}
 
 
 def test_diff(run):
@@ -55,4 +55,4 @@ def test_diff(run):
 
 def test_check_and_diff(run):
 	data, _ = run(check_mode=True, diff=True)
-	assert data == {"changed": False, "diff": {"before": EXPECTED, "after": EXPECTED}}
+	assert data == {"changed": False, "methods": EXPECTED, "diff": {"before": EXPECTED, "after": EXPECTED}}

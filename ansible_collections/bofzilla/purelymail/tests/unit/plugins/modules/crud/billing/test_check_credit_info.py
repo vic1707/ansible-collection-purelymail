@@ -29,13 +29,14 @@ def test_diff(run):
 
 def test_check(run):
 	data, _ = run(check_mode=True)
-	assert data == {"changed": False}
+	assert data == {"changed": False, "credit": 12.34}
 
 
 def test_check_and_diff(run):
 	data, _ = run(diff=True, check_mode=True)
 	assert data == {
 		"changed": False,
+		"credit": 12.34,
 		"diff": {"before": {"credit": 12.34}, "after": {"credit": 12.34}},
 	}
 

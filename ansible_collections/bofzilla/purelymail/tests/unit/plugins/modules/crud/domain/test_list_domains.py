@@ -73,7 +73,18 @@ def test_diff(run):
 def test_check(run):
 	data, _ = run(check_mode=True)
 
-	assert data == {"changed": False}
+	assert data == {
+		"changed": False,
+		"domains": [
+			{
+				"name": "example.com",
+				"allowAccountReset": True,
+				"symbolicSubaddressing": False,
+				"isShared": False,
+				"dnsSummary": {"passesMx": True, "passesSpf": True, "passesDkim": True, "passesDmarc": True},
+			}
+		],
+	}
 
 
 def test_check_and_diff(run):
@@ -81,6 +92,15 @@ def test_check_and_diff(run):
 
 	assert data == {
 		"changed": False,
+		"domains": [
+			{
+				"name": "example.com",
+				"allowAccountReset": True,
+				"symbolicSubaddressing": False,
+				"isShared": False,
+				"dnsSummary": {"passesMx": True, "passesSpf": True, "passesDkim": True, "passesDmarc": True},
+			}
+		],
 		"diff": {
 			"before": [
 				{

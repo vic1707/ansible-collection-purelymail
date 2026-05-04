@@ -184,12 +184,6 @@ users:
   elements: str
 """
 
-
-# ---------------------------------------------------------------------------
-# helpers
-# ---------------------------------------------------------------------------
-
-
 def _split_email(name: str) -> tuple[str, str]:
 	if "@" not in name:
 		raise ValueError(f"User name must be a full email address, got {name!r}")
@@ -206,7 +200,7 @@ def _desired_methods(entry: dict[str, Any]) -> list[dict[str, Any]]:
 				"type": "email",
 				"target": entry["recovery_email"],
 				"description": entry.get("recovery_email_description") or "",
-				"allowMfaReset": entry.get("recovery_email_allow_mfa_reset") if entry.get("recovery_email_allow_mfa_reset") is not None else True,
+				"allowMfaReset": entry["recovery_email_allow_mfa_reset"],
 			}
 		)
 	if entry.get("recovery_phone"):
@@ -215,7 +209,7 @@ def _desired_methods(entry: dict[str, Any]) -> list[dict[str, Any]]:
 				"type": "phone",
 				"target": entry["recovery_phone"],
 				"description": entry.get("recovery_phone_description") or "",
-				"allowMfaReset": entry.get("recovery_phone_allow_mfa_reset") if entry.get("recovery_phone_allow_mfa_reset") is not None else True,
+				"allowMfaReset": entry["recovery_phone_allow_mfa_reset"],
 			}
 		)
 	return out
@@ -239,11 +233,6 @@ def _build_create_request(entry: dict[str, Any]) -> CreateUserRequest:
 		enable_search_indexing=entry.get("enable_search_indexing", True),
 		send_welcome_email=entry.get("send_welcome_email") or False,
 	)
-
-
-# ---------------------------------------------------------------------------
-# main
-# ---------------------------------------------------------------------------
 
 
 def main():
@@ -352,7 +341,6 @@ def main():
 
 			# recovery methods reconciliation: always canonical for declared kinds
 			declared_methods = _desired_methods(entry)
-			declared_kinds = {m["type"] for m in declared_methods}
 
 			listed = client.list_password_reset(ListPasswordResetRequest(entry["name"]))
 			current_methods = list(listed.users)
@@ -365,11 +353,6 @@ def main():
 			# even if as ""). So remove every existing method that doesn't match a declared one.
 			methods_to_remove: list[ListPasswordResetResponseItem] = [m for m in current_methods if not any(_method_matches(m, d) for d in declared_methods)]
 			methods_to_add: list[dict[str, Any]] = [d for d in declared_methods if not any(_method_matches(m, d) for m in current_methods)]
-
-			# safety: if a declared kind already has a perfect match we obviously don't
-			# delete other items of the same kind unless they truly mismatch
-			# (covered by the predicate above).
-			_ = declared_kinds  # readability marker; kept for potential future use
 
 			existing_user_plans.append(
 				{

@@ -65,13 +65,10 @@ def main():
 	try:
 		users = client.list_users().as_api_response()
 
-		res: dict[str, Any] = {"changed": False}
+		res: dict[str, Any] = {"changed": False, "users": users}
 
 		if module._diff:
 			res["diff"] = {"before": users, "after": users}
-
-		if not module.check_mode:
-			res["users"] = users
 
 		module.exit_json(**res)
 	except ApiError as err:  # pragma: no cover

@@ -92,7 +92,7 @@ def main():
 	client = RoutingClient(api)
 
 	try:
-		rule_spec = module.params
+		rule_spec = dict(module.params)
 		del rule_spec["api_token"]
 		rule = CreateRoutingRequest(**rule_spec)
 

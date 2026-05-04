@@ -1,7 +1,7 @@
 from collections.abc import Callable, Sequence
 from typing import Any, ClassVar
 
-from pydantic import ConfigDict, Field, Json, PositiveFloat, TypeAdapter, computed_field
+from pydantic import ConfigDict, Field, Json, NonNegativeFloat, TypeAdapter, computed_field
 from pydantic.dataclasses import dataclass
 
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.api_types import (
@@ -22,7 +22,7 @@ class EmptyResponse:
 ## Billing
 @dataclass(config=ConfigDict(**DEFAULT_CFG))
 class CheckCreditResponse:
-	credit: Json[PositiveFloat]
+	credit: Json[NonNegativeFloat]
 
 
 ## Routing
@@ -107,7 +107,7 @@ class GetUserResponse:
 	enableSpamFiltering: bool
 	resetMethods: list[GetUserPasswordResetMethod]
 
-	def as_api_response(self) -> dict:
+	def as_api_response(self) -> dict[str, Any]:
 		return GetUserResponse._adapter.dump_python(self)
 
 

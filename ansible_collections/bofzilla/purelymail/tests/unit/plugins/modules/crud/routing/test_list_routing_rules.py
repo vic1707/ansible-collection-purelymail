@@ -47,13 +47,23 @@ def test_diff(run):
 
 def test_check(run):
 	data, _ = run(check_mode=True)
-	assert data == {"changed": False}
+	assert data == {
+		"changed": False,
+		"rules": [
+			{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"], "id": 1},
+			{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"], "id": 2},
+		],
+	}
 
 
 def test_check_and_diff(run):
 	data, _ = run(check_mode=True, diff=True)
 	assert data == {
 		"changed": False,
+		"rules": [
+			{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"], "id": 1},
+			{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "admin", "targetAddresses": ["support@example.com"], "id": 2},
+		],
 		"diff": {
 			"before": [
 				{"prefix": True, "catchall": False, "domainName": "example.com", "matchUser": "toto", "targetAddresses": ["admin@example.com"], "id": 1},

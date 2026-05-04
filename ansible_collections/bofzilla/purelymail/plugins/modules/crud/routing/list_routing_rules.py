@@ -74,6 +74,7 @@ rules:
 def main():
 	module = AnsibleModule(
 		argument_spec=dict(api_token=dict(type="str", required=True, no_log=True)),
+		supports_check_mode=True,
 	)
 
 	api = PurelymailAPI(module.params["api_token"])
@@ -82,13 +83,10 @@ def main():
 	try:
 		rules = client.list_routing_rules().as_api_response()
 
-		res: dict[str, Any] = {"changed": False}
+		res: dict[str, Any] = {"changed": False, "rules": rules}
 
 		if module._diff:
 			res["diff"] = {"before": rules, "after": rules}
-
-		if not module.check_mode:
-			res["rules"] = rules
 
 		module.exit_json(**res)
 	except ApiError as err:  # pragma: no cover

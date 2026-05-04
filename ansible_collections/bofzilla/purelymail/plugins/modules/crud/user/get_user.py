@@ -18,7 +18,7 @@ options:
     description: Purelymail API token
     required: true
     type: str
-  username:
+  user_name:
     description: Full username, e.g. "user@domain.com"
     required: true
     type: str
@@ -37,7 +37,7 @@ EXAMPLES = r"""
 - name: Get user details
   bofzilla.purelymail.crud.user.get_user:
     api_token: "{{ lookup('env','PURELYMAIL_API_TOKEN') }}"
-    username: user@example.com
+    user_name: user@example.com
 """
 
 RETURN = r"""
@@ -82,7 +82,7 @@ def main():
 	module = AnsibleModule(
 		argument_spec=dict(
 			api_token=dict(type="str", required=True, no_log=True),
-			username=dict(type="str", required=True),
+			user_name=dict(type="str", required=True),
 		),
 		supports_check_mode=True,
 	)
@@ -91,15 +91,12 @@ def main():
 	client = UserClient(api)
 
 	try:
-		name = module.params["username"]
+		name = module.params["user_name"]
 		user = client.get_user(GetUserRequest(name)).as_api_response()
-		result: dict[str, Any] = {"changed": False}
+		result: dict[str, Any] = {"changed": False, "user": user}
 
 		if module._diff:
 			result["diff"] = {"before": user, "after": user}
-
-		if not module.check_mode:
-			result["user"] = user
 
 		module.exit_json(**result)
 	except ApiError as err:  # pragma: no cover

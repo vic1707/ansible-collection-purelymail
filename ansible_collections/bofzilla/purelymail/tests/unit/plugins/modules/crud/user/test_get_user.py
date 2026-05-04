@@ -22,7 +22,7 @@ def run(make_runner):  # noqa: F811
 
 	@functools.wraps(runner_run)
 	def inner_run(username: str, **kwargs):
-		return runner_run(params={"username": username}, **kwargs)
+		return runner_run(params={"user_name": username}, **kwargs)
 
 	return inner_run
 
@@ -49,7 +49,10 @@ def test_diff_mode_unknown(run):
 def test_check_mode(run):
 	data, _ = run("existing@example.com", check_mode=True)
 
-	assert data == {"changed": False}
+	assert data == {
+		"changed": False,
+		"user": {"enableSearchIndexing": True, "enableSpamFiltering": True, "recoveryEnabled": False, "requireTwoFactorAuthentication": False, "resetMethods": []},
+	}
 
 
 def test_check_mode_unknown(run):
@@ -67,6 +70,7 @@ def test_diff_and_check_modes(run):
 			"before": {"enableSearchIndexing": True, "enableSpamFiltering": True, "recoveryEnabled": False, "requireTwoFactorAuthentication": False, "resetMethods": []},
 			"after": {"enableSearchIndexing": True, "enableSpamFiltering": True, "recoveryEnabled": False, "requireTwoFactorAuthentication": False, "resetMethods": []},
 		},
+		"user": {"enableSearchIndexing": True, "enableSpamFiltering": True, "recoveryEnabled": False, "requireTwoFactorAuthentication": False, "resetMethods": []},
 	}
 
 

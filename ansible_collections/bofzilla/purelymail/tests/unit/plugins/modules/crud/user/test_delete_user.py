@@ -26,7 +26,7 @@ def run(make_runner):  # noqa: F811
 
 	@functools.wraps(runner_run)
 	def inner_run(username: str, **kwargs):
-		return runner_run(params={"username": username}, **kwargs)
+		return runner_run(params={"user_name": username}, **kwargs)
 
 	return inner_run
 

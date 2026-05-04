@@ -5,6 +5,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.base_client import PurelymailAPI
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.requests import DeletePasswordResetRequest, ListPasswordResetRequest
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.response_wrapper import ApiError
+from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.responses import ListPasswordResetResponse
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.user_client import UserClient
 
 DOCUMENTATION = r"""
@@ -73,7 +74,7 @@ def main():
 		if target is None:
 			# delete-all semantics
 			changed = len(existing.users) > 0
-			after = existing
+			after = ListPasswordResetResponse([])
 		else:
 			changed = any(m.target == target for m in existing.users)
 			after = existing.filter(lambda m: m.target != target)

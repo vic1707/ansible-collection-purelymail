@@ -29,7 +29,8 @@ class CreateRoutingRequest(RoutingRule):
 	@model_validator(mode="before")
 	@classmethod
 	def apply_preset(cls, data: ArgsKwargs) -> ArgsKwargs:
-		assert data.args == (), "apply_preset only support kwargs."
+		if data.args:
+			raise TypeError("apply_preset only supports kwargs.")
 		if not data.kwargs:  # pragma: no cover
 			return data
 
@@ -67,7 +68,8 @@ class UpdateDomainSettingsRequest:
 	recheckDns: bool = Field(default=False, alias="recheck_dns")
 
 	def updates(self, domain: ApiDomainInfo, *, ignore_recheck_dns: bool = False) -> bool:
-		assert self.name == domain.name
+		if self.name != domain.name:
+			raise ValueError(f"UpdateDomainSettingsRequest.updates: name mismatch ({self.name!r} vs {domain.name!r})")
 		return (
 			(self.recheckDns and not ignore_recheck_dns)
 			or (self.allowAccountReset is not None and self.allowAccountReset != domain.allowAccountReset)
@@ -75,7 +77,8 @@ class UpdateDomainSettingsRequest:
 		)
 
 	def update(self, domain: ApiDomainInfo) -> ApiDomainInfo:
-		assert self.name == domain.name
+		if self.name != domain.name:
+			raise ValueError(f"UpdateDomainSettingsRequest.update: name mismatch ({self.name!r} vs {domain.name!r})")
 		return ApiDomainInfo(
 			name=domain.name,
 			allowAccountReset=(self.allowAccountReset if self.allowAccountReset is not None else domain.allowAccountReset),

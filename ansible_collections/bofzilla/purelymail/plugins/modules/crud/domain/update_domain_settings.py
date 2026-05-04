@@ -87,7 +87,7 @@ def main():
 		if not current:
 			module.fail_json(msg=f"Error: domain '{module.params['name']}' does not exist.")
 
-		req_params = module.params
+		req_params = dict(module.params)
 		del req_params["api_token"], req_params["__include_shared"]
 		req = UpdateDomainSettingsRequest(**req_params)
 

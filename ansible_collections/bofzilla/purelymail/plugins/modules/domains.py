@@ -28,7 +28,7 @@ options:
 
   canonical:
     description: Canonical means we remove any domain not specified in `domains`
-    type: boolean
+    type: bool
     required: false
     default: true
 

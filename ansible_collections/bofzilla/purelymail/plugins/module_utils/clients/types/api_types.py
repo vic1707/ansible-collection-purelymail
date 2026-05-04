@@ -1,4 +1,4 @@
-from typing import ClassVar, Literal
+from typing import Any, ClassVar, Literal
 
 from pydantic import ConfigDict, Field, TypeAdapter, computed_field
 from pydantic.dataclasses import dataclass
@@ -73,6 +73,7 @@ class ApiDomainInfo:
 	def as_display(self):
 		return ApiDomainInfo._adapter.dump_python(self)
 
+	@staticmethod
 	def DEFAULT(domain_name: str) -> "ApiDomainInfo":
 		"""
 		AddDomain doesn't return anything, but accepted domains should return this.
@@ -110,7 +111,7 @@ class ListPasswordResetResponseItem:
 	description: str
 	allowMfaReset: bool
 
-	def as_api_response(self) -> dict:
+	def as_api_response(self) -> dict[str, Any]:
 		return ListPasswordResetResponseItem._adapter.dump_python(self)
 
 

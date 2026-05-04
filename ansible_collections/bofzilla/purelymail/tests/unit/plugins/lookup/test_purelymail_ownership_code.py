@@ -21,9 +21,5 @@ def test_lookup_success(lookup_module):
 	ret = lookup_module.run([], variables={}, api_token="dummy")
 	assert isinstance(ret, list)
 	assert len(ret) == 1
-	assert ret[0].code == "purelymail_ownership_proof=dQw4w9WgXcQ"
-	assert ret[0].value == "dQw4w9WgXcQ"
-
-
-# def test_lookup_missing_token(lookup_module):
-# 	ret = lookup_module.run([], variables={}, api_token="dummy")
+	assert ret[0]["code"] == "purelymail_ownership_proof=dQw4w9WgXcQ"
+	assert ret[0]["value"] == "dQw4w9WgXcQ"

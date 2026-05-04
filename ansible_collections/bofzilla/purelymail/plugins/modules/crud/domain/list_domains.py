@@ -102,13 +102,10 @@ def main():
 		req = ListDomainsRequest(module.params["include_shared"])
 		domains = client.list_domains(req).as_api_response()
 
-		res: dict[str, Any] = {"changed": False}
+		res: dict[str, Any] = {"changed": False, "domains": domains}
 
 		if module._diff:
 			res["diff"] = {"before": domains, "after": domains}
-
-		if not module.check_mode:
-			res["domains"] = domains
 
 		module.exit_json(**res)
 	except ApiError as err:  # pragma: no cover

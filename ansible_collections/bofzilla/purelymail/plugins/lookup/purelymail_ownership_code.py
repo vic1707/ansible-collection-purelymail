@@ -37,11 +37,12 @@ EXAMPLES = r"""
 RETURN = r"""
 _raw:
   description:
-    - The object provides two useful attributes:
+    - A list with a single dict containing two keys:
         - C(code): The full DNS TXT value (e.g. C(purelymail_ownership_proof=dQw4w9WgXcQ))
         - C(value): The extracted verification code without the prefix (e.g. C(dQw4w9WgXcQ))
     - Both values are sensitive and should be treated as secrets.
   type: list
+  elements: dict
   returned: always
   sample:
     - code: purelymail_ownership_proof=dQw4w9WgXcQ
@@ -51,7 +52,8 @@ _raw:
 
 class LookupModule(LookupBase):
 	def run(self, terms, variables=None, **kwargs):
-		assert len(terms) == 0
+		if terms:
+			raise AnsibleError("purelymail_ownership_code lookup does not accept positional terms.")
 		self.set_options(var_options=variables, direct=kwargs)
 		api_token = self.get_option("api_token")
 
@@ -59,7 +61,8 @@ class LookupModule(LookupBase):
 		client = DomainClient(api)
 
 		try:
-			return [client.get_ownership_code()]
+			resp = client.get_ownership_code()
+			return [{"code": resp.code, "value": resp.value}]
 		except ApiError as err:  # pragma: no cover
 			raise AnsibleError(f"Purelymail API error: {err}") from err
 		except Exception as err:  # pragma: no cover

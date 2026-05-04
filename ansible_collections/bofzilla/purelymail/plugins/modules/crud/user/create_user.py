@@ -103,7 +103,7 @@ def main():
 	client = UserClient(api)
 
 	try:
-		user_spec = module.params
+		user_spec = dict(module.params)
 		del user_spec["api_token"]
 		user = CreateUserRequest(**user_spec)
 

@@ -18,8 +18,8 @@ options:
     description: Purelymail API token
     required: true
     type: str
-  username:
-    description: The name of the user to delete
+  user_name:
+    description: The full username of the user to delete (e.g. "user@domain.com")
     required: true
     type: str
 
@@ -39,7 +39,7 @@ EXAMPLES = r"""
 - name: Delete a user
   bofzilla.purelymail.crud.user.delete_user:
     api_token: "{{ lookup('env','PURELYMAIL_API_TOKEN') }}"
-    username: user@example.com
+    user_name: user@example.com
 """
 
 RETURN = r""""""
@@ -49,7 +49,7 @@ def main():
 	module = AnsibleModule(
 		argument_spec=dict(
 			api_token=dict(type="str", required=True, no_log=True),
-			username=dict(type="str", required=True),
+			user_name=dict(type="str", required=True),
 		),
 		supports_check_mode=True,
 	)
@@ -58,7 +58,7 @@ def main():
 	client = UserClient(api)
 
 	try:
-		name = module.params["username"]
+		name = module.params["user_name"]
 		existing_users = client.list_users()
 
 		exists = any(u == name for u in existing_users.users)

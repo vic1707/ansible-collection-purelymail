@@ -53,6 +53,7 @@ credit:
 def main():
 	module = AnsibleModule(
 		argument_spec=dict(api_token=dict(type="str", required=True, no_log=True)),
+		supports_check_mode=True,
 	)
 
 	api = PurelymailAPI(module.params["api_token"])
@@ -61,16 +62,13 @@ def main():
 	try:
 		data = client.check_account_credit()
 
-		res: dict[str, Any] = {"changed": False}
+		res: dict[str, Any] = {"changed": False, "credit": data.credit}
 
 		if module._diff:
 			res["diff"] = {
 				"before": {"credit": data.credit},
 				"after": {"credit": data.credit},
 			}
-
-		if not module.check_mode:
-			res["credit"] = data.credit
 
 		module.exit_json(**res)
 	except ApiError as err:  # pragma: no cover

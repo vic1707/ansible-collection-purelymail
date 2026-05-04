@@ -27,9 +27,10 @@ class DomainClient:
 
 	def list_domains(self, req: ListDomainsRequest) -> ListDomainsResponse:
 		res = self.api.post("/listDomains", req, ListDomainsResponse)
-		assert req.includeShared or all(not d.isShared for d in res.domains), (
-			f"[Purelymail error]: API returned shared domains despite includeShared=False ({[d.name for d in res.domains if d.isShared]})"
-		)
+		if not req.includeShared:
+			shared = [d.name for d in res.domains if d.isShared]
+			if shared:  # pragma: no cover
+				raise RuntimeError(f"[Purelymail error]: API returned shared domains despite includeShared=False ({shared})")
 		return res
 
 	def update_domain_settings(self, req: UpdateDomainSettingsRequest) -> EmptyResponse:

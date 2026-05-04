@@ -85,13 +85,10 @@ def main():
 	try:
 		methods = client.list_password_reset(ListPasswordResetRequest(module.params["user_name"])).as_api_response()
 
-		result: dict[str, Any] = {"changed": False}
+		result: dict[str, Any] = {"changed": False, "methods": methods}
 
 		if module._diff:
 			result["diff"] = {"before": methods, "after": methods}
-
-		if not module.check_mode:
-			result["methods"] = methods
 
 		module.exit_json(**result)
 	except ApiError as err:  # pragma: no cover
