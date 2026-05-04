@@ -246,10 +246,7 @@ def main():
 				# Rule 2: certain presets must be unique (even between each others)
 				if rule.preset in ("any_address", "catchall_except_valid"):
 					conflict_in_rules = any(
-						i != idx
-						and r.preset in ("any_address", "catchall_except_valid")
-						and r.domainName == rule.domainName
-						and r.targetAddresses == rule.targetAddresses
+						i != idx and r.preset in ("any_address", "catchall_except_valid") and r.domainName == rule.domainName and r.targetAddresses == rule.targetAddresses
 						for i, r in enumerate(rules)
 					)
 					conflict_in_existing = rule.domainName not in canonical_domains and any(

@@ -68,7 +68,7 @@ domains:
       description: Whether this domain is a shared Purelymail domain
       type: bool
     dnsSummary:
-      description: Summary of the domain’s DNS status
+      description: Summary of the domain's DNS status
       type: dict
       contains:
         passesMx:

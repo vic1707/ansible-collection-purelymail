@@ -1,10 +1,15 @@
 from collections.abc import Callable, Sequence
-from typing import Any
+from typing import Any, ClassVar
 
-from pydantic import ConfigDict, Field, Json, PositiveFloat, computed_field
+from pydantic import ConfigDict, Field, Json, PositiveFloat, TypeAdapter, computed_field
 from pydantic.dataclasses import dataclass
 
-from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.api_types import ApiDomainInfo, RoutingRule
+from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.api_types import (
+	ApiDomainInfo,
+	GetUserPasswordResetMethod,
+	ListPasswordResetResponseItem,
+	RoutingRule,
+)
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.requests import UpdateDomainSettingsRequest
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.pydantic import DEFAULT_CFG
 
@@ -74,3 +79,61 @@ class ListDomainsResponse:
 		update_map = {u.name: u for u in updates}
 
 		return ListDomainsResponse([update_map[d.name].update(d) if d.name in update_map else d for d in self.domains])
+
+
+## User
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class ListUsersResponse:
+	users: list[str]
+
+	def as_api_response(self) -> list[str]:
+		return [u for u in self.users]
+
+	def filter(self, predicate: Callable[[str], bool]) -> "ListUsersResponse":
+		"""True means keep"""
+		return ListUsersResponse([u for u in self.users if predicate(u)])
+
+	def concat(self, new_users: list[str]) -> "ListUsersResponse":
+		return ListUsersResponse(self.users + new_users)
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class GetUserResponse:
+	_adapter: ClassVar[TypeAdapter["GetUserResponse"]]
+
+	enableSearchIndexing: bool
+	recoveryEnabled: bool
+	requireTwoFactorAuthentication: bool
+	enableSpamFiltering: bool
+	resetMethods: list[GetUserPasswordResetMethod]
+
+	def as_api_response(self) -> dict:
+		return GetUserResponse._adapter.dump_python(self)
+
+
+GetUserResponse._adapter = TypeAdapter(GetUserResponse)
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class ListPasswordResetResponse:
+	_adapter: ClassVar[TypeAdapter["ListPasswordResetResponse"]]
+
+	users: list[ListPasswordResetResponseItem]
+
+	def as_api_response(self) -> list[dict[str, Any]]:
+		return [item.as_api_response() for item in self.users]
+
+	def filter(self, predicate: Callable[[ListPasswordResetResponseItem], bool]) -> "ListPasswordResetResponse":
+		"""True means keep"""
+		return ListPasswordResetResponse([item for item in self.users if predicate(item)])
+
+	def concat(self, new_items: Sequence[ListPasswordResetResponseItem]) -> "ListPasswordResetResponse":
+		return ListPasswordResetResponse(self.users + list(new_items))
+
+
+ListPasswordResetResponse._adapter = TypeAdapter(ListPasswordResetResponse)
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class CreateAppPasswordResponse:
+	appPassword: str
