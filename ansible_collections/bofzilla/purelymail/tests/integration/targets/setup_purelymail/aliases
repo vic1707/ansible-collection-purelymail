@@ -1,0 +1,3 @@
+# Marks this target as a setup-only role; it is consumed via meta dependencies
+# from other targets and is not meant to run on its own.
+hidden

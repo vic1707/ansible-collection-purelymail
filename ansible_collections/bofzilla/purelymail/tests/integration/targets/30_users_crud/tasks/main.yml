@@ -1,0 +1,282 @@
+---
+- name: "30_users_crud | Import integration_config.yml"
+  ansible.builtin.include_vars:
+    file: "{{ playbook_dir }}/integration_config.yml"
+
+- name: "30_users_crud | Set test user facts"
+  ansible.builtin.set_fact:
+    test_user_local: "ansible-test-integration"
+    test_user_email: "ansible-test-integration@{{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+    test_recovery_email: "ansible-test-recovery@{{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+
+- name: 30_users_crud | run
+  block:
+    # ----- create_user -----
+    - name: "30_users_crud | Create_user"
+      bofzilla.purelymail.crud.user.create_user:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        user_name: "{{ test_user_local }}"
+        domain_name: "{{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+        password: "{{ PURELYMAIL_USER_PASSWORD }}"
+        enable_password_reset: true
+        recovery_email: ""
+        recovery_email_description: ""
+        recovery_phone: ""
+        recovery_phone_description: ""
+        enable_search_indexing: true
+        send_welcome_email: false
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_create
+
+    - name: "30_users_crud | Assert create changed"
+      ansible.builtin.assert:
+        that:
+          - r_create.changed == true
+
+    - name: "30_users_crud | Create_user idempotency"
+      bofzilla.purelymail.crud.user.create_user:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        user_name: "{{ test_user_local }}"
+        domain_name: "{{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+        password: "{{ PURELYMAIL_USER_PASSWORD }}"
+        enable_password_reset: true
+        recovery_email: ""
+        recovery_email_description: ""
+        recovery_phone: ""
+        recovery_phone_description: ""
+        enable_search_indexing: true
+        send_welcome_email: false
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_create_again
+
+    - name: "30_users_crud | Assert create idempotent"
+      ansible.builtin.assert:
+        that:
+          - r_create_again.changed == false
+
+    # ----- get_user -----
+    - name: "30_users_crud | Get_user"
+      bofzilla.purelymail.crud.user.get_user:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        user_name: "{{ test_user_email }}"
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_get
+
+    - name: "30_users_crud | Assert get_user shape"
+      ansible.builtin.assert:
+        that:
+          - r_get.changed == false
+          - r_get.user.enableSearchIndexing == true
+          - r_get.user.resetMethods == []
+
+    # ----- modify_user -----
+    - name: "30_users_crud | Modify_user disable indexing"
+      bofzilla.purelymail.crud.user.modify_user:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        user_name: "{{ test_user_email }}"
+        enable_search_indexing: false
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_mod
+
+    - name: "30_users_crud | Assert modify changed"
+      ansible.builtin.assert:
+        that:
+          - r_mod.changed == true
+
+    - name: "30_users_crud | Modify_user idempotency"
+      bofzilla.purelymail.crud.user.modify_user:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        user_name: "{{ test_user_email }}"
+        enable_search_indexing: false
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_mod_again
+
+    - name: "30_users_crud | Assert modify idempotent"
+      ansible.builtin.assert:
+        that:
+          - r_mod_again.changed == false
+
+    # ----- password reset methods -----
+    - name: "30_users_crud | List_password_resets initial"
+      bofzilla.purelymail.crud.user.list_password_resets:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        user_name: "{{ test_user_email }}"
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_pr0
+
+    - name: "30_users_crud | Assert no methods initially"
+      ansible.builtin.assert:
+        that:
+          - r_pr0.methods == []
+
+    - name: "30_users_crud | Upsert email reset"
+      bofzilla.purelymail.crud.user.upsert_password_reset:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        user_name: "{{ test_user_email }}"
+        type: email
+        target: "{{ test_recovery_email }}"
+        description: integration test
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_up_email
+
+    - name: "30_users_crud | Assert upsert email changed"
+      ansible.builtin.assert:
+        that:
+          - r_up_email.changed == true
+
+    - name: "30_users_crud | Upsert email idempotency"
+      bofzilla.purelymail.crud.user.upsert_password_reset:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        user_name: "{{ test_user_email }}"
+        type: email
+        target: "{{ test_recovery_email }}"
+        description: integration test
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_up_email_again
+
+    - name: "30_users_crud | Assert upsert email idempotent"
+      ansible.builtin.assert:
+        that:
+          - r_up_email_again.changed == false
+
+    - name: "30_users_crud | List_password_resets after upsert"
+      bofzilla.purelymail.crud.user.list_password_resets:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        user_name: "{{ test_user_email }}"
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_pr1
+
+    - name: "30_users_crud | Assert one method"
+      ansible.builtin.assert:
+        that:
+          - r_pr1.methods | length == 1
+          - r_pr1.methods[0].target == test_recovery_email
+
+    # delete by target
+    - name: "30_users_crud | Delete_password_reset by target"
+      bofzilla.purelymail.crud.user.delete_password_reset:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        user_name: "{{ test_user_email }}"
+        target: "{{ test_recovery_email }}"
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_del_pr
+
+    - name: "30_users_crud | Assert delete changed"
+      ansible.builtin.assert:
+        that:
+          - r_del_pr.changed == true
+
+    - name: "30_users_crud | Delete_password_reset by target idempotency"
+      bofzilla.purelymail.crud.user.delete_password_reset:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        user_name: "{{ test_user_email }}"
+        target: "{{ test_recovery_email }}"
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_del_pr_again
+
+    - name: "30_users_crud | Assert delete idempotent"
+      ansible.builtin.assert:
+        that:
+          - r_del_pr_again.changed == false
+
+    # delete-all regression
+    - name: "30_users_crud | Re-add two methods (email + email#2) to test delete-all"
+      bofzilla.purelymail.crud.user.upsert_password_reset:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        user_name: "{{ test_user_email }}"
+        type: email
+        target: "{{ test_recovery_email }}"
+        description: integration delete-all
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+
+    - name: "30_users_crud | Delete_password_reset with no target (delete-all)"
+      bofzilla.purelymail.crud.user.delete_password_reset:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        user_name: "{{ test_user_email }}"
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_del_all
+
+    - name: "30_users_crud | Assert delete-all changed"
+      ansible.builtin.assert:
+        that:
+          - r_del_all.changed == true
+
+    - name: "30_users_crud | List_password_resets after delete-all"
+      bofzilla.purelymail.crud.user.list_password_resets:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        user_name: "{{ test_user_email }}"
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_pr_after_all
+
+    - name: "30_users_crud | Assert all methods gone"
+      ansible.builtin.assert:
+        that:
+          - r_pr_after_all.methods == []
+
+    - name: "30_users_crud | Delete-all idempotency"
+      bofzilla.purelymail.crud.user.delete_password_reset:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        user_name: "{{ test_user_email }}"
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_del_all_again
+
+    - name: "30_users_crud | Assert delete-all idempotent"
+      ansible.builtin.assert:
+        that:
+          - r_del_all_again.changed == false
+
+    # ----- app password -----
+    - name: "30_users_crud | Create_app_password"
+      bofzilla.purelymail.crud.user.create_app_password:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        user_handle: "{{ test_user_email }}"
+        name: "30_users_crud | Integration-test"
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_app_pw
+      no_log: true
+
+    - name: "30_users_crud | Assert app_password generated"
+      ansible.builtin.assert:
+        that:
+          - r_app_pw.changed == true
+          - r_app_pw.app_password is defined
+          - r_app_pw.app_password | length > 0
+
+    - name: "30_users_crud | Delete_app_password"
+      bofzilla.purelymail.crud.user.delete_app_password:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        user_name: "{{ test_user_email }}"
+        app_password: "{{ r_app_pw.app_password }}"
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_del_app_pw
+
+    - name: "30_users_crud | Assert delete_app_password"
+      ansible.builtin.assert:
+        that:
+          - r_del_app_pw.changed == true
+
+  always:
+    - name: "30_users_crud | Cleanup test user"
+      bofzilla.purelymail.crud.user.delete_user:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        user_name: "{{ test_user_email }}"
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      failed_when: false

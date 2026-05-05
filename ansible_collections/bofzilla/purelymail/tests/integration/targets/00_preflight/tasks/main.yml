@@ -1,0 +1,39 @@
+---
+- name: "00_preflight | Import integration_config.yml"
+  ansible.builtin.include_vars:
+    file: "{{ playbook_dir }}/integration_config.yml"
+
+- name: 00_preflight | List domains
+  bofzilla.purelymail.crud.domain.list_domains:
+    api_token: "{{ PURELYMAIL_API_TOKEN }}"
+  environment:
+    PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+  register: _pf_domains
+
+- name: 00_preflight | List routing rules
+  bofzilla.purelymail.crud.routing.list_routing_rules:
+    api_token: "{{ PURELYMAIL_API_TOKEN }}"
+  environment:
+    PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+  register: _pf_rules
+
+- name: 00_preflight | Check credit
+  bofzilla.purelymail.crud.billing.check_credit_info:
+    api_token: "{{ PURELYMAIL_API_TOKEN }}"
+  environment:
+    PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+  register: _pf_credit
+
+- name: 00_preflight | Assert account is blank and funded
+  ansible.builtin.assert:
+    that:
+      - (_pf_domains.domains | rejectattr('isShared', 'equalto', true) | list | length) == 0
+      - (_pf_rules.rules | length) == 0
+      - _pf_credit.credit | float > 0
+    fail_msg: >-
+      Test account is not in a clean state. Run
+      `mise run integration-tests:wipe` first, then re-run.
+      Found:
+      domains={{ _pf_domains.domains | rejectattr('isShared', 'equalto', true) | map(attribute='name') | list }},
+      rules={{ _pf_rules.rules | length }},
+      credit={{ _pf_credit.credit }}.

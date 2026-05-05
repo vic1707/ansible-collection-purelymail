@@ -1,0 +1,143 @@
+---
+- name: "40_users_high_level | Import integration_config.yml"
+  ansible.builtin.include_vars:
+    file: "{{ playbook_dir }}/integration_config.yml"
+
+- name: "40_users_high_level | Set facts"
+  ansible.builtin.set_fact:
+    user1: "hl-alice@{{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+    user2: "hl-bob@{{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+    user1_recovery: "hl-alice-recovery@{{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+    user1_recovery_alt: "hl-alice-recovery-alt@{{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+    user2_recovery: "hl-bob-recovery@{{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+
+- name: 40_users_high_level | run
+  block:
+    # ----- create 2 users with recovery -----
+    - name: "40_users_high_level | Create users"
+      bofzilla.purelymail.users:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        canonical: false
+        users:
+          - name: "40_users_high_level | {{ user1 }}"
+            password: "{{ PURELYMAIL_USER_PASSWORD }}"
+            recovery_email: "{{ user1_recovery }}"
+            recovery_email_description: alice-rec
+          - name: "40_users_high_level | {{ user2 }}"
+            password: "{{ PURELYMAIL_USER_PASSWORD }}"
+            recovery_email: "{{ user2_recovery }}"
+            recovery_email_description: bob-rec
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_create
+
+    - name: "40_users_high_level | Assert created"
+      ansible.builtin.assert:
+        that:
+          - r_create.changed == true
+          - r_create.users | length == 2
+
+    - name: "40_users_high_level | Idempotent rerun"
+      bofzilla.purelymail.users:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        canonical: false
+        users:
+          - name: "40_users_high_level | {{ user1 }}"
+            password: "{{ PURELYMAIL_USER_PASSWORD }}"
+            password_mode: ignore-if-exists
+            recovery_email: "{{ user1_recovery }}"
+            recovery_email_description: alice-rec
+          - name: "40_users_high_level | {{ user2 }}"
+            password: "{{ PURELYMAIL_USER_PASSWORD }}"
+            password_mode: ignore-if-exists
+            recovery_email: "{{ user2_recovery }}"
+            recovery_email_description: bob-rec
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_create_again
+
+    - name: "40_users_high_level | Assert idempotent"
+      ansible.builtin.assert:
+        that:
+          - r_create_again.changed == false
+
+    # ----- change user1's recovery email; user2 untouched -----
+    - name: "40_users_high_level | Change user1 recovery"
+      bofzilla.purelymail.users:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        canonical: false
+        users:
+          - name: "40_users_high_level | {{ user1 }}"
+            password: "{{ PURELYMAIL_USER_PASSWORD }}"
+            password_mode: ignore-if-exists
+            recovery_email: "{{ user1_recovery_alt }}"
+            recovery_email_description: alice-rec
+          - name: "40_users_high_level | {{ user2 }}"
+            password: "{{ PURELYMAIL_USER_PASSWORD }}"
+            password_mode: ignore-if-exists
+            recovery_email: "{{ user2_recovery }}"
+            recovery_email_description: bob-rec
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_change
+
+    - name: "40_users_high_level | Assert change reported"
+      ansible.builtin.assert:
+        that:
+          - r_change.changed == true
+
+    - name: "40_users_high_level | List user1 reset methods"
+      bofzilla.purelymail.crud.user.list_password_resets:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        user_name: "{{ user1 }}"
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_user1_methods
+
+    - name: "40_users_high_level | List user2 reset methods"
+      bofzilla.purelymail.crud.user.list_password_resets:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        user_name: "{{ user2 }}"
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_user2_methods
+
+    - name: "40_users_high_level | Assert recovery reconciled correctly"
+      ansible.builtin.assert:
+        that:
+          - r_user1_methods.methods | length == 1
+          - r_user1_methods.methods[0].target == user1_recovery_alt
+          - r_user2_methods.methods | length == 1
+          - r_user2_methods.methods[0].target == user2_recovery
+
+    # ----- canonical=true with only user1 -----
+    - name: "40_users_high_level | Canonical drops user2"
+      bofzilla.purelymail.users:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        canonical: true
+        users:
+          - name: "40_users_high_level | {{ user1 }}"
+            password: "{{ PURELYMAIL_USER_PASSWORD }}"
+            password_mode: ignore-if-exists
+            recovery_email: "{{ user1_recovery_alt }}"
+            recovery_email_description: alice-rec
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_canon
+
+    - name: "40_users_high_level | Assert canonical changed"
+      ansible.builtin.assert:
+        that:
+          - r_canon.changed == true
+          - user2 not in r_canon.users
+          - user1 in r_canon.users
+
+  always:
+    - name: "40_users_high_level | Cleanup all users"
+      bofzilla.purelymail.users:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        canonical: true
+        users: []
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      failed_when: false

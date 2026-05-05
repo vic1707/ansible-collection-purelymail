@@ -1,0 +1,3 @@
+# Standalone target: wipes the test account back to a blank state.
+# Runnable via: ansible-test integration purelymail_wipe
+# Or via: mise run integration-tests:wipe

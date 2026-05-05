@@ -46,6 +46,11 @@ depends = ["clean", "generate-integration-config"]
 dir = "{{ config_root }}/ansible_collections/bofzilla/purelymail"
 run = "ansible-test integration --coverage --python-interpreter $(which python)"
 
+["integration-tests:wipe"]
+depends = ["generate-integration-config"]
+dir = "{{ config_root }}/ansible_collections/bofzilla/purelymail"
+run = "ansible-test integration --python-interpreter $(which python) purelymail_wipe"
+
 [unit-tests]
 depends = ["clean"]
 dir = "{{ config_root }}/ansible_collections/bofzilla/purelymail"

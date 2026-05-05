@@ -1,0 +1,13 @@
+---
+- name: "99_teardown_check | Import integration_config.yml"
+  ansible.builtin.include_vars:
+    file: "{{ playbook_dir }}/integration_config.yml"
+
+# Run the same teardown as the standalone purelymail_wipe target. This is the
+# final safety net: if any earlier target leaked state, wiping it here keeps
+# subsequent CI runs from inheriting garbage. purelymail_wipe is fully
+# idempotent and ends with an assertion that the account is blank, so this
+# task also serves as the end-of-suite blank-state check.
+- name: "99_teardown_check | Wipe and assert blank"
+  ansible.builtin.include_role:
+    name: purelymail_wipe

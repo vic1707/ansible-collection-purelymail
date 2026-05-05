@@ -1,0 +1,100 @@
+---
+- name: "50_routing_crud | Import integration_config.yml"
+  ansible.builtin.include_vars:
+    file: "{{ playbook_dir }}/integration_config.yml"
+
+- name: 50_routing_crud | run
+  block:
+    - name: "50_routing_crud | Create_routing_rule"
+      bofzilla.purelymail.crud.routing.create_routing_rule:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        domain_name: "{{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+        match_user: integrationtest
+        target_addresses:
+          - "test@{{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+        prefix: false
+        catchall: false
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_create
+
+    - name: "50_routing_crud | Assert create changed"
+      ansible.builtin.assert:
+        that:
+          - r_create.changed == true
+
+    - name: "50_routing_crud | Create idempotent"
+      bofzilla.purelymail.crud.routing.create_routing_rule:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        domain_name: "{{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+        match_user: integrationtest
+        target_addresses:
+          - "test@{{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+        prefix: false
+        catchall: false
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_create_again
+
+    - name: "50_routing_crud | Assert create idempotent"
+      ansible.builtin.assert:
+        that:
+          - r_create_again.changed == false
+
+    - name: "50_routing_crud | List rules and capture id"
+      bofzilla.purelymail.crud.routing.list_routing_rules:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_list
+
+    - name: "50_routing_crud | Capture rule id"
+      ansible.builtin.set_fact:
+        test_rule_id: >-
+          {{ (r_list.rules
+               | selectattr('domainName','equalto', PURELYMAIL_TEST_DOMAIN_PRIMARY)
+               | selectattr('matchUser','equalto','integrationtest')
+               | map(attribute='id')
+               | list)[0] | default(None) }}
+
+    - name: "50_routing_crud | Assert id captured"
+      ansible.builtin.assert:
+        that:
+          - test_rule_id is not none
+
+    - name: "50_routing_crud | Delete_routing_rule"
+      bofzilla.purelymail.crud.routing.delete_routing_rule:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        routing_rule_id: "{{ test_rule_id }}"
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_delete
+
+    - name: "50_routing_crud | Assert delete changed"
+      ansible.builtin.assert:
+        that:
+          - r_delete.changed == true
+
+    - name: "50_routing_crud | Delete idempotent"
+      bofzilla.purelymail.crud.routing.delete_routing_rule:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        routing_rule_id: "{{ test_rule_id }}"
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_delete_again
+
+    - name: "50_routing_crud | Assert delete idempotent"
+      ansible.builtin.assert:
+        that:
+          - r_delete_again.changed == false
+
+  always:
+    - name: "50_routing_crud | Cleanup rules on primary"
+      bofzilla.purelymail.routing_rules:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        rules: []
+        canonical:
+          - "{{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      failed_when: false

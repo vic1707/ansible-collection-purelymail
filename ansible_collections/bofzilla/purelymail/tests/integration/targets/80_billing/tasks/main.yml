@@ -1,0 +1,18 @@
+---
+- name: "80_billing | Import integration_config.yml"
+  ansible.builtin.include_vars:
+    file: "{{ playbook_dir }}/integration_config.yml"
+
+- name: 80_billing | check_credit_info
+  bofzilla.purelymail.crud.billing.check_credit_info:
+    api_token: "{{ PURELYMAIL_API_TOKEN }}"
+  environment:
+    PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+  register: r_credit
+
+- name: "80_billing | Assert credit shape"
+  ansible.builtin.assert:
+    that:
+      - r_credit.changed == false
+      - r_credit.credit is defined
+      - r_credit.credit | float >= 0

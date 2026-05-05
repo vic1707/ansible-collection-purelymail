@@ -1,0 +1,56 @@
+---
+- name: "Purelymail_wipe | Import integration_config.yml"
+  ansible.builtin.include_vars:
+    file: "{{ playbook_dir }}/integration_config.yml"
+
+# 1) Wipe routing rules across all known test domains.
+- name: "Purelymail_wipe | Drop all routing rules on test domains"
+  bofzilla.purelymail.routing_rules:
+    api_token: "{{ PURELYMAIL_API_TOKEN }}"
+    rules: []
+    canonical:
+      - "{{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+      - "{{ PURELYMAIL_TEST_DOMAIN_SECONDARY }}"
+      - "{{ PURELYMAIL_TEST_DOMAIN_TERTIARY }}"
+  environment:
+    PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+  failed_when: false
+
+# 2) Wipe all users.
+- name: "Purelymail_wipe | Delete all users"
+  bofzilla.purelymail.users:
+    api_token: "{{ PURELYMAIL_API_TOKEN }}"
+    canonical: true
+    users: []
+  environment:
+    PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+  failed_when: false
+
+# 3) Best-effort delete of every test domain.
+- name: "Purelymail_wipe | Delete each test domain"
+  bofzilla.purelymail.crud.domain.delete_domain:
+    api_token: "{{ PURELYMAIL_API_TOKEN }}"
+    domain_name: "{{ item }}"
+  loop:
+    - "{{ PURELYMAIL_TEST_DOMAIN_TERTIARY }}"
+    - "{{ PURELYMAIL_TEST_DOMAIN_SECONDARY }}"
+    - "{{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+  environment:
+    PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+  failed_when: false
+
+# 4) Confirm the account is blank.
+- name: "Purelymail_wipe | List remaining domains"
+  bofzilla.purelymail.crud.domain.list_domains:
+    api_token: "{{ PURELYMAIL_API_TOKEN }}"
+  environment:
+    PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+  register: _wipe_remaining
+
+- name: "Purelymail_wipe | Assert account is blank"
+  ansible.builtin.assert:
+    that:
+      - (_wipe_remaining.domains | rejectattr('isShared', 'equalto', true) | list | length) == 0
+    fail_msg: >-
+      Account still has non-shared domains after wipe:
+      {{ _wipe_remaining.domains | rejectattr('isShared', 'equalto', true) | map(attribute='name') | list }}

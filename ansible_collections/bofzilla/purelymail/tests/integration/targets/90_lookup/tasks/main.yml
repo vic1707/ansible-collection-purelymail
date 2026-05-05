@@ -1,0 +1,37 @@
+---
+- name: "90_lookup | Import integration_config.yml"
+  ansible.builtin.include_vars:
+    file: "{{ playbook_dir }}/integration_config.yml"
+
+- name: "90_lookup | Get ownership code via module"
+  bofzilla.purelymail.crud.domain.get_ownership_code:
+    api_token: "{{ PURELYMAIL_API_TOKEN }}"
+  environment:
+    PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+  register: r_mod
+
+- name: "90_lookup | Assert module response shape"
+  ansible.builtin.assert:
+    that:
+      - r_mod.changed == false
+      - r_mod.code is defined
+      - r_mod.code is string
+      - r_mod.value is defined
+      - r_mod.value is string
+      - r_mod.code.endswith(r_mod.value)
+
+- name: "90_lookup | Call lookup plugin"
+  ansible.builtin.set_fact:
+    pm_lookup: >-
+      {{ lookup('bofzilla.purelymail.purelymail_ownership_code',
+                api_token=PURELYMAIL_API_TOKEN) }}
+
+- name: "90_lookup | Assert lookup response shape"
+  ansible.builtin.assert:
+    that:
+      - pm_lookup.code is defined
+      - pm_lookup.code is string
+      - pm_lookup.value is defined
+      - pm_lookup.value is string
+      - pm_lookup.code == r_mod.code
+      - pm_lookup.value == r_mod.value

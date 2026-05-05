@@ -1,0 +1,14 @@
+---
+# Wrap a single preset-combo file with pre-cleanup so each combo starts from
+# a known empty rules state on the primary domain.
+- name: "_combo | Pre-cleanup"
+  bofzilla.purelymail.routing_rules:
+    api_token: "{{ PURELYMAIL_API_TOKEN }}"
+    rules: []
+    canonical:
+      - "{{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+  environment:
+    PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+
+- name: "_combo | Run combo {{ combo_path }}"
+  ansible.builtin.include_tasks: "purelymail_internal_preset_rules/{{ combo_path }}"

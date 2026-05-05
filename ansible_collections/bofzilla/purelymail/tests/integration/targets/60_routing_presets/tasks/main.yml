@@ -1,0 +1,49 @@
+---
+- name: 60_routing_presets | Import integration_config.yml
+  ansible.builtin.include_vars:
+    file: "{{ playbook_dir }}/integration_config.yml"
+
+- name: 60_routing_presets | run preset matrix
+  block:
+    # Failure-mode test (does not require cleanup, no rules created).
+    - name: Include missing_preset_or_settings
+      ansible.builtin.include_tasks: missing_preset_or_settings.yml
+
+    # Combo files. Each combo creates its rules from scratch; we clean rules
+    # on the primary domain before *and* after every combo to keep them
+    # independent. Using `include_tasks` inside a loop with a pre-task wipe.
+    - name: Run each combo with isolated state
+      ansible.builtin.include_tasks: _combo.yml
+      loop:
+        - any_address/any_any.yml
+        - any_address/any_catchall.yml
+        - any_address/any_exact.yml
+        - any_address/any_prefix.yml
+        - catchall_except_valid/catchall_any.yml
+        - catchall_except_valid/catchall_catchall.yml
+        - catchall_except_valid/catchall_exact.yml
+        - catchall_except_valid/catchall_prefix.yml
+        - exact_match/exact_any.yml
+        - exact_match/exact_catchall.yml
+        - exact_match/exact_exact.yml
+        - exact_match/exact_prefix.yml
+        - prefix_match/prefix_any.yml
+        - prefix_match/prefix_catchall.yml
+        - prefix_match/prefix_exact.yml
+        - prefix_match/prefix_prefix.yml
+      loop_control:
+        loop_var: combo_path
+
+    - name: Include unused_presets_combinations
+      ansible.builtin.include_tasks: purelymail_internal_preset_rules/unused_presets_combinations.yml
+
+  always:
+    - name: 60_routing_presets | cleanup primary
+      bofzilla.purelymail.routing_rules:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        rules: []
+        canonical:
+          - "{{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      failed_when: false

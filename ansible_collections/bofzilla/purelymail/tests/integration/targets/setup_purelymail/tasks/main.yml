@@ -1,0 +1,20 @@
+---
+# This role is invoked as a meta dependency by tests that need primary/secondary
+# domains to exist. It is idempotent and never deletes anything.
+- name: "Setup_purelymail | Import integration_config.yml"
+  ansible.builtin.include_vars:
+    file: "{{ playbook_dir }}/integration_config.yml"
+
+- name: "Setup_purelymail | Ensure primary domain exists"
+  bofzilla.purelymail.crud.domain.add_domain:
+    api_token: "{{ PURELYMAIL_API_TOKEN }}"
+    domain_name: "{{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+  environment:
+    PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+
+- name: "Setup_purelymail | Ensure secondary domain exists"
+  bofzilla.purelymail.crud.domain.add_domain:
+    api_token: "{{ PURELYMAIL_API_TOKEN }}"
+    domain_name: "{{ PURELYMAIL_TEST_DOMAIN_SECONDARY }}"
+  environment:
+    PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"

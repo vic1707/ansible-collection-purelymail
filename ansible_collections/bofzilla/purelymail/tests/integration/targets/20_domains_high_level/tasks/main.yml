@@ -1,0 +1,142 @@
+---
+- name: "20_domains_high_level | Import integration_config.yml"
+  ansible.builtin.include_vars:
+    file: "{{ playbook_dir }}/integration_config.yml"
+
+- name: 20_domains_high_level | run
+  block:
+    # ----- non-canonical add tertiary -----
+    - name: "20_domains_high_level | Declare 3 domains, canonical=false"
+      bofzilla.purelymail.domains:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        canonical: false
+        domains:
+          - name: "20_domains_high_level | {{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+          - name: "20_domains_high_level | {{ PURELYMAIL_TEST_DOMAIN_SECONDARY }}"
+          - name: "20_domains_high_level | {{ PURELYMAIL_TEST_DOMAIN_TERTIARY }}"
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_add3
+
+    - name: "20_domains_high_level | Assert add3 changed"
+      ansible.builtin.assert:
+        that:
+          - r_add3.changed == true
+          - r_add3.domains | map(attribute='name') | list
+            is superset([PURELYMAIL_TEST_DOMAIN_PRIMARY, PURELYMAIL_TEST_DOMAIN_SECONDARY, PURELYMAIL_TEST_DOMAIN_TERTIARY])
+
+    - name: "20_domains_high_level | Declare same 3 again (idempotent)"
+      bofzilla.purelymail.domains:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        canonical: false
+        domains:
+          - name: "20_domains_high_level | {{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+          - name: "20_domains_high_level | {{ PURELYMAIL_TEST_DOMAIN_SECONDARY }}"
+          - name: "20_domains_high_level | {{ PURELYMAIL_TEST_DOMAIN_TERTIARY }}"
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_add3_again
+
+    - name: "20_domains_high_level | Assert idempotent"
+      ansible.builtin.assert:
+        that:
+          - r_add3_again.changed == false
+
+    # ----- canonical removes tertiary -----
+    - name: "20_domains_high_level | Declare only primary+secondary, canonical=true"
+      bofzilla.purelymail.domains:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        canonical: true
+        domains:
+          - name: "20_domains_high_level | {{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+          - name: "20_domains_high_level | {{ PURELYMAIL_TEST_DOMAIN_SECONDARY }}"
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_canon
+
+    - name: "20_domains_high_level | Assert canonical removed tertiary"
+      ansible.builtin.assert:
+        that:
+          - r_canon.changed == true
+          - PURELYMAIL_TEST_DOMAIN_TERTIARY not in (r_canon.domains | map(attribute='name') | list)
+
+    - name: "20_domains_high_level | Re-run canonical (idempotent)"
+      bofzilla.purelymail.domains:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        canonical: true
+        domains:
+          - name: "20_domains_high_level | {{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+          - name: "20_domains_high_level | {{ PURELYMAIL_TEST_DOMAIN_SECONDARY }}"
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_canon_again
+
+    - name: "20_domains_high_level | Assert canonical idempotent"
+      ansible.builtin.assert:
+        that:
+          - r_canon_again.changed == false
+
+    # ----- update via high-level -----
+    - name: "20_domains_high_level | High-level update primary settings"
+      bofzilla.purelymail.domains:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        canonical: false
+        domains:
+          - name: "20_domains_high_level | {{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+            allow_account_reset: false
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_update
+
+    - name: "20_domains_high_level | Assert update changed"
+      ansible.builtin.assert:
+        that:
+          - r_update.changed == true
+
+    # ----- check-mode: declares change but no real change -----
+    - name: "20_domains_high_level | Check-mode declared flip"
+      bofzilla.purelymail.domains:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        canonical: false
+        domains:
+          - name: "20_domains_high_level | {{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+            allow_account_reset: true
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_check
+      check_mode: true
+
+    - name: "20_domains_high_level | Re-list to verify check-mode did not change state"
+      bofzilla.purelymail.crud.domain.list_domains:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_relist
+
+    - name: "20_domains_high_level | Assert check-mode reported change, real state untouched"
+      ansible.builtin.assert:
+        that:
+          - r_check.changed == true
+          - r_check.domains is defined
+          - >-
+            (r_relist.domains | selectattr('name','equalto',PURELYMAIL_TEST_DOMAIN_PRIMARY) | list | first).allowAccountReset
+            == false
+
+  always:
+    # Restore primary defaults; ensure tertiary is gone.
+    - name: "20_domains_high_level | Ensure tertiary removed"
+      bofzilla.purelymail.crud.domain.delete_domain:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        domain_name: "{{ PURELYMAIL_TEST_DOMAIN_TERTIARY }}"
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      failed_when: false
+
+    - name: "20_domains_high_level | Restore primary defaults"
+      bofzilla.purelymail.crud.domain.update_domain_settings:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        name: "20_domains_high_level | {{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+        allow_account_reset: true
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      failed_when: false

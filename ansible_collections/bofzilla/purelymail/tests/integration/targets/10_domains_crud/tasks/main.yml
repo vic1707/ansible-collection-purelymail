@@ -1,0 +1,144 @@
+---
+- name: "10_domains_crud | Import integration_config.yml"
+  ansible.builtin.include_vars:
+    file: "{{ playbook_dir }}/integration_config.yml"
+
+- name: 10_domains_crud | run lifecycle
+  block:
+    # ----- add_domain idempotent on existing setup -----
+    - name: "10_domains_crud | Add_domain primary again (idempotent)"
+      bofzilla.purelymail.crud.domain.add_domain:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        domain_name: "{{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_add_again
+
+    - name: "10_domains_crud | Assert add_domain idempotent"
+      ansible.builtin.assert:
+        that:
+          - r_add_again.changed == false
+
+    # ----- update_domain_settings: allow_account_reset -----
+    - name: "10_domains_crud | Update allow_account_reset=false"
+      bofzilla.purelymail.crud.domain.update_domain_settings:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        name: "10_domains_crud | {{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+        allow_account_reset: false
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_set_false
+
+    - name: "10_domains_crud | Assert update changed"
+      ansible.builtin.assert:
+        that:
+          - r_set_false is not failed
+          - r_set_false.changed == true
+
+    - name: "10_domains_crud | Update allow_account_reset=false again (idempotent)"
+      bofzilla.purelymail.crud.domain.update_domain_settings:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        name: "10_domains_crud | {{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+        allow_account_reset: false
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_set_false_again
+
+    - name: "10_domains_crud | Assert update idempotent"
+      ansible.builtin.assert:
+        that:
+          - r_set_false_again.changed == false
+
+    # ----- recheck_dns is always 'changed' -----
+    - name: "10_domains_crud | Recheck_dns"
+      bofzilla.purelymail.crud.domain.update_domain_settings:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        name: "10_domains_crud | {{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+        recheck_dns: true
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_recheck
+
+    - name: "10_domains_crud | Assert recheck always changed"
+      ansible.builtin.assert:
+        that:
+          - r_recheck is not failed
+          - r_recheck.changed == true
+
+    # ----- mixed: recheck + setting flip -----
+    - name: "10_domains_crud | Mixed update (recheck + flip allow_account_reset back to true)"
+      bofzilla.purelymail.crud.domain.update_domain_settings:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        name: "10_domains_crud | {{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+        allow_account_reset: true
+        recheck_dns: true
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_mixed
+
+    - name: "10_domains_crud | Assert mixed changed"
+      ansible.builtin.assert:
+        that:
+          - r_mixed.changed == true
+
+    # ----- check-mode: should not actually change -----
+    - name: "10_domains_crud | Snapshot before check-mode"
+      bofzilla.purelymail.crud.domain.list_domains:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_before_check
+
+    - name: "10_domains_crud | Check-mode flip allow_account_reset=false"
+      bofzilla.purelymail.crud.domain.update_domain_settings:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        name: "10_domains_crud | {{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+        allow_account_reset: false
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_check_mode
+      check_mode: true
+
+    - name: "10_domains_crud | Snapshot after check-mode"
+      bofzilla.purelymail.crud.domain.list_domains:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_after_check
+
+    - name: "10_domains_crud | Assert check-mode reported change but state untouched"
+      ansible.builtin.assert:
+        that:
+          - r_check_mode.changed == true
+          - >-
+            (r_before_check.domains | selectattr('name','equalto', PURELYMAIL_TEST_DOMAIN_PRIMARY) | list | first).allowAccountReset
+            == (r_after_check.domains | selectattr('name','equalto', PURELYMAIL_TEST_DOMAIN_PRIMARY) | list | first).allowAccountReset
+
+    # ----- diff-mode -----
+    - name: "10_domains_crud | Diff-mode update"
+      bofzilla.purelymail.crud.domain.update_domain_settings:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        name: "10_domains_crud | {{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+        allow_account_reset: false
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_diff
+      diff: true
+
+    - name: "10_domains_crud | Assert diff present"
+      ansible.builtin.assert:
+        that:
+          - r_diff.diff is defined
+          - r_diff.diff.before is defined
+          - r_diff.diff.after is defined
+
+  always:
+    # Restore default settings on primary (safe to run on failure too).
+    - name: "10_domains_crud | Restore primary defaults"
+      bofzilla.purelymail.crud.domain.update_domain_settings:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        name: "10_domains_crud | {{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+        allow_account_reset: true
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      failed_when: false

@@ -1,0 +1,88 @@
+---
+- name: "70_routing_high_level | Import integration_config.yml"
+  ansible.builtin.include_vars:
+    file: "{{ playbook_dir }}/integration_config.yml"
+
+- name: 70_routing_high_level | run
+  block:
+    # Seed: a rule on secondary that is NOT managed by the high-level call.
+    - name: "70_routing_high_level | Seed rule on secondary"
+      bofzilla.purelymail.crud.routing.create_routing_rule:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        domain_name: "{{ PURELYMAIL_TEST_DOMAIN_SECONDARY }}"
+        match_user: untouched
+        target_addresses:
+          - "test@{{ PURELYMAIL_TEST_DOMAIN_SECONDARY }}"
+        prefix: false
+        catchall: false
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+
+    # canonical scoped to primary only — secondary rule should survive.
+    - name: "70_routing_high_level | Routing_rules canonical=[primary]"
+      bofzilla.purelymail.routing_rules:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        canonical:
+          - "{{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+        rules:
+          - domain_name: "{{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+            preset: any_address
+            target_addresses:
+              - "primary@{{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_scoped
+
+    - name: "70_routing_high_level | List rules to confirm secondary survived"
+      bofzilla.purelymail.crud.routing.list_routing_rules:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_list
+
+    - name: "70_routing_high_level | Assert secondary survived"
+      ansible.builtin.assert:
+        that:
+          - r_scoped.changed == true
+          - (r_list.rules | selectattr('domainName','equalto', PURELYMAIL_TEST_DOMAIN_SECONDARY) | list | length) == 1
+
+    # canonical includes secondary now — secondary rule should be removed.
+    - name: "70_routing_high_level | Routing_rules canonical=[primary, secondary]"
+      bofzilla.purelymail.routing_rules:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        canonical:
+          - "{{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+          - "{{ PURELYMAIL_TEST_DOMAIN_SECONDARY }}"
+        rules:
+          - domain_name: "{{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+            preset: any_address
+            target_addresses:
+              - "primary@{{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_full
+
+    - name: "70_routing_high_level | List rules to confirm secondary gone"
+      bofzilla.purelymail.crud.routing.list_routing_rules:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      register: r_list2
+
+    - name: "70_routing_high_level | Assert secondary removed"
+      ansible.builtin.assert:
+        that:
+          - r_full.changed == true
+          - (r_list2.rules | selectattr('domainName','equalto', PURELYMAIL_TEST_DOMAIN_SECONDARY) | list | length) == 0
+
+  always:
+    - name: "70_routing_high_level | Cleanup"
+      bofzilla.purelymail.routing_rules:
+        api_token: "{{ PURELYMAIL_API_TOKEN }}"
+        rules: []
+        canonical:
+          - "{{ PURELYMAIL_TEST_DOMAIN_PRIMARY }}"
+          - "{{ PURELYMAIL_TEST_DOMAIN_SECONDARY }}"
+      environment:
+        PURELYMAIL_API_TLS_VERIFY: "{{ PURELYMAIL_API_TLS_VERIFY }}"
+      failed_when: false
