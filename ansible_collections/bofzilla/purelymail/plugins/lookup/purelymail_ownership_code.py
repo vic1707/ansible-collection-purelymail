@@ -26,27 +26,27 @@ EXAMPLES = r"""
 - name: Get the full TXT record value
   ansible.builtin.debug:
     msg: >-
-      {{ lookup('bofzilla.purelymail.purelymail_ownership_code', api_token=lookup('env', 'PURELYMAIL_API_TOKEN')).code }}
+      {{ lookup('bofzilla.purelymail.purelymail_ownership_code', api_token=lookup('env', 'PURELYMAIL_API_TOKEN')).record }}
 
 - name: Get just the verification code (without prefix)
   ansible.builtin.debug:
     msg: >-
-      {{ lookup('bofzilla.purelymail.purelymail_ownership_code', api_token=lookup('env', 'PURELYMAIL_API_TOKEN')).value }}
+      {{ lookup('bofzilla.purelymail.purelymail_ownership_code', api_token=lookup('env', 'PURELYMAIL_API_TOKEN')).code }}
 """
 
 RETURN = r"""
 _raw:
   description:
     - A list with a single dict containing two keys:
-        - C(code): The full DNS TXT value (e.g. C(purelymail_ownership_proof=dQw4w9WgXcQ))
-        - C(value): The extracted verification code without the prefix (e.g. C(dQw4w9WgXcQ))
+        - C(record): The full DNS TXT value (e.g. C(purelymail_ownership_proof=dQw4w9WgXcQ))
+        - C(code): The extracted verification code without the prefix (e.g. C(dQw4w9WgXcQ))
     - Both values are sensitive and should be treated as secrets.
   type: list
   elements: dict
   returned: always
   sample:
-    - code: purelymail_ownership_proof=dQw4w9WgXcQ
-      value: dQw4w9WgXcQ
+    - record: purelymail_ownership_proof=dQw4w9WgXcQ
+      code: dQw4w9WgXcQ
 """
 
 
@@ -62,7 +62,7 @@ class LookupModule(LookupBase):
 
 		try:
 			resp = client.get_ownership_code()
-			return [{"code": resp.code, "value": resp.value}]
+			return [{"record": resp.code, "code": resp.value}]
 		except ApiError as err:  # pragma: no cover
 			raise AnsibleError(f"Purelymail API error: {err}") from err
 		except Exception as err:  # pragma: no cover
