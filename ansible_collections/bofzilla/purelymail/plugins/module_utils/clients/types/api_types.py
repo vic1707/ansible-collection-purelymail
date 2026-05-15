@@ -95,14 +95,6 @@ UserPasswordResetMethodType = Literal["email", "phone"]
 
 
 @dataclass(config=ConfigDict(**DEFAULT_CFG))
-class GetUserPasswordResetMethod:
-	type: UserPasswordResetMethodType
-	target: str
-	description: str
-	allowMfaReset: bool
-
-
-@dataclass(config=ConfigDict(**DEFAULT_CFG))
 class ListPasswordResetResponseItem:
 	_adapter: ClassVar[TypeAdapter["ListPasswordResetResponseItem"]]
 
@@ -116,3 +108,7 @@ class ListPasswordResetResponseItem:
 
 
 ListPasswordResetResponseItem._adapter = TypeAdapter(ListPasswordResetResponseItem)
+
+
+class GetUserPasswordResetMethod(ListPasswordResetResponseItem):
+	pass

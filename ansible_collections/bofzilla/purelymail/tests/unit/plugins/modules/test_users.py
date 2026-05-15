@@ -2,9 +2,9 @@ import functools
 
 import pytest
 
-from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.api_types import ListPasswordResetResponseItem
+from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.api_types import GetUserPasswordResetMethod
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.requests import ModifyUserRequest, UpsertPasswordResetRequest
-from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.responses import GetUserResponse, ListPasswordResetResponse, ListUsersResponse
+from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.responses import GetUserResponse, ListUsersResponse
 from ansible_collections.bofzilla.purelymail.plugins.modules import users
 from ansible_collections.bofzilla.purelymail.tests.unit.plugins.mock_utils import make_runner  # noqa: F401
 
@@ -13,13 +13,14 @@ def _existing_user(
 	enableSearchIndexing: bool = True,
 	recoveryEnabled: bool = True,
 	requireTwoFactorAuthentication: bool = False,
+	resetMethods: list[GetUserPasswordResetMethod] | None = None,
 ) -> GetUserResponse:
 	return GetUserResponse(
 		enableSearchIndexing=enableSearchIndexing,
 		recoveryEnabled=recoveryEnabled,
 		requireTwoFactorAuthentication=requireTwoFactorAuthentication,
 		enableSpamFiltering=True,
-		resetMethods=[],
+		resetMethods=resetMethods or [],
 	)
 
 
@@ -27,14 +28,12 @@ def _setup_default(mock):
 	# default: 'alice@example.com' already exists, 'bob@example.com' does not.
 	mock.list_users.return_value = ListUsersResponse(users=["alice@example.com"])
 	mock.get_user.return_value = _existing_user()
-	mock.list_password_reset.return_value = ListPasswordResetResponse(users=[])
 
 
 def _setup_with_methods(methods):
 	def _setup(mock):
 		mock.list_users.return_value = ListUsersResponse(users=["alice@example.com"])
-		mock.get_user.return_value = _existing_user()
-		mock.list_password_reset.return_value = ListPasswordResetResponse(users=methods)
+		mock.get_user.return_value = _existing_user(resetMethods=methods)
 
 	return _setup
 
@@ -99,7 +98,7 @@ def test_create_new_user(run):
 	assert created_req.domainName == "example.com"
 	assert created_req.password == "s3cret"
 	assert data["changed"] is True
-	assert "bob@example.com" in data["users"]
+	assert any(u["name"] == "bob@example.com" for u in data["users"])
 
 
 def test_create_with_recovery_passes_through(run):
@@ -248,7 +247,7 @@ def test_recovery_email_added(make_runner):  # noqa: F811
 
 
 def test_recovery_email_idempotent(make_runner):  # noqa: F811
-	current = [ListPasswordResetResponseItem(type="email", target="r@example.com", description="bk", allowMfaReset=True)]
+	current = [GetUserPasswordResetMethod(type="email", target="r@example.com", description="bk", allowMfaReset=True)]
 	runner = make_runner(users, (("UserClient", _setup_with_methods(current)),))
 	data, mocks = runner(params=_params_with_user(recovery_email="r@example.com", recovery_email_description="bk"))
 	mocks["UserClient"].upsert_password_reset.assert_not_called()
@@ -257,7 +256,7 @@ def test_recovery_email_idempotent(make_runner):  # noqa: F811
 
 
 def test_recovery_email_replaced_when_target_changes(make_runner):  # noqa: F811
-	current = [ListPasswordResetResponseItem(type="email", target="old@example.com", description="", allowMfaReset=True)]
+	current = [GetUserPasswordResetMethod(type="email", target="old@example.com", description="", allowMfaReset=True)]
 	runner = make_runner(users, (("UserClient", _setup_with_methods(current)),))
 	data, mocks = runner(params=_params_with_user(recovery_email="new@example.com"))
 	# old removed, new added
@@ -271,7 +270,7 @@ def test_recovery_email_replaced_when_target_changes(make_runner):  # noqa: F811
 
 
 def test_empty_recovery_email_deletes_existing(make_runner):  # noqa: F811
-	current = [ListPasswordResetResponseItem(type="email", target="old@example.com", description="", allowMfaReset=True)]
+	current = [GetUserPasswordResetMethod(type="email", target="old@example.com", description="", allowMfaReset=True)]
 	runner = make_runner(users, (("UserClient", _setup_with_methods(current)),))
 	data, mocks = runner(params=_params_with_user())  # both recovery_* default to ""
 	mocks["UserClient"].delete_password_reset.assert_called_once()
@@ -290,7 +289,7 @@ def test_recovery_phone(make_runner):  # noqa: F811
 
 
 def test_allow_mfa_reset_flag(make_runner):  # noqa: F811
-	current = [ListPasswordResetResponseItem(type="email", target="r@example.com", description="", allowMfaReset=True)]
+	current = [GetUserPasswordResetMethod(type="email", target="r@example.com", description="", allowMfaReset=True)]
 	runner = make_runner(users, (("UserClient", _setup_with_methods(current)),))
 	data, mocks = runner(params=_params_with_user(recovery_email="r@example.com", recovery_email_allow_mfa_reset=False))
 	# mismatch on allowMfaReset → delete + add
@@ -339,8 +338,42 @@ def test_diff(run):
 	)
 	assert data["changed"] is True
 	assert "diff" in data
-	assert "alice@example.com" in data["diff"]["before"]["users"]
-	assert "bob@example.com" in data["diff"]["after"]["users"]
+	assert any(u["name"] == "alice@example.com" and u["enableSearchIndexing"] is True for u in data["diff"]["before"])
+	assert any(u["name"] == "alice@example.com" and u["enableSearchIndexing"] is False for u in data["diff"]["after"])
+	assert any(u["name"] == "bob@example.com" and u["password"] == "<set>" for u in data["diff"]["after"])
+
+
+def test_get_user_called_for_each_listed_user(make_runner):  # noqa: F811
+	def _setup(mock):
+		mock.list_users.return_value = ListUsersResponse(users=["alice@example.com", "charlie@example.com"])
+		mock.get_user.side_effect = [
+			_existing_user(),
+			_existing_user(enableSearchIndexing=False),
+		]
+
+	runner = make_runner(users, (("UserClient", _setup),))
+	data, mocks = runner(params={"canonical": False, "password_mode": "update-if-provided", "users": []})
+
+	assert mocks["UserClient"].get_user.call_count == 2
+	assert [call.args[0].userName for call in mocks["UserClient"].get_user.call_args_list] == ["alice@example.com", "charlie@example.com"]
+	assert data["users"] == [
+		{
+			"name": "alice@example.com",
+			"enableSearchIndexing": True,
+			"recoveryEnabled": True,
+			"requireTwoFactorAuthentication": False,
+			"enableSpamFiltering": True,
+			"resetMethods": [],
+		},
+		{
+			"name": "charlie@example.com",
+			"enableSearchIndexing": False,
+			"recoveryEnabled": True,
+			"requireTwoFactorAuthentication": False,
+			"enableSpamFiltering": True,
+			"resetMethods": [],
+		},
+	]
 
 
 def test_check_mode_no_side_effects(run):

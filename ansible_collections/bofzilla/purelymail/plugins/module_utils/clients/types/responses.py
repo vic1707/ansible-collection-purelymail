@@ -10,7 +10,8 @@ from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.
 	ListPasswordResetResponseItem,
 	RoutingRule,
 )
-from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.requests import UpdateDomainSettingsRequest
+from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.module_inputs import UserInput
+from ansible_collections.bofzilla.purelymail.plugins.module_utils.clients.types.requests import ModifyUserRequest, UpdateDomainSettingsRequest
 from ansible_collections.bofzilla.purelymail.plugins.module_utils.pydantic import DEFAULT_CFG
 
 
@@ -109,6 +110,49 @@ class GetUserResponse:
 
 	def as_api_response(self) -> dict[str, Any]:
 		return GetUserResponse._adapter.dump_python(self)
+
+	def as_display(self, name: str) -> dict[str, Any]:
+		user = GetUserResponse._adapter.dump_python(self)
+		user["name"] = name
+		return user
+
+	def update(self, req: ModifyUserRequest, resetMethods: list[GetUserPasswordResetMethod] | None = None) -> "GetUserResponse":
+		return GetUserResponse(
+			enableSearchIndexing=req.enableSearchIndexing if req.enableSearchIndexing is not None else self.enableSearchIndexing,
+			recoveryEnabled=req.enablePasswordReset if req.enablePasswordReset is not None else self.recoveryEnabled,
+			requireTwoFactorAuthentication=req.requireTwoFactorAuthentication if req.requireTwoFactorAuthentication is not None else self.requireTwoFactorAuthentication,
+			enableSpamFiltering=self.enableSpamFiltering,
+			resetMethods=resetMethods if resetMethods is not None else self.resetMethods,
+		)
+
+	def modify_request(self, user_name: str, expected: "GetUserResponse", *, new_password: str | None = None) -> ModifyUserRequest:
+		return ModifyUserRequest(
+			user_name=user_name,
+			new_password=new_password,
+			enable_search_indexing=(expected.enableSearchIndexing if expected.enableSearchIndexing != self.enableSearchIndexing else None),
+			enable_password_reset=(expected.recoveryEnabled if expected.recoveryEnabled != self.recoveryEnabled else None),
+			require_two_factor_authentication=(expected.requireTwoFactorAuthentication if expected.requireTwoFactorAuthentication != self.requireTwoFactorAuthentication else None),
+		)
+
+	@staticmethod
+	def expectedFromUserInput(
+		req: UserInput,
+		enableSpamFiltering: bool = True,
+		from_create: bool = False,
+	) -> "GetUserResponse":
+		resetMethods = []
+		if req.recoveryEmail:
+			resetMethods.append(GetUserPasswordResetMethod("email", req.recoveryEmail, req.recoveryEmailDescription, True if from_create else req.recoveryEmailAllowMfaReset))
+		if req.recoveryPhone:
+			resetMethods.append(GetUserPasswordResetMethod("phone", req.recoveryPhone, req.recoveryPhoneDescription, True if from_create else req.recoveryPhoneAllowMfaReset))
+
+		return GetUserResponse(
+			enableSearchIndexing=req.enableSearchIndexing,
+			recoveryEnabled=req.enablePasswordReset,
+			requireTwoFactorAuthentication=False if from_create else req.requireTwoFactorAuthentication,
+			enableSpamFiltering=enableSpamFiltering,
+			resetMethods=resetMethods,
+		)
 
 
 GetUserResponse._adapter = TypeAdapter(GetUserResponse)
