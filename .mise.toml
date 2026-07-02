@@ -10,11 +10,11 @@ includes = [".config/tasks.mise.toml"]
 
 [tools]
 actionlint = "1.7.12"
-jq = "1.8.1"
+jq = "1.8.2"
 python = "3.14.6"
-typos = "1.47.2"
-uv = "0.11.21"
-zizmor = "1.25.2"
+typos = "1.48.0"
+uv = "0.11.26"
+zizmor = "1.26.1"
 
 [plugins]
 zizmor = "asdf:vic1707/asdf-zizmor"
