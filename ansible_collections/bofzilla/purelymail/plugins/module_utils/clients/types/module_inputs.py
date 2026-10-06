@@ -10,7 +10,7 @@ from ansible_collections.bofzilla.purelymail.plugins.module_utils.pydantic impor
 
 @dataclass(config=ConfigDict(**DEFAULT_CFG, validate_by_name=True, validate_by_alias=True))
 class UserInput(CreateUserRequest):
-	password: Annotated[str, BeforeValidator(lambda value: value or "")] = Field(default="", alias="password")
+	password: Annotated[str, BeforeValidator(lambda value: value or "")] = Field(default="", alias="password", kw_only=True)
 	passwordMode: str | None = Field(default=None, alias="password_mode", exclude=True)
 	requireTwoFactorAuthentication: bool = Field(default=False, alias="require_two_factor_authentication", exclude=True)
 	recoveryEmailAllowMfaReset: bool = Field(default=True, alias="recovery_email_allow_mfa_reset", exclude=True)
