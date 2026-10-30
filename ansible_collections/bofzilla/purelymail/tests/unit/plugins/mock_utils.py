@@ -18,12 +18,11 @@ def make_runner():
 		mock_setup: tuple[tuple[str, Callable[[MagicMock], None]] | str, ...],
 		mock_api_response: Callable[[dict], FakeApiResponse] | None = None,
 	) -> Callable[..., tuple[dict, dict[str, MagicMock]]]:
-		monkeypatch = pytest.MonkeyPatch()
-		mocks = bootstrap_module(monkeypatch, py_module, mock_setup, mock_api_response)
-
 		@functools.wraps(run_module_test)
 		def run_with_params(**kwargs):
-			return run_module_test(py_module, mocks, **kwargs)
+			with pytest.MonkeyPatch.context() as monkeypatch:
+				mocks = bootstrap_module(monkeypatch, py_module, mock_setup, mock_api_response)
+				return run_module_test(py_module, mocks, **kwargs)
 
 		return run_with_params
 
