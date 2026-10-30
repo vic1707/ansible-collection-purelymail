@@ -105,6 +105,7 @@ mise integration-tests
 
 Please add an entry to [the collection changelog](ansible_collections/vic1707/purelymail/CHANGELOG.md)
 for any user-visible change and update the affected module's documentation and examples.
+See [README.md](README.md#publishing) for publishing.
 
 ---
 
