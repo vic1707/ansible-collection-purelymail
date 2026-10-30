@@ -1,0 +1,180 @@
+from pydantic import ConfigDict, Field, model_validator
+from pydantic.dataclasses import dataclass
+from pydantic_core import ArgsKwargs
+
+from ansible_collections.vic1707.purelymail.plugins.module_utils.clients.types.api_types import PRESET_MAP, ApiDomainInfo, PresetType, RoutingRule, UserPasswordResetMethodType
+from ansible_collections.vic1707.purelymail.plugins.module_utils.pydantic import DEFAULT_CFG
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class EmptyRequest:
+	pass
+
+
+## Routing
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class CreateRoutingRequest(RoutingRule):
+	id: None = Field(default=None, init=False, exclude=True)  # doesn't exist yet
+	_preset: PresetType | None = Field(default=None, exclude=True, alias="preset")
+
+	def eq(self, rule: RoutingRule) -> bool:
+		return (
+			self.prefix == rule.prefix
+			and self.catchall == rule.catchall
+			and self.domainName == rule.domainName
+			and self.matchUser == rule.matchUser
+			and self.targetAddresses == rule.targetAddresses
+		)
+
+	@model_validator(mode="before")
+	@classmethod
+	def apply_preset(cls, data: ArgsKwargs) -> ArgsKwargs:
+		if data.args:
+			raise TypeError("apply_preset only supports kwargs.")
+		if not data.kwargs:  # pragma: no cover
+			return data
+
+		preset = data.kwargs.pop("__preset", None) or data.kwargs.pop("preset", None)
+		if preset:
+			normalized_names = {f.name: getattr(f.default, "alias", None) or f.name for f in cls.__dataclass_fields__.values()}
+			for k, v in PRESET_MAP[preset].items():
+				name = normalized_names.get(k, k)
+				data.kwargs[name] = v
+
+		return data
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class DeleteRoutingRequest:
+	routingRuleId: int = Field(..., alias="routing_rule_id")
+
+
+## Domain
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class AddDomainRequest:
+	domainName: str = Field(..., alias="domain_name")
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class ListDomainsRequest:
+	includeShared: bool = Field(alias="include_shared")
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG, validate_by_name=True))
+class UpdateDomainSettingsRequest:
+	name: str
+	allowAccountReset: bool | None = Field(default=None, alias="allow_account_reset")
+	symbolicSubaddressing: bool | None = Field(default=None, alias="symbolic_subaddressing")
+	recheckDns: bool = Field(default=False, alias="recheck_dns")
+
+	def updates(self, domain: ApiDomainInfo, *, ignore_recheck_dns: bool = False) -> bool:
+		if self.name != domain.name:
+			raise ValueError(f"UpdateDomainSettingsRequest.updates: name mismatch ({self.name!r} vs {domain.name!r})")
+		return (
+			(self.recheckDns and not ignore_recheck_dns)
+			or (self.allowAccountReset is not None and self.allowAccountReset != domain.allowAccountReset)
+			or (self.symbolicSubaddressing is not None and self.symbolicSubaddressing != domain.symbolicSubaddressing)
+		)
+
+	def update(self, domain: ApiDomainInfo) -> ApiDomainInfo:
+		if self.name != domain.name:
+			raise ValueError(f"UpdateDomainSettingsRequest.update: name mismatch ({self.name!r} vs {domain.name!r})")
+		return ApiDomainInfo(
+			name=domain.name,
+			allowAccountReset=(self.allowAccountReset if self.allowAccountReset is not None else domain.allowAccountReset),
+			symbolicSubaddressing=(self.symbolicSubaddressing if self.symbolicSubaddressing is not None else domain.symbolicSubaddressing),
+			isShared=domain.isShared,
+			dnsSummary=domain.dnsSummary,
+		)
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class DeleteDomainRequest:
+	name: str
+
+
+## User
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class DeleteUserRequest:
+	userName: str
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class GetUserRequest:
+	userName: str
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG))
+class CreateUserRequest:
+	userName: str = Field(alias="user_name")
+	domainName: str = Field(alias="domain_name")
+	password: str = Field(alias="password")
+	enablePasswordReset: bool = Field(alias="enable_password_reset")
+	recoveryEmail: str = Field(alias="recovery_email")
+	recoveryEmailDescription: str = Field(alias="recovery_email_description")
+	recoveryPhone: str = Field(alias="recovery_phone")
+	recoveryPhoneDescription: str = Field(alias="recovery_phone_description")
+	enableSearchIndexing: bool = Field(alias="enable_search_indexing")
+	sendWelcomeEmail: bool = Field(alias="send_welcome_email")
+
+	@property
+	def email(self) -> str:
+		return f"{self.userName}@{self.domainName}"
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG, validate_by_name=True, validate_by_alias=True))
+class ModifyUserRequest:
+	userName: str = Field(..., alias="user_name")
+	newUserName: str | None = Field(default=None, alias="new_user_name")
+	newPassword: str | None = Field(default=None, alias="new_password")
+	enableSearchIndexing: bool | None = Field(default=None, alias="enable_search_indexing")
+	enablePasswordReset: bool | None = Field(default=None, alias="enable_password_reset")
+	requireTwoFactorAuthentication: bool | None = Field(default=None, alias="require_two_factor_authentication")
+
+	def has_changes(self) -> bool:
+		"""True if any modifying field is set (other than userName)."""
+		return any(
+			getattr(self, f) is not None
+			for f in (
+				"newUserName",
+				"newPassword",
+				"enableSearchIndexing",
+				"enablePasswordReset",
+				"requireTwoFactorAuthentication",
+			)
+		)
+
+
+## User Password Reset
+@dataclass(config=ConfigDict(**DEFAULT_CFG, validate_by_name=True, validate_by_alias=True))
+class UpsertPasswordResetRequest:
+	type: UserPasswordResetMethodType
+	target: str
+	userName: str = Field(..., alias="user_name")
+	existingTarget: str | None = Field(default=None, alias="existing_target")
+	description: str = ""
+	allowMfaReset: bool = Field(default=True, alias="allow_mfa_reset")
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG, validate_by_name=True, validate_by_alias=True))
+class DeletePasswordResetRequest:
+	userName: str = Field(..., alias="user_name")
+	target: str | None = None
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG, validate_by_name=True, validate_by_alias=True))
+class ListPasswordResetRequest:
+	userName: str = Field(..., alias="user_name")
+
+
+## User App Password
+@dataclass(config=ConfigDict(**DEFAULT_CFG, validate_by_name=True, validate_by_alias=True))
+class CreateAppPasswordRequest:
+	userHandle: str = Field(..., alias="user_handle")
+	name: str = ""
+
+
+@dataclass(config=ConfigDict(**DEFAULT_CFG, validate_by_name=True, validate_by_alias=True))
+class DeleteAppPasswordRequest:
+	userName: str = Field(..., alias="user_name")
+	appPassword: str = Field(..., alias="app_password")

@@ -11,7 +11,7 @@ zizmor = "zizmor ."
 
 clean = """
 rm -fr .ruff_cache .ansible .pytest_cache
-find ansible_collections/bofzilla/purelymail \
+find ansible_collections/vic1707/purelymail \
 	-type d -name '__pycache__' -o -path '*/tests/output' \
 	| xargs rm -rf
 """
@@ -33,7 +33,7 @@ depends = ["ansible-lint:fix", "ty", "ruff:lint:fix"]
 
 [generate-integration-config]
 env = { _.file = ".env" }
-dir = "{{ config_root }}/ansible_collections/bofzilla/purelymail/tests/integration"
+dir = "{{ config_root }}/ansible_collections/vic1707/purelymail/tests/integration"
 run = '''
 rm -f integration_config.yml
 while read -r line; do
@@ -43,12 +43,12 @@ done < integration_config.yml.tpl
 
 [integration-tests]
 depends = ["clean", "generate-integration-config"]
-dir = "{{ config_root }}/ansible_collections/bofzilla/purelymail"
+dir = "{{ config_root }}/ansible_collections/vic1707/purelymail"
 run = "ansible-test integration --coverage --python-interpreter $(which python)"
 
 [unit-tests]
 depends = ["clean"]
-dir = "{{ config_root }}/ansible_collections/bofzilla/purelymail"
+dir = "{{ config_root }}/ansible_collections/vic1707/purelymail"
 run = "ansible-test units --coverage --python-interpreter $(which python)"
 
 [tests]
@@ -56,5 +56,5 @@ depends = ["unit-tests", "integration-tests"]
 
 [tests-coverage]
 depends = ["tests"]
-dir = "{{ config_root }}/ansible_collections/bofzilla/purelymail"
+dir = "{{ config_root }}/ansible_collections/vic1707/purelymail"
 run = "ansible-test coverage html"

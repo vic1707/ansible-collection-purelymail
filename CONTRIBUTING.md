@@ -78,7 +78,7 @@ They must cover:
 -   check mode behavior
 -   diff mode behavior
 
-Use the existing [examples](ansible_collections/bofzilla/purelymail/tests/unit) as reference.
+Use the existing [examples](ansible_collections/vic1707/purelymail/tests/unit) as reference.
 
 Run unit tests with
 ```sh
@@ -91,7 +91,7 @@ At least one per main module, and one calling all CRUD modules related to the sa
 
 _Integration tests require a valid `.env` file._
 
-Use the existing [examples](ansible_collections/bofzilla/purelymail/tests/integration) as reference.
+Use the existing [examples](ansible_collections/vic1707/purelymail/tests/integration) as reference.
 
 Run integration tests:
 
@@ -103,7 +103,8 @@ mise integration-tests
 
 ## Changelog
 
-Please add a `CHANGELOG.md` entry for any user-visible change.
+Please add an entry to [the collection changelog](ansible_collections/vic1707/purelymail/CHANGELOG.md)
+for any user-visible change and update the affected module's documentation and examples.
 
 ---
 
