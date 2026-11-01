@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-11-01
+
+- Initial Galaxy release for Purelymail account management.
 - Publish SemVer tags, including prereleases, to Galaxy after CI.
 - Run credentialed live API tests only by explicit workflow dispatch.
 - Use the `vic1707` collection namespace.
