@@ -2,7 +2,7 @@
 name = "ansible-collection-purelymail"
 version = "0.0.1"
 dependencies = [
-	"ansible==14.4.0",
+	"ansible==15.0.0",
 	"ansible-lint==26.9.0",
 	"coverage==7.16.2",
 	"pydantic==2.13.5",
